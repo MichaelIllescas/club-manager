@@ -96,11 +96,8 @@ public class JugadorController {
     }
     @GetMapping("/estados")
     public ResponseEntity<List<EstadoJugadorDTO>> obtenerTodosLosJugadores() {
-        List<EstadoJugadorDTO> jugadores = jugadorService.obtenerTodosLosJugadoresDTO();
-        if (jugadores.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(jugadores);
+        // Sin jugadores devuelve una lista vacía (200), no un 204 sin cuerpo
+        return ResponseEntity.ok(jugadorService.obtenerTodosLosJugadoresDTO());
     }
     @PutMapping("/deshabilitar/{id}")
     public ResponseEntity<String> deshabilitarJugador(@PathVariable Long id) {
