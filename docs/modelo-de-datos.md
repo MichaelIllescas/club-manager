@@ -5,9 +5,9 @@ Las tablas las genera Hibernate a partir de las entidades (`ddl-auto=update`).
 ## Diagrama
 
 ```
-Categoria 1 ──── * Jugador 1 ──── * Pago * ──── 1 Socio
+Category 1 ──── * Player 1 ──── * Payment * ──── 1 Member
                                     │
-                         Cuota 1 ───┤
+                           Fee 1 ───┤
                                     │
                           User 1 ───┘   (usuario que registró el pago)
 ```
@@ -16,71 +16,71 @@ Cada pago corresponde a un jugador o a un socio, siempre a una cuota y al usuari
 
 ## Entidades
 
-### Socio (`socios`)
+### Member: socio (`members`)
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | id | Long | Clave primaria |
-| nombre, apellido | String | Obligatorios |
+| firstName, lastName | String | Obligatorios |
 | dni | String | Único |
-| numeroSocio | String | Único, opcional |
-| direccion, telefono, email | String | Opcionales |
-| fechaRegistro | LocalDate | Se asigna al crear |
-| fechaBaja | LocalDate | |
-| estado | Enum | `ACTIVO` o `ANULADO` |
+| memberNumber | String | Número de socio. Único, opcional |
+| address, phone, email | String | Opcionales |
+| registrationDate | LocalDate | Se asigna al crear |
+| deactivationDate | LocalDate | |
+| status | MemberStatus | `ACTIVE` o `INACTIVE` |
 
-### Jugador (`jugadores`)
+### Player: jugador (`players`)
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | id | Long | Clave primaria |
-| nombre, apellido | String | Obligatorios |
+| firstName, lastName | String | Obligatorios |
 | dni | String | Único |
 | email | String | Único |
-| telefono | String | |
-| categoria | Categoria | Categoría a la que pertenece |
-| fechaRegistro | LocalDate | Se asigna al crear |
-| fechaBaja | LocalDate | |
-| estado | EstadoJugador | `ACTIVO` o `ANULADO`; empieza en `ACTIVO` |
+| phone | String | |
+| category | Category | Categoría en la que juega |
+| registrationDate | LocalDate | Se asigna al crear |
+| deactivationDate | LocalDate | |
+| status | PlayerStatus | `ACTIVE` o `INACTIVE`; empieza en `ACTIVE` |
 
-### Categoria
-
-| Campo | Tipo | Notas |
-|---|---|---|
-| id | Long | Clave primaria |
-| nombre | String | Único, hasta 100 caracteres |
-| descripcion | String | |
-
-### Cuota
+### Category: categoría
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | id | Long | Clave primaria |
-| tipo | String | Nombre de la cuota |
-| monto | Double | |
-| fechaRegistro, fechaUltimaActualizacion | LocalDateTime | |
+| name | String | Único, hasta 100 caracteres |
+| description | String | |
 
-### Pago (`pagos`)
+### Fee: cuota
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | id | Long | Clave primaria |
-| fechaPago | LocalDate | Fecha del pago |
-| fechaRegistro | LocalDate | Fecha de carga en el sistema |
-| monto | BigDecimal | |
-| descripcion | String | |
-| cuota | Cuota | Obligatoria |
-| jugador | Jugador | Si el pago es de un jugador |
-| socio | Socio | Si el pago es de un socio |
-| usuario | User | Quién registró el pago |
+| name | String | Nombre de la cuota |
+| amount | Double | |
+| registrationDate, lastUpdated | LocalDateTime | |
 
-### User
+### Payment: pago (`payments`)
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | Long | Clave primaria |
+| paymentDate | LocalDate | Fecha del pago |
+| registrationDate | LocalDate | Fecha de carga en el sistema |
+| amount | BigDecimal | |
+| description | String | |
+| fee | Fee | Obligatoria |
+| player | Player | Si el pago es de un jugador |
+| member | Member | Si el pago es de un socio |
+| user | User | Quién registró el pago |
+
+### User: usuario (`users`)
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | id | Long | Clave primaria |
 | firstName, lastName | String | |
-| dni, telefono, direccion | String | |
+| dni, phone, address | String | |
 | email | String | Se usa como nombre de usuario |
 | password | String | Hash con BCrypt |
 | enabled | boolean | Usuario habilitado |

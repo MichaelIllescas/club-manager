@@ -43,11 +43,11 @@ Los servicios lanzan excepciones propias del dominio y `GlobalExceptionHandler` 
 
 | Excepción | Código | Cuándo |
 |---|---|---|
-| `RecursoNoEncontradoException` | 404 | El socio, jugador, cuota o usuario pedido no existe |
-| `DatoDuplicadoException` | 409 | Ya existe un registro con ese DNI o número de socio |
-| `DatoInvalidoException` | 400 | Falta un dato obligatorio |
-| `CredencialesInvalidasException` | 401 | Email o contraseña incorrectos |
-| `UsuarioDeshabilitadoException` | 403 | El usuario está deshabilitado |
+| `ResourceNotFoundException` | 404 | El socio, jugador, cuota o usuario pedido no existe |
+| `DuplicateValueException` | 409 | Ya existe un registro con ese DNI o número de socio |
+| `InvalidValueException` | 400 | Falta un dato obligatorio |
+| `InvalidCredentialsException` | 401 | Email o contraseña incorrectos |
+| `DisabledUserException` | 403 | El usuario está deshabilitado |
 | Cualquier otra | 500 | Se registra en el log y al cliente se le da un mensaje genérico |
 
 ## Frontend
@@ -56,15 +56,17 @@ Organizado por módulo funcional dentro de `src/`:
 
 | Carpeta | Contenido |
 |---|---|
-| `Index` | Login, panel de inicio con gráfico y footer |
-| `Navbar` | Menú de navegación y definición de rutas |
-| `Socios`, `Jugadores`, `Categoria`, `Cuotas`, `Pagos`, `Recaudaciones`, `Usuarios` | Pantallas de cada módulo |
-| `Components` | Tabla genérica con búsqueda, orden, paginación y exportación a Excel, y comprobante de pago en PDF |
+| `Pages` | Login, panel de inicio, página 404 y footer |
+| `Navbar` | Menú de navegación y definición de rutas (`AppRoutes`) |
+| `Members`, `Players`, `Categories`, `Fees`, `Payments`, `Revenue`, `Users` | Pantallas de cada módulo |
+| `Components` | Tabla genérica (`TableGeneric`), estructura de las pantallas de alta (`FormPage`), franja de totales y comprobante de pago en PDF |
 | `Auth` | Contexto de sesión (usuario y rol) y aviso de sesión expirada |
 | `Config` | Cliente axios; la URL de la API sale de `VITE_API_URL` |
-| `Utils` | Formato de moneda argentino |
+| `Utils` | Formato de moneda y fechas, estilos de los gráficos |
 
-Como la cookie es HttpOnly, al cargar la aplicación se piden los datos del usuario a `/api/users/perfil` y el rol se usa para mostrar u ocultar menús. Si cualquier pedido recibe `401`, se muestra el aviso de sesión vencida y se vuelve al login.
+El código (componentes, variables, clases CSS y API) está en inglés; los textos que ve el usuario, en castellano.
+
+Como la cookie es HttpOnly, al cargar la aplicación se piden los datos del usuario a `/api/users/me` y el rol se usa para mostrar u ocultar menús. Si cualquier pedido recibe `401`, se muestra el aviso de sesión vencida y se vuelve al login.
 
 ## Despliegue
 
