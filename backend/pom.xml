@@ -21,6 +21,8 @@
 	<!-- Propiedades del proyecto -->
 	<properties>
 		<java.version>17</java.version>
+		<!-- Versiones compatibles con JDK 25 -->
+		<byte-buddy.version>1.17.8</byte-buddy.version>
 	</properties>
 
 	<!-- Dependencias -->
@@ -91,7 +93,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.34</version>
+			<version>1.18.42</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -106,6 +108,20 @@
 	<!-- Configuración del build -->
 	<build>
 		<plugins>
+			<!-- Lombok declarado como procesador de anotaciones: desde JDK 23 no se ejecuta solo -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.42</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
 			<!-- Plugin de Spring Boot -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
