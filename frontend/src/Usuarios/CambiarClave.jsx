@@ -2,7 +2,7 @@ import PaginaAlta, { NotaLateral } from "../Components/PaginaAlta";
 import { useState } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const UpdatePasswordForm = () => {
+const CambiarClave = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -141,4 +141,4 @@ const UpdatePasswordForm = () => {
   );
 };
 
-export default UpdatePasswordForm;
+export default CambiarClave;

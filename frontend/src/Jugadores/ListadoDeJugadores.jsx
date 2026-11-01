@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
-import TableGeneric from "/src/components/TableGeneric";
+import TableGeneric from "../Components/TableGeneric";
 
 const FiltrarJugadoresPorCategoria = () => {
   const [categorias, setCategorias] = useState([]); // Lista de categorías

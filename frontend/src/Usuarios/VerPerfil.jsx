@@ -69,7 +69,7 @@ const VerPerfil = () => {
                 ? "Podés gestionar cuotas, categorías, usuarios y ver las recaudaciones."
                 : "Podés registrar socios, jugadores y pagos, y consultar los listados."}
             </p>
-            <Link to="/actualziar-clave" className="btn btn-secondary">
+            <Link to="/perfil/clave" className="btn btn-secondary">
               <i className="fas fa-key me-2" aria-hidden="true"></i>Cambiar
               contraseña
             </Link>

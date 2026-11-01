@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import "../Usuarios/RegistrarUsuario.css";
 
-const RegistroUsuario = () => {
+const RegistrarUsuario = () => {
   const [recarga, setRecarga] = useState(0);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -252,4 +252,4 @@ const RegistroUsuario = () => {
   );
 };
 
-export default RegistroUsuario;
+export default RegistrarUsuario;

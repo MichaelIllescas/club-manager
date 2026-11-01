@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import CountUp from "react-countup";
 import Header from "../Navbar/Header";
-import Footer from "/src/index/Footer";
-import GraficoIndex from "/src/index/Grafico"; // Asegúrate de que la ruta sea correcta
+import Footer from "./Footer";
+import GraficoIndex from "./Grafico"; // Asegúrate de que la ruta sea correcta
 import { useSession } from "../Auth/useSession";
 import { Link } from "react-router-dom";
 import "./Inicio.css";
@@ -37,10 +37,10 @@ function App() {
   const duracion = sinAnimacion ? 0 : 1.2;
 
   const accesos = [
-    { to: "/registrarPago", icono: "fa-hand-holding-usd", texto: "Registrar pago" },
-    { to: "/RegistrarSocio", icono: "fa-user-plus", texto: "Registrar socio" },
-    { to: "/registrarJugador", icono: "fa-running", texto: "Registrar jugador" },
-    { to: "/ListadoPagosGeneral", icono: "fa-list", texto: "Ver pagos" },
+    { to: "/pagos/nuevo", icono: "fa-hand-holding-usd", texto: "Registrar pago" },
+    { to: "/socios/nuevo", icono: "fa-user-plus", texto: "Registrar socio" },
+    { to: "/jugadores/nuevo", icono: "fa-running", texto: "Registrar jugador" },
+    { to: "/pagos", icono: "fa-list", texto: "Ver pagos" },
   ];
 
   return (

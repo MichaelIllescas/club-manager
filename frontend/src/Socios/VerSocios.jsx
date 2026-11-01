@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Header from "../Navbar/Header";
-import TableGeneric from "/src/Components/TableGeneric";
+import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import ActualizarSocio from "./ActualizarSocio";
 import Footer from "../Index/Footer";

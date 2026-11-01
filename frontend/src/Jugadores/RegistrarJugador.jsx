@@ -1,8 +1,8 @@
 import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
 import { useState } from "react";
-import RegistroJugadorForm from "./RegistroForm";
+import FormularioJugador from "./FormularioJugador";
 
-function REgistroJugadores() {
+function RegistrarJugador() {
   const [recarga, setRecarga] = useState(0);
   return (
     <>
@@ -24,10 +24,10 @@ function REgistroJugadores() {
           />
         }
       >
-        <RegistroJugadorForm onRegistrado={() => setRecarga((n) => n + 1)} />
+        <FormularioJugador onRegistrado={() => setRecarga((n) => n + 1)} />
       </PaginaAlta>
     </>
   );
 }
 
-export default REgistroJugadores;
+export default RegistrarJugador;

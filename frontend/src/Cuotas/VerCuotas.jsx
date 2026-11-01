@@ -1,6 +1,6 @@
 import Footer from "../Index/Footer";
 import Header from "../Navbar/Header";
-import TableGeneric from "/src/Components/TableGeneric";
+import TableGeneric from "../Components/TableGeneric";
 import ResumenLista from "../Components/ResumenLista";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -80,7 +80,7 @@ const VerCuotas = () => {
               data={filas}
               accionPrincipal={
                 rol === "ADMIN" && (
-                  <Link to="/registrarCuota" className="btn btn-primary">
+                  <Link to="/cuotas/nueva" className="btn btn-primary">
                     <i className="fas fa-plus me-2" aria-hidden="true"></i>Nueva cuota
                   </Link>
                 )

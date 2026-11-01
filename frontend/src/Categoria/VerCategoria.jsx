@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Navbar/Header";
-import Footer from "../index/Footer";
-import TableGeneric from "/src/Components/TableGeneric";
+import Footer from "../Index/Footer";
+import TableGeneric from "../Components/TableGeneric";
 import ResumenLista from "../Components/ResumenLista";
 import apiClient from "../Config/axiosConfig";
 import { useSession } from "../Auth/useSession";
@@ -74,7 +74,7 @@ const VerCategoria = () => {
               data={filas}
               accionPrincipal={
                 rol === "ADMIN" && (
-                  <Link to="/RegistarCategoria" className="btn btn-primary">
+                  <Link to="/categorias/nueva" className="btn btn-primary">
                     <i className="fas fa-plus me-2" aria-hidden="true"></i>Nueva categoría
                   </Link>
                 )

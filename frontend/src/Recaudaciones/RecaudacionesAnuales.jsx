@@ -1,4 +1,4 @@
-import Footer from "../index/Footer";
+import Footer from "../Index/Footer";
 import { formatearMoneda } from "../Utils/formatearMoneda";
 import { COLOR_ANIO, COLOR_ANIO_RELLENO, COLOR_ANTERIOR, opcionesGrafico } from "../Utils/estiloGraficos";
 import Header from "../Navbar/Header";

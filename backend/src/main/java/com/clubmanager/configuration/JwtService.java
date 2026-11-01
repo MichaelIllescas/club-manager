@@ -71,12 +71,12 @@ public class JwtService {
     }
 
     public <T> T extractClaim (String jwt, Function <Claims, T> claimsTFunction){
-        final Claims claims = extactAllCalims(jwt);
+        final Claims claims = extractAllClaims(jwt);
         return claimsTFunction.apply(claims);
 
     }
 
-    public Claims extactAllCalims(String jwt){
+    public Claims extractAllClaims(String jwt){
         return Jwts
                .parserBuilder()
                .setSigningKey(getSignInKey() )

@@ -7,7 +7,7 @@ import "../Components/Alta.css";
 
 const FORMULARIO_VACIO = { type: "", amount: "" };
 
-const RegisterFeeForm = () => {
+const RegistrarCuota = () => {
   const [formData, setFormData] = useState(FORMULARIO_VACIO);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -185,4 +185,4 @@ const RegisterFeeForm = () => {
   );
 };
 
-export default RegisterFeeForm;
+export default RegistrarCuota;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
-import TableGeneric from "/src/components/TableGeneric";
+import TableGeneric from "../Components/TableGeneric";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
 import DescargarComprobante from "../Components/ComprobantePagoPDF";

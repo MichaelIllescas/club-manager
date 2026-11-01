@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
-import TableGeneric from "/src/Components/TableGeneric";
+import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";

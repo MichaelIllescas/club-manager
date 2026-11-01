@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Footer from "../Index/Footer";
 import Header from "../Navbar/Header";
-import TableGeneric from "/src/Components/TableGeneric";
+import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import DescargarComprobante from "../Components/ComprobantePagoPDF";
 

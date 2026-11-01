@@ -32,7 +32,7 @@ class JwtServiceTest {
         String token = jwtService.generateToken(usuario);
 
         assertThat(jwtService.extractUserName(token)).isEqualTo("admin@club.com");
-        assertThat(jwtService.extactAllCalims(token).get("role")).isEqualTo("ADMIN");
+        assertThat(jwtService.extractAllClaims(token).get("role")).isEqualTo("ADMIN");
     }
 
     @Test

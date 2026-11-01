@@ -51,7 +51,7 @@ const Login = () => {
         localStorage.removeItem("email");
       }
       if (response.status==200){
-        window.location.href = "/index";
+        window.location.href = "/inicio";
       }
     } catch (error) {
       if (error.response) {

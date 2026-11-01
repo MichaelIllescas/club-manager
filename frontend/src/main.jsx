@@ -6,7 +6,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./GeneralStyles.css";
 import "./theme.css";
 
-import Enrrutado from "./Navbar/Enrutmiento";
+import Rutas from "./Navbar/Rutas";
 import SesionExpirada from "./Auth/SesionExpirada";
 import { SessionProvider } from "./Auth/SessionContext";
   
@@ -15,7 +15,7 @@ createRoot(document.getElementById("root")).render(
       <BrowserRouter>
         <SessionProvider>
           <SesionExpirada />
-          <Enrrutado />
+          <Rutas />
         </SessionProvider>
       </BrowserRouter>
   </StrictMode>

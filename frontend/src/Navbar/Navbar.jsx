@@ -29,7 +29,7 @@ const NavBar = () => {
       {" "}
       <nav className="navbar navbar-expand-lg navbar-light fixed-top cm-nav">
         <div className="container">
-          <Link to={"/index"} className="navbar-brand cm-nav__marca">
+          <Link to={"/inicio"} className="navbar-brand cm-nav__marca">
             <img src={logo} width="40" height="40" alt="" />
             <span>Club Manager</span>
           </Link>
@@ -61,18 +61,18 @@ const NavBar = () => {
                 <ul className="dropdown-menu" aria-labelledby="sociosDropdown">
                
                   <li>
-                    <Link to="/RegistrarSocio" className="dropdown-item">
+                    <Link to="/socios/nuevo" className="dropdown-item">
                       <i className="fas fa-user-plus"></i> Registrar socio
                     </Link>
                   </li>
                   <li>
-                    <Link to="/VerSocios" className="dropdown-item">
+                    <Link to="/socios" className="dropdown-item">
                       <i className="fas fa-list"></i> Lista de socios
                     </Link>
                   </li>
                 
                   <li>
-                    <Link to={"/cambiarEstadoSocio"} className="dropdown-item" >
+                    <Link to={"/socios/estado"} className="dropdown-item" >
                       <i className="fas fa-exchange-alt"></i> Cambiar estado
                     </Link>
                   </li>
@@ -97,22 +97,22 @@ const NavBar = () => {
                 >
                   
                   <li>
-                    <Link to={"/registrarJugador"} className="dropdown-item">
+                    <Link to={"/jugadores/nuevo"} className="dropdown-item">
                       <i className="fas fa-user-plus"></i> Registrar jugador
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/verJugadores"} className="dropdown-item">
+                    <Link to={"/jugadores"} className="dropdown-item">
                       <i className="fas fa-list"></i> Lista general de jugadores
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/listadoDeJugadoresPorCategoria"} className="dropdown-item">
+                    <Link to={"/jugadores/por-categoria"} className="dropdown-item">
                       <i className="fas fa-list"></i> Lista de jugadores por categoría
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/cambioEstado"} className="dropdown-item">
+                    <Link to={"/jugadores/estado"} className="dropdown-item">
                       <i className="fas fa-exchange-alt"></i> Cambiar estado
                     </Link>
                   </li>
@@ -135,7 +135,7 @@ const NavBar = () => {
                 <ul className="dropdown-menu" aria-labelledby="cuotasDropdown">
                 {role === "ADMIN" && ( <li>
                     <Link
-                      to="/registrarCuota"
+                      to="/cuotas/nueva"
                       className="dropdown-item"
                       href="#"
                     >
@@ -144,7 +144,7 @@ const NavBar = () => {
                   </li>)}
                   {role === "ADMIN" && ( <li>
                     <Link
-                      to="/actualizarCuotas"
+                      to="/cuotas/montos"
                       className="dropdown-item"
                       href="#"
                     >
@@ -152,7 +152,7 @@ const NavBar = () => {
                     </Link>
                   </li>)}
                   <li>
-                    <Link to="/verCuotas" className="dropdown-item" href="#">
+                    <Link to="/cuotas" className="dropdown-item" href="#">
                       <i className="fas fa-list"></i> Consultar tipos de cuotas
                     </Link>
                   </li>
@@ -177,7 +177,7 @@ const NavBar = () => {
                 >
                   <li>
                     <Link
-                      to={"/RegistarCategoria"}
+                      to={"/categorias/nueva"}
                       className="dropdown-item"
                       href="#"
                     >
@@ -186,7 +186,7 @@ const NavBar = () => {
                   </li>
                   <li>
                     <Link
-                      to={"/VerCategoria"}
+                      to={"/categorias"}
                       className="dropdown-item"
                       href="#"
                     >
@@ -195,7 +195,7 @@ const NavBar = () => {
                   </li>
                   <li>
                     <Link
-                      to="/ActualizarCategoria"
+                      to="/categorias/editar"
                       className="dropdown-item"
                       href="#"
                     >
@@ -219,28 +219,28 @@ const NavBar = () => {
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="pagosDropdown">
                   <li>
-                    <Link to={"/registrarPago"} className="dropdown-item">
+                    <Link to={"/pagos/nuevo"} className="dropdown-item">
                       <i className="fas fa-plus-circle"></i> Registrar pago
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/ListadoPagosGeneral"} className="dropdown-item">
+                    <Link to={"/pagos"} className="dropdown-item">
                       <i className="fas fa-eye"></i> Ver historial general de pagos
                     </Link>
                   </li>
 
                   <li>
-                    <Link to={"/filtrarHistorial"} className="dropdown-item">
+                    <Link to={"/pagos/por-persona"} className="dropdown-item">
                       <i className="fas fa-user"></i> Pagos de un jugador o socio
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/historialDePagpPorCategoria"} className="dropdown-item">
+                    <Link to={"/pagos/por-categoria"} className="dropdown-item">
                       <i className="fas fa-th-list"></i> Pagos por categoría
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/verPagosPorPeriodo"} className="dropdown-item" >
+                    <Link to={"/pagos/por-fecha"} className="dropdown-item" >
                       <i className="fas fa-calendar-alt"></i> Pagos por fecha
                     </Link>
                   </li>
@@ -264,12 +264,12 @@ const NavBar = () => {
                   aria-labelledby="recaudacionesDropdown"
                 >
                   <li>
-                    <Link to={"/recaudacionesAnuales"} className="dropdown-item" >
+                    <Link to={"/recaudaciones/anuales"} className="dropdown-item" >
                       <i className="fas fa-eye"></i> Recaudaciones anuales
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/recaudacionTrimestral"} className="dropdown-item" >
+                    <Link to={"/recaudaciones/trimestrales"} className="dropdown-item" >
                       <i className="fas fa-chart-line"></i> Recaudaciones trimestrales
                     </Link>
                   </li>
@@ -294,18 +294,18 @@ const NavBar = () => {
                   aria-labelledby="usuariosDropdown"
                 >
                   <li>
-                    <Link to={"/registrarUsuario"} className="dropdown-item" >
+                    <Link to={"/usuarios/nuevo"} className="dropdown-item" >
                       <i className="fas fa-user-plus me-2"></i>Registrar usuario
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/verUsuarios"} className="dropdown-item" >
+                    <Link to={"/usuarios"} className="dropdown-item" >
                       <i className="fas fa-users me-2"></i>Ver usuarios
                     </Link>
                   </li>
                  
                   <li>
-                    <Link to={"/cambiar-estado-usuario"} className="dropdown-item" >
+                    <Link to={"/usuarios/estado"} className="dropdown-item" >
                       <i className="fas fa-user-times me-2"></i>Cambiar estado
                     </Link>
                   </li>
@@ -332,12 +332,12 @@ const NavBar = () => {
                   aria-labelledby="userDropdown"
                 >
                   <li>
-                    <Link to="/actualziar-perfil" className="dropdown-item">
+                    <Link to="/perfil" className="dropdown-item">
                       <i className="fas fa-user-edit me-2"></i>Actualizar perfil
                     </Link>
                   </li>
                   <li>
-                    <Link to="/actualziar-clave" className="dropdown-item">
+                    <Link to="/perfil/clave" className="dropdown-item">
                       <i className="fas fa-key me-2"></i>Cambiar contraseña
                     </Link>
                   </li>

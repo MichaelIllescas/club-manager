@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const RegistroJugadorForm = ({ onRegistrado }) => {
+const FormularioJugador = ({ onRegistrado }) => {
   const [jugador, setJugador] = useState({
     nombre: "",
     apellido: "",
@@ -183,8 +183,8 @@ const RegistroJugadorForm = ({ onRegistrado }) => {
   );
 };
 
-RegistroJugadorForm.propTypes = {
+FormularioJugador.propTypes = {
   onRegistrado: PropTypes.func,
 };
 
-export default RegistroJugadorForm;
+export default FormularioJugador;

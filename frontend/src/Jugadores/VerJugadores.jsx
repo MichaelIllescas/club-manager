@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
-import TableGeneric from "/src/Components/TableGeneric";
-import EditarJugador from "/src/Jugadores/EditarJugador";
+import TableGeneric from "../Components/TableGeneric";
+import EditarJugador from "./EditarJugador";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 
