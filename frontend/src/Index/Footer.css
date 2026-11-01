@@ -1,0 +1,36 @@
+/* Reserva el espacio del footer fijo para que no tape tablas ni contenido */
+#root {
+    --footer-space: 30px;
+    padding-bottom: var(--footer-space);
+}
+
+@media (max-width: 576px) {
+    #root {
+        --footer-space: 40px;
+    }
+}
+
+.sticky-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.author-link {
+    color: #4fc3f7;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.author-link:hover {
+    color: #81d4fa;
+    text-decoration: none;
+    text-shadow: 0 0 8px rgba(79, 195, 247, 0.6);
+}
+

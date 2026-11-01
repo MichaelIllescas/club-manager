@@ -1,0 +1,86 @@
+package com.clubmanager.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Entity
+@Table(name = "socios")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Socio {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "El nombre no puede estar vacío.")
+    @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres.")
+    @Column(nullable = false)
+    private String nombre;
+
+    @NotBlank(message = "El apellido no puede estar vacío.")
+    @Size(max = 50, message = "El apellido no puede tener más de 50 caracteres.")
+    @Column(nullable = false)
+    private String apellido;
+
+    @NotBlank(message = "El DNI no puede estar vacío.")
+    @Pattern(regexp = "\\d{7,8}", message = "El DNI debe tener entre 7 y 8 dígitos.")
+    @Column(nullable = false, unique = true)
+    private String dni;
+
+    @NotBlank(message = "La dirección no puede estar vacía.")
+    @Size(max = 255, message = "La dirección no puede tener más de 255 caracteres.")
+    @Column(nullable = false)
+    private String direccion;
+
+    @NotBlank(message = "El teléfono no puede estar vacío.")
+    @Column(nullable = false)
+    private String telefono;
+
+    @Email(message = "El email debe ser válido.")
+    @Column(nullable = true, unique = false)
+    private String email;
+
+    @Column(name = "numero_socio", nullable = true, unique = true)
+    private String numeroSocio;
+
+    @NotNull(message = "La fecha de registro no puede ser nula.")
+    @Column(name = "fecha_registro", nullable = false)
+    private LocalDate fechaRegistro;
+
+    @Column(name = "fecha_baja")
+    private LocalDate fechaBaja;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoSocio estado;
+
+    @OneToMany(mappedBy = "socio", cascade = CascadeType.ALL)
+    private List<Pago> pagos;
+
+    public enum EstadoSocio {
+        ACTIVO,
+        ANULADO
+    }
+
+    public void anular() {
+        this.estado = EstadoSocio.ANULADO;
+        this.fechaBaja = LocalDate.now();
+    }
+
+    public void habilitar() {
+        this.estado = EstadoSocio.ACTIVO;
+        this.fechaBaja = null;
+    }
+
+    public boolean esActivo() {
+        return this.estado == EstadoSocio.ACTIVO;
+    }
+}
