@@ -24,12 +24,10 @@ public class SocioService {
 
     // Crear un nuevo socio con validaciones de duplicados (DNI y número de socio)
     public SocioDTO crearSocio(SocioDTO socioDTO) {
-        // Validar DNI
-        String dni = socioDTO.getDni();
-        if (dni != null && !dni.isBlank()) {
-            if (socioRepository.existsByDni(dni)) {
-                throw new RuntimeException("Ya existe un socio con el DNI: " + dni);
-            }
+        // Validar DNI (obligatorio y único)
+        String dni = validarDniObligatorio(socioDTO.getDni());
+        if (socioRepository.existsByDni(dni)) {
+            throw new RuntimeException("Ya existe un socio con el DNI: " + dni);
         }
 
         // Validar número de socio
@@ -63,16 +61,12 @@ public class SocioService {
         Socio socioExistente = socioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Socio no encontrado con el ID: " + id));
 
-        // Validar nuevo DNI (si viene)
-        String nuevoDni = socioDTO.getDni();
-        if (nuevoDni != null && !nuevoDni.isBlank()) {
-            if (socioRepository.existsByDniAndIdNot(nuevoDni, id)) {
-                throw new RuntimeException("No se puede actualizar: ya existe otro socio con el DNI: " + nuevoDni);
-            }
-            socioExistente.setDni(nuevoDni);
-        } else {
-            socioExistente.setDni(null);
+        // Validar nuevo DNI (obligatorio y único)
+        String nuevoDni = validarDniObligatorio(socioDTO.getDni());
+        if (socioRepository.existsByDniAndIdNot(nuevoDni, id)) {
+            throw new RuntimeException("No se puede actualizar: ya existe otro socio con el DNI: " + nuevoDni);
         }
+        socioExistente.setDni(nuevoDni);
 
         // Validar nuevo número de socio (si viene)
         String nuevoNumeroSocio = socioDTO.getNumeroSocio();
@@ -114,6 +108,14 @@ public class SocioService {
                 .orElseThrow(() -> new RuntimeException("Socio no encontrado con el ID: " + id));
         socio.habilitar();
         socioRepository.save(socio);
+    }
+
+    // El DNI es obligatorio: sin esta validación la base rechaza el registro con un error 500
+    private String validarDniObligatorio(String dni) {
+        if (dni == null || dni.isBlank()) {
+            throw new RuntimeException("El DNI del socio es obligatorio.");
+        }
+        return dni.trim();
     }
 
     // Convertir Socio a SocioDTO

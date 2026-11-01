@@ -96,6 +96,22 @@ class SocioServiceTest {
     }
 
     @Test
+    void crearSocio_exigeDni() {
+        assertThatThrownBy(() -> socioService.crearSocio(nuevoSocio("  ", null)))
+                .hasMessageContaining("obligatorio");
+        verify(socioRepository, never()).save(any());
+    }
+
+    @Test
+    void actualizarSocio_exigeDni() {
+        when(socioRepository.findById(1L)).thenReturn(Optional.of(new Socio()));
+
+        assertThatThrownBy(() -> socioService.actualizarSocio(1L, nuevoSocio(null, null)))
+                .hasMessageContaining("obligatorio");
+        verify(socioRepository, never()).save(any());
+    }
+
+    @Test
     void actualizarSocio_fallaSiNoExiste() {
         when(socioRepository.findById(9L)).thenReturn(Optional.empty());
 
