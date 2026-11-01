@@ -1,5 +1,7 @@
 package com.clubmanager.service;
 
+import com.clubmanager.exception.RecursoNoEncontradoException;
+
 import com.clubmanager.entity.Cuota;
 import com.clubmanager.repository.CuotaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ public class CuotaService {
         if (cuotaRepository.existsById(id)) {
             cuotaRepository.deleteById(id);
         } else {
-            throw new IllegalArgumentException("La cuota con el ID " + id + " no existe.");
+            throw new RecursoNoEncontradoException("La cuota con el ID " + id + " no existe.");
         }
     }
 

@@ -1,5 +1,9 @@
 package com.clubmanager.service;
 
+import com.clubmanager.exception.RecursoNoEncontradoException;
+
+import com.clubmanager.exception.DatoInvalidoException;
+
 import com.clubmanager.dto.*;
 import com.clubmanager.entity.*;
 import com.clubmanager.repository.CuotaRepository;
@@ -38,25 +42,25 @@ public class PagoService {
     public PagoFullDataDTO guardarPago(Pago pago) {
         // Verificar que la cuota no sea nula
         if (pago.getCuota() == null || pago.getCuota().getId() == null) {
-            throw new IllegalArgumentException("La cuota no puede ser nula y debe contener un ID válido.");
+            throw new DatoInvalidoException("El pago tiene que indicar una cuota.");
         }
 
         // Validar la existencia de la cuota en la base de datos
         Cuota cuota = cuotaRepository.findById(pago.getCuota().getId())
-                .orElseThrow(() -> new IllegalArgumentException("La cuota especificada no existe."));
+                .orElseThrow(() -> new RecursoNoEncontradoException("La cuota especificada no existe."));
         pago.setCuota(cuota);
 
         // Validar la existencia del jugador si está presente
         if (pago.getJugador() != null && pago.getJugador().getId() != null) {
             Jugador jugador = jugadorRepository.findById(pago.getJugador().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("El jugador especificado no existe."));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("El jugador especificado no existe."));
             pago.setJugador(jugador);
         }
 
         // Validar la existencia del socio si está presente
         if (pago.getSocio() != null && pago.getSocio().getId() != null) {
             Socio socio = socioRepository.findById(pago.getSocio().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("El socio especificado no existe."));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("El socio especificado no existe."));
             pago.setSocio(socio);
         }
 

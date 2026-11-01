@@ -1,10 +1,11 @@
 package com.clubmanager.service;
 
+import com.clubmanager.exception.RecursoNoEncontradoException;
+
 import com.clubmanager.dto.EstadoJugadorDTO;
 import com.clubmanager.dto.JugadorDTO;
 import com.clubmanager.entity.EstadoJugador;
 import com.clubmanager.entity.Jugador;
-import com.clubmanager.exception.JugadorNotFoundException;
 import com.clubmanager.repository.JugadorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class JugadorService {
 
     public Jugador actualizarJugador(Long id, Jugador jugadorActualizado) {
         if (!jugadorRepository.existsById(id)) {
-            throw new JugadorNotFoundException("El jugador con ID " + id + " no existe.");
+            throw new RecursoNoEncontradoException("El jugador con ID " + id + " no existe.");
         }
         jugadorActualizado.setId(id);
         return jugadorRepository.save(jugadorActualizado);
@@ -71,7 +72,7 @@ public class JugadorService {
             jugador.setFechaBaja(LocalDate.now());
             jugadorRepository.save(jugador);
         }, () -> {
-            throw new JugadorNotFoundException("El jugador con ID " + id + " no existe.");
+            throw new RecursoNoEncontradoException("El jugador con ID " + id + " no existe.");
         });
     }
 
@@ -114,13 +115,13 @@ public class JugadorService {
     @Transactional
     public void deshabilitarJugador(Long id) {
         Jugador jugador = jugadorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Jugador no encontrado"));
         jugador.anular();
         jugadorRepository.save(jugador);
     }
     public void habilitarJugador(Long id) {
         Jugador jugador = jugadorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Jugador no encontrado"));
         jugador.habilitar();
         jugadorRepository.save(jugador);
     }

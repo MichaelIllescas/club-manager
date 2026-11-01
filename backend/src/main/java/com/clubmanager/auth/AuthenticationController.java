@@ -2,8 +2,6 @@ package com.clubmanager.auth;
 
 import com.clubmanager.dto.UserDTO;
 import com.clubmanager.entity.Role;
-import com.clubmanager.exception.DisabledUserException;
-import com.clubmanager.exception.InvalidCredentialsException;
 import com.clubmanager.service.CookieService;
 import com.clubmanager.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,30 +36,20 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request,
             HttpServletResponse response
     ) {
-        try {
-            // Llamar al servicio para manejar el login y obtener la respuesta de autenticación
-            AuthenticationResponse authResponse = authenticationService.login(request);
+        // Llamar al servicio para manejar el login y obtener la respuesta de autenticación
+        AuthenticationResponse authResponse = authenticationService.login(request);
 
-            // Usar el servicio para crear la cookie
-            ResponseCookie cookie = cookieService.createAuthCookie(authResponse.getJwt());
+        // Usar el servicio para crear la cookie
+        ResponseCookie cookie = cookieService.createAuthCookie(authResponse.getJwt());
 
-            // Agregar la cookie a la respuesta HTTP
-            response.addHeader("Set-Cookie", cookie.toString());
+        // Agregar la cookie a la respuesta HTTP
+        response.addHeader("Set-Cookie", cookie.toString());
 
-            UserDTO userDto = userService.toDTO(authenticationService.getUserByEmail(request.getEmail()).get());
+        UserDTO userDto = userService.toDTO(authenticationService.getUserByEmail(request.getEmail()).get());
 
-            // Devolver el UserDTO en la respuesta
-            return ResponseEntity.ok(userDto);
-        } catch (InvalidCredentialsException e) {
-            // Manejar credenciales inválidas
-            return ResponseEntity.status(401).body(e.getMessage());
-        } catch (DisabledUserException e) {
-            // Manejar usuario deshabilitado con código 403
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }catch (Exception e) {
-            // Manejar errores inesperados
-            return ResponseEntity.status(500).body("Error al conectarse al servidor. Intente más tarde.");
-        }
+        // Devolver el UserDTO en la respuesta
+        return ResponseEntity.ok(userDto);
+
     }
 
     @PostMapping("/logout")

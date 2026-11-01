@@ -25,13 +25,9 @@ public class PagoController {
 
     @PostMapping
     public ResponseEntity<?> registrarPago(@RequestBody Pago pago) {
-        try {
-            PagoFullDataDTO nuevoPago = pagoService.guardarPago(pago);
-            return ResponseEntity.ok(nuevoPago);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage()); // Devuelve un 400 si algo falla
-        }
+        PagoFullDataDTO nuevoPago = pagoService.guardarPago(pago);
+        return ResponseEntity.ok(nuevoPago);
+
     }
 
     @GetMapping("/estado-pagos") // Endpoint específico

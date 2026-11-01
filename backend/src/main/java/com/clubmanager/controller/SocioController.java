@@ -45,33 +45,24 @@ public class SocioController {
     // Actualizar un socio
     @PutMapping("/{id}")
     public ResponseEntity<SocioDTO> actualizarSocio(@PathVariable Long id, @RequestBody SocioDTO socioDTO) {
-        try {
-            SocioDTO socioActualizado = socioService.actualizarSocio(id, socioDTO);
-            return ResponseEntity.ok(socioActualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        SocioDTO socioActualizado = socioService.actualizarSocio(id, socioDTO);
+        return ResponseEntity.ok(socioActualizado);
+
     }
 
     // Anular un socio
     @PutMapping("/{id}/anular")
     public ResponseEntity<Void> anularSocio(@PathVariable Long id) {
-        try {
-            socioService.anularSocio(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        socioService.anularSocio(id);
+        return ResponseEntity.noContent().build();
+
     }
 
     // Habilitar un socio
     @PutMapping("/{id}/habilitar")
     public ResponseEntity<Void> habilitarSocio(@PathVariable Long id) {
-        try {
-            socioService.habilitarSocio(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        socioService.habilitarSocio(id);
+        return ResponseEntity.noContent().build();
+
     }
 }

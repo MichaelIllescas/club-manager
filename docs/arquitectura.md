@@ -39,7 +39,16 @@ La clave de firma se toma de la variable `JWT_SECRET`. El dominio de la cookie y
 
 ### Errores
 
-`GlobalExceptionHandler` convierte las excepciones en respuestas HTTP: credenciales inválidas, usuario deshabilitado, jugador inexistente y errores de validación.
+Los servicios lanzan excepciones propias del dominio y `GlobalExceptionHandler` las convierte en respuestas HTTP. Los controladores no tienen `try/catch`. Todas las respuestas de error tienen la forma `{"error": "mensaje"}`.
+
+| Excepción | Código | Cuándo |
+|---|---|---|
+| `RecursoNoEncontradoException` | 404 | El socio, jugador, cuota o usuario pedido no existe |
+| `DatoDuplicadoException` | 409 | Ya existe un registro con ese DNI o número de socio |
+| `DatoInvalidoException` | 400 | Falta un dato obligatorio |
+| `CredencialesInvalidasException` | 401 | Email o contraseña incorrectos |
+| `UsuarioDeshabilitadoException` | 403 | El usuario está deshabilitado |
+| Cualquier otra | 500 | Se registra en el log y al cliente se le da un mensaje genérico |
 
 ## Frontend
 

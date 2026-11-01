@@ -1,5 +1,7 @@
 package com.clubmanager.service;
 
+import com.clubmanager.exception.DatoInvalidoException;
+
 import com.clubmanager.dto.JugadorPagoDTO;
 import com.clubmanager.dto.RecaudacionMensualDTO;
 import com.clubmanager.dto.RecaudacionTrimestralDTO;
@@ -95,7 +97,7 @@ class PagoServiceTest {
     @Test
     void guardarPago_exigeUnaCuota() {
         assertThatThrownBy(() -> pagoService.guardarPago(new Pago()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DatoInvalidoException.class);
     }
 
     @Test

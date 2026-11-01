@@ -1,5 +1,7 @@
 package com.clubmanager.service;
 
+import com.clubmanager.exception.RecursoNoEncontradoException;
+
 import com.clubmanager.dto.EstadoUsuarioDTO;
 import com.clubmanager.dto.UserDTO;
 import com.clubmanager.entity.Role;
@@ -42,14 +44,14 @@ public class UserService {
     // Obtener un usuario por ID
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         return toDTO(user);
     }
 
     // Actualizar un usuario
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
 
         user.setFirstName(userDTO.getNombre());
         user.setLastName(userDTO.getApellido());
@@ -67,7 +69,7 @@ public class UserService {
     // Eliminar un usuario (cambio de estado en lugar de eliminación física)
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         user.setEnabled(false); // Deshabilitar el usuario
         userRepository.save(user);
     }
@@ -152,7 +154,7 @@ public class UserService {
     // Restablecer la contraseña
     public void resetearClave(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
 
         // Obtener el DNI del usuario
         String dni = user.getDni();
@@ -190,6 +192,6 @@ public class UserService {
     public User obtenerUsuarioActual() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
     }
 }

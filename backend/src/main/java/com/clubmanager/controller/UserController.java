@@ -59,23 +59,17 @@ public class UserController {
         // Anular un usuario
         @PutMapping("/{id}/anular")
         public ResponseEntity<Void> anularUsuario(@PathVariable Long id) {
-            try {
-                userService.anularUsuario(id);
-                return ResponseEntity.noContent().build();
-            } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
+            userService.anularUsuario(id);
+            return ResponseEntity.noContent().build();
+
         }
 
         // Habilitar un usuario
         @PutMapping("/{id}/habilitar")
         public ResponseEntity<Void> habilitarUsuario(@PathVariable Long id) {
-            try {
-                userService.habilitarUsuario(id);
-                return ResponseEntity.noContent().build();
-            } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
+            userService.habilitarUsuario(id);
+            return ResponseEntity.noContent().build();
+
         }
 
         // Obtener todos los usuarios
@@ -114,12 +108,9 @@ public class UserController {
         // Endpoint para resetear la contraseña
         @PostMapping("/resetearClave/{id}")
         public ResponseEntity<String> resetearClave(@PathVariable Long id) {
-            try {
-                userService.resetearClave(id);
-                return ResponseEntity.ok("Contraseña reseteada exitosamente.");
-            } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
-            }
+            userService.resetearClave(id);
+            return ResponseEntity.ok("Contraseña reseteada exitosamente.");
+
         }
 
 

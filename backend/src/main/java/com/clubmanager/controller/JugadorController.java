@@ -1,5 +1,8 @@
 package com.clubmanager.controller;
 
+import com.clubmanager.exception.RecursoNoEncontradoException;
+
+
 
 import com.clubmanager.dto.EstadoJugadorDTO;
 import com.clubmanager.dto.JugadorDTO;
@@ -61,38 +64,33 @@ public class JugadorController {
     // Actualizar un jugador
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarJugador(@PathVariable Long id, @RequestBody JugadorDTO jugadorDTO) {
-        try {
-            // Buscar la categoría por nombre
-            Categoria categoria = (Categoria) categoriaRepository.findByNombre(jugadorDTO.getCategoria())
-                    .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+        // Buscar la categoría por nombre
+        Categoria categoria = (Categoria) categoriaRepository.findByNombre(jugadorDTO.getCategoria())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Categoría no encontrada"));
 
-            // Convertir DTO a entidad Jugador
-            Jugador jugador = jugadorService.obtenerJugadorPorId(id).orElse(null); // Obtener el jugador existente
-            jugador.setNombre(jugadorDTO.getNombre());
-            jugador.setApellido(jugadorDTO.getApellido());
-            jugador.setDni(jugadorDTO.getDni());
-            jugador.setTelefono(jugadorDTO.getTelefono());
-            jugador.setEmail(jugadorDTO.getEmail());
-            jugador.setCategoria(categoria); // Asignar el objeto de categoría
+        // Convertir DTO a entidad Jugador
+        Jugador jugador = jugadorService.obtenerJugadorPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("El jugador con ID " + id + " no existe.")); // Obtener el jugador existente
+        jugador.setNombre(jugadorDTO.getNombre());
+        jugador.setApellido(jugadorDTO.getApellido());
+        jugador.setDni(jugadorDTO.getDni());
+        jugador.setTelefono(jugadorDTO.getTelefono());
+        jugador.setEmail(jugadorDTO.getEmail());
+        jugador.setCategoria(categoria); // Asignar el objeto de categoría
 
-            // Guardar los cambios
-            jugadorService.crearJugador(jugador);
+        // Guardar los cambios
+        jugadorService.crearJugador(jugador);
 
-            return ResponseEntity.ok(jugador);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(jugador);
+
     }
 
     // Anular un jugador (cambiar el estado a inactivo)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> anularJugador(@PathVariable Long id) {
-        try {
-            jugadorService.anularJugador(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        jugadorService.anularJugador(id);
+        return ResponseEntity.noContent().build();
+
     }
     @GetMapping("/estados")
     public ResponseEntity<List<EstadoJugadorDTO>> obtenerTodosLosJugadores() {
@@ -101,21 +99,15 @@ public class JugadorController {
     }
     @PutMapping("/deshabilitar/{id}")
     public ResponseEntity<String> deshabilitarJugador(@PathVariable Long id) {
-        try {
-            jugadorService.deshabilitarJugador(id);
-            return ResponseEntity.ok("Jugador deshabilitado con éxito");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Error: " + e.getMessage());
-        }
+        jugadorService.deshabilitarJugador(id);
+        return ResponseEntity.ok("Jugador deshabilitado con éxito");
+
     }
     @PutMapping("/habilitar/{id}")
     public ResponseEntity<String> habilitarJugador(@PathVariable Long id) {
-        try {
-            jugadorService.habilitarJugador(id);
-            return ResponseEntity.ok("Jugador deshabilitado con éxito");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Error: " + e.getMessage());
-        }
+        jugadorService.habilitarJugador(id);
+        return ResponseEntity.ok("Jugador habilitado con éxito");
+
     }
 
 }

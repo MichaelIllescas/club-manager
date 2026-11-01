@@ -2,7 +2,7 @@ package com.clubmanager.service;
 
 import com.clubmanager.entity.EstadoJugador;
 import com.clubmanager.entity.Jugador;
-import com.clubmanager.exception.JugadorNotFoundException;
+import com.clubmanager.exception.RecursoNoEncontradoException;
 import com.clubmanager.repository.JugadorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class JugadorServiceTest {
         when(jugadorRepository.existsById(3L)).thenReturn(false);
 
         assertThatThrownBy(() -> jugadorService.actualizarJugador(3L, new Jugador()))
-                .isInstanceOf(JugadorNotFoundException.class);
+                .isInstanceOf(RecursoNoEncontradoException.class);
         verify(jugadorRepository, never()).save(any());
     }
 

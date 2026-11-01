@@ -1,10 +1,12 @@
 package com.clubmanager.auth;
 
+import com.clubmanager.exception.UsuarioDeshabilitadoException;
+
+import com.clubmanager.exception.CredencialesInvalidasException;
+
 import com.clubmanager.configuration.JwtService;
 import com.clubmanager.entity.Role;
 import com.clubmanager.entity.User;
-import com.clubmanager.exception.DisabledUserException;
-import com.clubmanager.exception.InvalidCredentialsException;
 import com.clubmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,11 +49,11 @@ public class AuthenticationService {
     public AuthenticationResponse login(AuthenticationRequest request) {
         // Buscar al usuario en la base de datos
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Usuario no encontrado."));
+                .orElseThrow(() -> new CredencialesInvalidasException("Usuario no encontrado."));
 
         // Verificar si el usuario está deshabilitado
         if (!user.isEnabled()) {
-            throw new DisabledUserException("El usuario está deshabilitado.");
+            throw new UsuarioDeshabilitadoException("El usuario está deshabilitado.");
         }
 
         try {
@@ -63,7 +65,7 @@ public class AuthenticationService {
                     )
             );
         } catch (Exception e) {
-            throw new InvalidCredentialsException("Usuario o contraseña incorrectos.");
+            throw new CredencialesInvalidasException("Usuario o contraseña incorrectos.");
         }
 
         // Generar el token JWT

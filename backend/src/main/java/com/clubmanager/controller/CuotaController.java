@@ -39,12 +39,9 @@ public class CuotaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCuota(@PathVariable Long id) {
-        try {
-            cuotaService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        cuotaService.deleteById(id);
+        return ResponseEntity.noContent().build();
+
     }
 
     @GetMapping
