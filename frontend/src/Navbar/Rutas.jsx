@@ -27,6 +27,7 @@ import RegistrarUsuario from "../Usuarios/RegistrarUsuario";
 import CambiarEstadoUsuario from "../Usuarios/CambiarEstadoUsuario";
 import VerPerfil from "../Usuarios/VerPerfil";
 import CambiarClave from "../Usuarios/CambiarClave";
+import NoEncontrada from "../Index/NoEncontrada";
 
 // Rutas disponibles para cualquier usuario logueado
 const RUTAS = [
@@ -63,7 +64,7 @@ const RUTAS_ADMIN = [
 ];
 
 const Rutas = () => {
-  const { rol } = useSession();
+  const { rol, cargando } = useSession();
   const rutas = rol === "ADMIN" ? [...RUTAS, ...RUTAS_ADMIN] : RUTAS;
 
   return (
@@ -72,6 +73,8 @@ const Rutas = () => {
       {rutas.map(({ path, element }) => (
         <Route key={path} path={path} element={element} />
       ))}
+      {/* Mientras carga la sesión todavía no se sabe qué rutas tiene el usuario */}
+      <Route path="*" element={cargando ? null : <NoEncontrada />} />
     </Routes>
   );
 };

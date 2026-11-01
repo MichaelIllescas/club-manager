@@ -28,15 +28,20 @@ const FiltrarPagosPorCategoria = () => {
   // Filtrar pagos por categoría, mes y año seleccionados
   // Actualizar el listado cuando cambian los filtros
   useEffect(() => {
+    // El backend necesita los tres filtros para calcular quién pagó y quién debe
+    if (!categoriaSeleccionada || !mesSeleccionado || !añoSeleccionado) {
+      setPagosFiltrados([]);
+      return;
+    }
+
     const fetchPagosFiltrados = async () => {
       setLoading(true);
       try {
-        // axios arma la URL y omite los filtros vacíos
         const response = await apiClient.get("/api/pagos/estado-pagos", {
           params: {
-            categoriaId: categoriaSeleccionada || undefined,
-            mes: mesSeleccionado || undefined,
-            año: añoSeleccionado || undefined,
+            categoriaId: categoriaSeleccionada,
+            mes: mesSeleccionado,
+            año: añoSeleccionado,
           },
         });
         setPagosFiltrados(response.data);
@@ -117,7 +122,11 @@ const FiltrarPagosPorCategoria = () => {
             ) : (
               <TableGeneric
                 columnas={["nombre", "apellido", "dni", "estado"]}
-                mensajeVacio="No hay pagos para los filtros elegidos."
+                mensajeVacio={
+                  categoriaSeleccionada && mesSeleccionado && añoSeleccionado
+                    ? "No hay jugadores activos en esa categoría."
+                    : "Elegí una categoría, un mes y un año para ver quién pagó y quién debe."
+                }
                 titulo="Pagos encontrados"
                 data={pagosFiltrados}
                 actions={[]}
