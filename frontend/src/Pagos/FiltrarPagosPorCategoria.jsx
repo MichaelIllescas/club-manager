@@ -26,30 +26,27 @@ const FiltrarPagosPorCategoria = () => {
   }, []);
 
   // Filtrar pagos por categoría, mes y año seleccionados
-  const fetchPagosFiltrados = async () => {
-    setLoading(true); // Mostrar indicador de carga
-    try {
-      // Construir URL manualmente
-      let url = "/api/pagos/estado-pagos?";
-      if (categoriaSeleccionada)
-        url += `categoriaId=${categoriaSeleccionada}&&`;
-      if (mesSeleccionado) url += `mes=${mesSeleccionado}&&`;
-      if (añoSeleccionado) url += `año=${añoSeleccionado}`;
-
-      url = url.endsWith("&&") ? url.slice(0, -2) : url;
-
-      const response = await apiClient.get(url);
-
-      setPagosFiltrados(response.data);
-    } catch (error) {
-      console.error("Error al filtrar pagos:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Actualizar filtrado cuando cambien los filtros
+  // Actualizar el listado cuando cambian los filtros
   useEffect(() => {
+    const fetchPagosFiltrados = async () => {
+      setLoading(true);
+      try {
+        // axios arma la URL y omite los filtros vacíos
+        const response = await apiClient.get("/api/pagos/estado-pagos", {
+          params: {
+            categoriaId: categoriaSeleccionada || undefined,
+            mes: mesSeleccionado || undefined,
+            año: añoSeleccionado || undefined,
+          },
+        });
+        setPagosFiltrados(response.data);
+      } catch (error) {
+        console.error("Error al filtrar pagos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPagosFiltrados();
   }, [categoriaSeleccionada, mesSeleccionado, añoSeleccionado]);
 

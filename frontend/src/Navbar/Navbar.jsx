@@ -1,35 +1,102 @@
 import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { useSession } from "../Auth/useSession";
 import apiClient from "../Config/axiosConfig";
 import logo from "../assets/img/logo.svg";
 
- 
-const handleLogout = async () => {
+// Secciones del menú. "soloAdmin" oculta la sección o el item a los usuarios comunes;
+// el backend también rechaza esas operaciones.
+const SECCIONES = [
+  {
+    nombre: "Socios",
+    icono: "fa-id-card",
+    items: [
+      { to: "/socios/nuevo", icono: "fa-user-plus", texto: "Registrar socio" },
+      { to: "/socios", icono: "fa-list", texto: "Lista de socios" },
+      { to: "/socios/estado", icono: "fa-exchange-alt", texto: "Cambiar estado" },
+    ],
+  },
+  {
+    nombre: "Jugadores",
+    icono: "fa-users",
+    items: [
+      { to: "/jugadores/nuevo", icono: "fa-user-plus", texto: "Registrar jugador" },
+      { to: "/jugadores", icono: "fa-list", texto: "Lista de jugadores" },
+      { to: "/jugadores/por-categoria", icono: "fa-th-list", texto: "Jugadores por categoría" },
+      { to: "/jugadores/estado", icono: "fa-exchange-alt", texto: "Cambiar estado" },
+    ],
+  },
+  {
+    nombre: "Cuotas",
+    icono: "fa-file-invoice-dollar",
+    items: [
+      { to: "/cuotas/nueva", icono: "fa-plus-circle", texto: "Registrar cuota", soloAdmin: true },
+      { to: "/cuotas/montos", icono: "fa-edit", texto: "Actualizar montos", soloAdmin: true },
+      { to: "/cuotas", icono: "fa-list", texto: "Lista de cuotas" },
+    ],
+  },
+  {
+    nombre: "Categorías",
+    icono: "fa-tags",
+    soloAdmin: true,
+    items: [
+      { to: "/categorias/nueva", icono: "fa-plus-circle", texto: "Registrar categoría" },
+      { to: "/categorias", icono: "fa-list", texto: "Lista de categorías" },
+      { to: "/categorias/editar", icono: "fa-edit", texto: "Actualizar categoría" },
+    ],
+  },
+  {
+    nombre: "Pagos",
+    icono: "fa-money-bill-wave",
+    items: [
+      { to: "/pagos/nuevo", icono: "fa-plus-circle", texto: "Registrar pago" },
+      { to: "/pagos", icono: "fa-list", texto: "Todos los pagos" },
+      { to: "/pagos/por-persona", icono: "fa-user", texto: "Pagos de un jugador o socio" },
+      { to: "/pagos/por-categoria", icono: "fa-th-list", texto: "Pagos por categoría" },
+      { to: "/pagos/por-fecha", icono: "fa-calendar-alt", texto: "Pagos por fecha" },
+    ],
+  },
+  {
+    nombre: "Recaudaciones",
+    icono: "fa-wallet",
+    soloAdmin: true,
+    items: [
+      { to: "/recaudaciones/anuales", icono: "fa-chart-bar", texto: "Recaudación anual" },
+      { to: "/recaudaciones/trimestrales", icono: "fa-chart-line", texto: "Recaudación trimestral" },
+    ],
+  },
+  {
+    nombre: "Usuarios",
+    icono: "fa-users-cog",
+    soloAdmin: true,
+    items: [
+      { to: "/usuarios/nuevo", icono: "fa-user-plus", texto: "Registrar usuario" },
+      { to: "/usuarios", icono: "fa-users", texto: "Lista de usuarios" },
+      { to: "/usuarios/estado", icono: "fa-user-times", texto: "Cambiar estado" },
+    ],
+  },
+];
+
+const cerrarSesion = async () => {
   try {
-    // 1. Informar al servidor sobre el cierre de sesión
+    // El backend borra la cookie de sesión (es HttpOnly)
     await apiClient.post("/auth/logout");
-
-    // 2. El backend borra la cookie de sesión (es HttpOnly)
-
-    // 3. Redirigir al usuario a la página de inicio de sesión
     window.location.href = "/";
   } catch (error) {
     console.error("Error al cerrar sesión:", error);
-    alert("Ocurrió un error al intentar cerrar la sesión. Inténtalo nuevamente.");
+    alert("No se pudo cerrar la sesión. Intentá nuevamente.");
   }
 };
 
+const Navbar = () => {
+  const { rol, usuario } = useSession();
+  const esAdmin = rol === "ADMIN";
+  const visible = (elemento) => esAdmin || !elemento.soloAdmin;
 
-const NavBar = () => {
-  const { rol: role, usuario } = useSession();
   return (
     <>
-      {" "}
       <nav className="navbar navbar-expand-lg navbar-light fixed-top cm-nav">
         <div className="container">
-          <Link to={"/inicio"} className="navbar-brand cm-nav__marca">
+          <Link to="/inicio" className="navbar-brand cm-nav__marca">
             <img src={logo} width="40" height="40" alt="" />
             <span>Club Manager</span>
           </Link>
@@ -37,319 +104,74 @@ const NavBar = () => {
             className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown"
+            data-bs-target="#menuPrincipal"
+            aria-controls="menuPrincipal"
             aria-expanded="false"
             aria-label="Abrir menú"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarNavDropdown">
+
+          <div className="collapse navbar-collapse" id="menuPrincipal">
             <ul className="navbar-nav me-auto">
-              {/* Gestión de Socios */}
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="sociosDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-id-card"></i> Socios
-                </a>
-                <ul className="dropdown-menu" aria-labelledby="sociosDropdown">
-               
-                  <li>
-                    <Link to="/socios/nuevo" className="dropdown-item">
-                      <i className="fas fa-user-plus"></i> Registrar socio
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/socios" className="dropdown-item">
-                      <i className="fas fa-list"></i> Lista de socios
-                    </Link>
-                  </li>
-                
-                  <li>
-                    <Link to={"/socios/estado"} className="dropdown-item" >
-                      <i className="fas fa-exchange-alt"></i> Cambiar estado
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              {/* Gestión de Jugadores */}
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="jugadoresDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-users"></i> Jugadores
-                </a>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="jugadoresDropdown"
-                >
-                  
-                  <li>
-                    <Link to={"/jugadores/nuevo"} className="dropdown-item">
-                      <i className="fas fa-user-plus"></i> Registrar jugador
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/jugadores"} className="dropdown-item">
-                      <i className="fas fa-list"></i> Lista general de jugadores
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/jugadores/por-categoria"} className="dropdown-item">
-                      <i className="fas fa-list"></i> Lista de jugadores por categoría
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/jugadores/estado"} className="dropdown-item">
-                      <i className="fas fa-exchange-alt"></i> Cambiar estado
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-               {/* Gestión de Cuotas */}
-               
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="cuotasDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-file-invoice-dollar"></i> Cuotas
-                </a>
-                <ul className="dropdown-menu" aria-labelledby="cuotasDropdown">
-                {role === "ADMIN" && ( <li>
-                    <Link
-                      to="/cuotas/nueva"
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      <i className="fas fa-plus-circle"></i> Registrar tipo de cuota
-                    </Link>
-                  </li>)}
-                  {role === "ADMIN" && ( <li>
-                    <Link
-                      to="/cuotas/montos"
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      <i className="fas fa-edit"></i> Actualizar montos
-                    </Link>
-                  </li>)}
-                  <li>
-                    <Link to="/cuotas" className="dropdown-item" href="#">
-                      <i className="fas fa-list"></i> Consultar tipos de cuotas
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              {/* Gestión de Categorías */}
-              {role === "ADMIN" && (<li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="categoriasDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-tags"></i> Categorías
-                </a>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="categoriasDropdown"
-                >
-                  <li>
-                    <Link
-                      to={"/categorias/nueva"}
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      <i className="fas fa-plus-circle"></i> Registrar categoría
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to={"/categorias"}
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      <i className="fas fa-list"></i> Ver categorías
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/categorias/editar"
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      <i className="fas fa-edit"></i> Actualizar categoría
-                    </Link>
-                  </li>
-                </ul>
-              </li> )}
-
-              {/* Gestión de Pagos */}
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="pagosDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-money-bill-wave"></i> Pagos
-                </a>
-                <ul className="dropdown-menu" aria-labelledby="pagosDropdown">
-                  <li>
-                    <Link to={"/pagos/nuevo"} className="dropdown-item">
-                      <i className="fas fa-plus-circle"></i> Registrar pago
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/pagos"} className="dropdown-item">
-                      <i className="fas fa-eye"></i> Ver historial general de pagos
-                    </Link>
-                  </li>
-
-                  <li>
-                    <Link to={"/pagos/por-persona"} className="dropdown-item">
-                      <i className="fas fa-user"></i> Pagos de un jugador o socio
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/pagos/por-categoria"} className="dropdown-item">
-                      <i className="fas fa-th-list"></i> Pagos por categoría
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/pagos/por-fecha"} className="dropdown-item" >
-                      <i className="fas fa-calendar-alt"></i> Pagos por fecha
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              {/* Gestión de Recaudaciones */}
-             {role === "ADMIN" && ( <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="recaudacionesDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-wallet"></i> Recaudaciones
-                </a>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="recaudacionesDropdown"
-                >
-                  <li>
-                    <Link to={"/recaudaciones/anuales"} className="dropdown-item" >
-                      <i className="fas fa-eye"></i> Recaudaciones anuales
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/recaudaciones/trimestrales"} className="dropdown-item" >
-                      <i className="fas fa-chart-line"></i> Recaudaciones trimestrales
-                    </Link>
-                  </li>
-               
-                </ul>
-              </li> )}
-
-              {/* Gestión de Usuarios */}
-              {role === "ADMIN" && (<li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="usuariosDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="fas fa-users-cog me-2"></i>Usuarios
-                </a>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="usuariosDropdown"
-                >
-                  <li>
-                    <Link to={"/usuarios/nuevo"} className="dropdown-item" >
-                      <i className="fas fa-user-plus me-2"></i>Registrar usuario
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/usuarios"} className="dropdown-item" >
-                      <i className="fas fa-users me-2"></i>Ver usuarios
-                    </Link>
-                  </li>
-                 
-                  <li>
-                    <Link to={"/usuarios/estado"} className="dropdown-item" >
-                      <i className="fas fa-user-times me-2"></i>Cambiar estado
-                    </Link>
-                  </li>
-               
-                </ul>
-              </li> ) }
+              {SECCIONES.filter(visible).map((seccion) => (
+                <li key={seccion.nombre} className="nav-item dropdown">
+                  <a
+                    className="nav-link dropdown-toggle"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <i className={`fas ${seccion.icono}`} aria-hidden="true"></i> {seccion.nombre}
+                  </a>
+                  <ul className="dropdown-menu">
+                    {seccion.items.filter(visible).map((item) => (
+                      <li key={item.to}>
+                        <Link to={item.to} className="dropdown-item">
+                          <i className={`fas ${item.icono}`} aria-hidden="true"></i> {item.texto}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </ul>
-            {/* Menú de usuario */}
-            <ul className="navbar-nav ms-auto">
+
+            <ul className="navbar-nav">
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle d-flex align-items-center"
                   href="#"
-                  id="userDropdown"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <i className="fas fa-user-circle fa-lg me-2"></i>
+                  <i className="fas fa-user-circle fa-lg me-2" aria-hidden="true"></i>
                   {usuario?.nombre ?? "Mi cuenta"}
                 </a>
-                <ul
-                  className="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="userDropdown"
-                >
+                <ul className="dropdown-menu dropdown-menu-end">
                   <li>
                     <Link to="/perfil" className="dropdown-item">
-                      <i className="fas fa-user-edit me-2"></i>Actualizar perfil
+                      <i className="fas fa-user-edit me-2" aria-hidden="true"></i>Mi perfil
                     </Link>
                   </li>
                   <li>
                     <Link to="/perfil/clave" className="dropdown-item">
-                      <i className="fas fa-key me-2"></i>Cambiar contraseña
+                      <i className="fas fa-key me-2" aria-hidden="true"></i>Cambiar contraseña
                     </Link>
                   </li>
-                  <li><hr className="dropdown-divider" /></li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
                   <li>
                     <button
                       type="button"
                       className="dropdown-item cm-nav__salir"
                       data-bs-toggle="modal"
-                      data-bs-target="#confirmLogoutModal"
+                      data-bs-target="#confirmarCierreSesion"
                     >
-                      <i className="fas fa-sign-out-alt me-2"></i>Cerrar sesión
+                      <i className="fas fa-sign-out-alt me-2" aria-hidden="true"></i>Cerrar sesión
                     </button>
                   </li>
                 </ul>
@@ -358,48 +180,30 @@ const NavBar = () => {
           </div>
         </div>
       </nav>
-      <div>
-        {/* Modal de Confirmación de Cerrar Sesión */}
-        <div
-          className="modal fade"
-          id="confirmLogoutModal"
-          tabIndex="-1"
-          aria-labelledby="confirmLogoutModalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="confirmLogoutModalLabel">
-                  Cerrar sesión
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Cerrar"
-                ></button>
-              </div>
-              <div className="modal-body">
-                Vas a tener que volver a ingresar con tu email y contraseña.
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cancelar
-                </button>
-                <button
-  type="button"
-  className="btn btn-danger"
-  onClick={handleLogout}
-  data-bs-dismiss="modal"
->
-  Cerrar Sesión
-</button>
-              </div>
+
+      <div
+        className="modal fade"
+        id="confirmarCierreSesion"
+        tabIndex="-1"
+        aria-labelledby="confirmarCierreSesionTitulo"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="confirmarCierreSesionTitulo">
+                Cerrar sesión
+              </h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div className="modal-body">Vas a tener que volver a ingresar con tu email y contraseña.</div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+              <button type="button" className="btn btn-danger" onClick={cerrarSesion} data-bs-dismiss="modal">
+                Cerrar sesión
+              </button>
             </div>
           </div>
         </div>
@@ -408,4 +212,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default Navbar;

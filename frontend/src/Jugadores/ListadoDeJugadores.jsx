@@ -24,27 +24,25 @@ const FiltrarJugadoresPorCategoria = () => {
   }, []);
 
   // Filtrar jugadores por categoría seleccionada
-  const fetchJugadores = async () => {
+  // Actualizar la lista de jugadores cuando cambia la categoría seleccionada
+  useEffect(() => {
     if (!categoriaSeleccionada) {
       setJugadores([]);
       return;
     }
 
-    setLoading(true); // Mostrar indicador de carga
-    try {
-      const response = await apiClient.get(
-        `/api/jugadores/categoria/${categoriaSeleccionada}`,
-      );
-      setJugadores(response.data);
-    } catch (error) {
-      console.error("Error al filtrar jugadores:", error);
-    } finally {
-      setLoading(false); // Ocultar indicador de carga
-    }
-  };
+    const fetchJugadores = async () => {
+      setLoading(true);
+      try {
+        const response = await apiClient.get(`/api/jugadores/categoria/${categoriaSeleccionada}`);
+        setJugadores(response.data);
+      } catch (error) {
+        console.error("Error al filtrar jugadores:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Actualizar lista de jugadores cuando cambia la categoría seleccionada
-  useEffect(() => {
     fetchJugadores();
   }, [categoriaSeleccionada]);
 
