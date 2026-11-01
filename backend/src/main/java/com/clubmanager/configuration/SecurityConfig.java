@@ -32,28 +32,28 @@ import org.springframework.beans.factory.annotation.Value;
             http
                     .cors(cors -> cors.configurationSource(request -> {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
-                        corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(","))); // Orígenes del frontend, separados por coma
+                        corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));  // Comma-separated frontend origins
                         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                        corsConfiguration.addAllowedHeader("*"); // Permitir todos los encabezados
-                        corsConfiguration.setAllowCredentials(true); // Permitir credenciales (cookies)
+                        corsConfiguration.addAllowedHeader("*");
+                        corsConfiguration.setAllowCredentials(true);
                         return corsConfiguration;
                     }))
                     .csrf().disable()
                     .authorizeHttpRequests()
                     .requestMatchers("/auth/login", "/auth/logout").permitAll()
-                    // Operaciones reservadas al administrador
-                    .requestMatchers("/auth/registrarUsuario").hasAuthority("ADMIN")
-                    .requestMatchers("/api/users/perfil", "/api/users/update-password").authenticated()
-                    .requestMatchers("/api/users/**", "/api/recaudaciones/**").hasAuthority("ADMIN")
-                    .requestMatchers(HttpMethod.POST, "/api/categorias/**", "/api/cuotas/**").hasAuthority("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/cuotas/**").hasAuthority("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/api/cuotas/**").hasAuthority("ADMIN")
+                    // Admin-only operations
+                    .requestMatchers("/auth/register").hasAuthority("ADMIN")
+                    .requestMatchers("/api/users/me", "/api/users/me/password").authenticated()
+                    .requestMatchers("/api/users/**", "/api/revenue/**").hasAuthority("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/categories/**", "/api/fees/**").hasAuthority("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/fees/**").hasAuthority("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/fees/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
                     .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                    // Sin sesión válida responde 401, para que el frontend vuelva al login
+                    // Without a valid session respond 401, so the frontend goes back to the login page
                     .exceptionHandling()
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                     .and()

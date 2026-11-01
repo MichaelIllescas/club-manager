@@ -24,11 +24,10 @@ public class AuthenticationController {
     private final UserService userService;
     private final CookieService cookieService;
 
-
-    @PostMapping("/registrarUsuario")
-    public ResponseEntity<AuthenticationResponse> registrarUsuario(
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> registerUser(
             @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authenticationService.registrarUsuario(request));
+        return ResponseEntity.ok(authenticationService.registerUser(request));
     }
 
     @PostMapping("/login")
@@ -36,37 +35,30 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request,
             HttpServletResponse response
     ) {
-        // Llamar al servicio para manejar el login y obtener la respuesta de autenticación
         AuthenticationResponse authResponse = authenticationService.login(request);
 
-        // Usar el servicio para crear la cookie
         ResponseCookie cookie = cookieService.createAuthCookie(authResponse.getJwt());
 
-        // Agregar la cookie a la respuesta HTTP
         response.addHeader("Set-Cookie", cookie.toString());
 
         UserDTO userDto = userService.toDTO(authenticationService.getUserByEmail(request.getEmail()).get());
 
-        // Devolver el UserDTO en la respuesta
         return ResponseEntity.ok(userDto);
 
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        // Cookie con tiempo de vida 0 y los mismos atributos, para eliminarla
+        // Expired cookie with the same attributes, so the browser deletes it
         ResponseCookie cookie = cookieService.clearAuthCookie();
 
-        // Agregar la cookie a la respuesta HTTP
         response.addHeader("Set-Cookie", cookie.toString());
 
-        // Devolver una respuesta de logout exitoso
         return ResponseEntity.ok("Logout successful!");
     }
 
     @GetMapping("/roles")
     public ResponseEntity<List<String>> getRoles() {
-        // Convertir los valores del enum a una lista de Strings
         List<String> roles = Arrays.stream(Role.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());

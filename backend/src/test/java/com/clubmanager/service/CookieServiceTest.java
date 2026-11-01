@@ -16,7 +16,7 @@ class CookieServiceTest {
     }
 
     @Test
-    void laCookieDeSesionEsHttpOnly() {
+    void sessionCookieIsHttpOnly() {
         ResponseCookie cookie = cookieService("", false).createAuthCookie("token");
 
         assertThat(cookie.isHttpOnly()).isTrue();
@@ -24,7 +24,7 @@ class CookieServiceTest {
     }
 
     @Test
-    void enLocalNoFijaDominioNiExigeHttps() {
+    void locallySetsNoDomainAndNoHttps() {
         ResponseCookie cookie = cookieService("", false).createAuthCookie("token");
 
         assertThat(cookie.getDomain()).isNull();
@@ -33,7 +33,7 @@ class CookieServiceTest {
     }
 
     @Test
-    void enProduccionUsaElDominioYHttps() {
+    void inProductionUsesDomainAndHttps() {
         ResponseCookie cookie = cookieService(".midominio.com", true).createAuthCookie("token");
 
         assertThat(cookie.getDomain()).isEqualTo(".midominio.com");
@@ -42,7 +42,7 @@ class CookieServiceTest {
     }
 
     @Test
-    void alCerrarSesionLaCookieVenceConLosMismosAtributos() {
+    void logoutExpiresCookieWithSameAttributes() {
         ResponseCookie cookie = cookieService(".midominio.com", true).clearAuthCookie();
 
         assertThat(cookie.getValue()).isEmpty();

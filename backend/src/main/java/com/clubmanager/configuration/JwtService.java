@@ -48,12 +48,11 @@ public class JwtService {
             Map<String, Object> claimsAdd,
             UserDetails userDetails
     ) {
-        // Agregar el rol del usuario a los claims
         if (userDetails.getAuthorities() != null) {
             claimsAdd.put("role", userDetails.getAuthorities().stream()
-                    .findFirst() // Obtener el primer rol (puedes ajustar para múltiples roles)
-                    .map(GrantedAuthority::getAuthority) // Obtener el nombre del rol
-                    .orElse(null)); // Manejar el caso donde no haya roles
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse(null));
         }
 
         return Jwts
@@ -61,7 +60,7 @@ public class JwtService {
                 .setClaims(claimsAdd)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))  // 1 hour
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

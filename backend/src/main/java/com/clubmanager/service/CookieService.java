@@ -14,23 +14,23 @@ public class CookieService {
     private boolean secure;
 
     public ResponseCookie createAuthCookie(String jwt) {
-        return buildCookie(jwt, 3600); // 1 hora, igual que el token
+        return buildCookie(jwt, 3600);  // 1 hour, same as the token
     }
 
-    // Cookie vacía con los mismos atributos, para que el navegador la borre
+    // Empty cookie with the same attributes, so the browser deletes it
     public ResponseCookie clearAuthCookie() {
         return buildCookie("", 0);
     }
 
     private ResponseCookie buildCookie(String value, long maxAge) {
         ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("authToken", value)
-                .httpOnly(true)   // JavaScript no puede leer el token
-                .secure(secure)   // En producción, sólo por HTTPS
+                .httpOnly(true)  // JavaScript cannot read the token
+                .secure(secure)  // HTTPS only in production
                 .sameSite(secure ? "None" : "Lax")
                 .path("/")
                 .maxAge(maxAge);
         if (!domain.isBlank()) {
-            cookie.domain(domain); // Permite compartir entre subdominios
+            cookie.domain(domain);  // Shared across subdomains
         }
         return cookie.build();
     }

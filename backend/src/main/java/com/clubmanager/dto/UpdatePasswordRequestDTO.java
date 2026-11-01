@@ -5,7 +5,6 @@ public class UpdatePasswordRequestDTO {
     private String currentPassword;
     private String newPassword;
 
-    // Getters y Setters
     public String getUsername() {
         return username;
     }

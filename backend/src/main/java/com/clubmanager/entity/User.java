@@ -1,6 +1,5 @@
 package com.clubmanager.entity;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,14 +9,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 @Entity
-@Table(name = "usuarios")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,11 +40,11 @@ public class User implements UserDetails
 
     @NotBlank(message = "El teléfono no puede estar vacío.")
     @Column(nullable = false)
-    private String telefono;
+    private String phone;
 
     @NotBlank(message = "La dirección no puede estar vacía.")
     @Column(nullable = false)
-    private String direccion;
+    private String address;
 
     @NotBlank(message = "El email no puede estar vacío.")
     @Email(message = "El email debe ser válido.")
@@ -64,8 +61,8 @@ public class User implements UserDetails
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pago> pagos = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,6 +1,5 @@
 package com.clubmanager.dto;
 
-
 import com.clubmanager.entity.Role;
 import lombok.*;
 
@@ -10,12 +9,12 @@ import lombok.*;
 @Builder
 public class UserDTO {
     private Long id;
-    private String nombre;
-    private String apellido;
+    private String firstName;
+    private String lastName;
     private String dni;
-    private String telefono;
-    private String direccion;
+    private String phone;
+    private String address;
     private String email;
-    private String estado;
-    private Role rol;
+    private String status;
+    private Role role;
 }

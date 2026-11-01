@@ -25,38 +25,31 @@ public class   JwtCookieAuthenticationFilter extends OncePerRequestFilter {
             throws java.io.IOException, jakarta.servlet.ServletException {
 
         try {
-            // Extraer el token desde la cookie
             String jwtToken = extractTokenFromCookies(request);
             String username = null;
 
             if (jwtToken != null) {
-                // Extraer el nombre de usuario del token
                 username = jwtService.extractUserName(jwtToken);
             }
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // Validar el token
                 if (jwtService.isTokenValid(jwtToken, userDetails)) {
-                    // Crear la autenticación y configurar el contexto de seguridad
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
 
-            // Continuar con el siguiente filtro si todo está bien
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
-            // Manejar el caso de token expirado
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401 Unauthorized
             response.setContentType("application/json");
             response.getWriter().write("{\"message\": \"Token expired\"}");
         } catch (Exception e) {
-            // Manejar cualquier otra excepción
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401 Unauthorized
             response.setContentType("application/json");
             response.getWriter().write("{\"message\": \"Invalid token\"}");
         }

@@ -4,50 +4,49 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class DashboardDTO {
-    private long cantidadJugadores;
-    private long cantidadSocios;
-    private BigDecimal recaudacionTotal;
-    private int categoriasActivas;
-    private List<BigDecimal> graficoData;
+    private long playerCount;
+    private long memberCount;
+    private BigDecimal totalRevenue;
+    private int activeCategories;
+    private List<BigDecimal> chartData;
 
-    // Getters y setters
-    public long getCantidadJugadores() {
-        return cantidadJugadores;
+    public long getPlayerCount() {
+        return playerCount;
     }
 
-    public void setCantidadJugadores(long cantidadJugadores) {
-        this.cantidadJugadores = cantidadJugadores;
+    public void setPlayerCount(long playerCount) {
+        this.playerCount = playerCount;
     }
 
-    public long getCantidadSocios() {
-        return cantidadSocios;
+    public long getMemberCount() {
+        return memberCount;
     }
 
-    public void setCantidadSocios(long cantidadSocios) {
-        this.cantidadSocios = cantidadSocios;
+    public void setMemberCount(long memberCount) {
+        this.memberCount = memberCount;
     }
 
-    public BigDecimal getRecaudacionTotal() {
-        return recaudacionTotal;
+    public BigDecimal getTotalRevenue() {
+        return totalRevenue;
     }
 
-    public void setRecaudacionTotal(BigDecimal recaudacionTotal) {
-        this.recaudacionTotal = recaudacionTotal;
+    public void setTotalRevenue(BigDecimal totalRevenue) {
+        this.totalRevenue = totalRevenue;
     }
 
-    public int getCategoriasActivas() {
-        return categoriasActivas;
+    public int getActiveCategories() {
+        return activeCategories;
     }
 
-    public void setCategoriasActivas(int categoriasActivas) {
-        this.categoriasActivas = categoriasActivas;
+    public void setActiveCategories(int activeCategories) {
+        this.activeCategories = activeCategories;
     }
 
-    public List<BigDecimal> getGraficoData() {
-        return graficoData;
+    public List<BigDecimal> getChartData() {
+        return chartData;
     }
 
-    public void setGraficoData(List<BigDecimal> graficoData) {
-        this.graficoData = graficoData;
+    public void setChartData(List<BigDecimal> chartData) {
+        this.chartData = chartData;
     }
 }

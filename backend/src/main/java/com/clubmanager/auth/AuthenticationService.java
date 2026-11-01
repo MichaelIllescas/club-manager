@@ -1,8 +1,8 @@
 package com.clubmanager.auth;
 
-import com.clubmanager.exception.UsuarioDeshabilitadoException;
+import com.clubmanager.exception.DisabledUserException;
 
-import com.clubmanager.exception.CredencialesInvalidasException;
+import com.clubmanager.exception.InvalidCredentialsException;
 
 import com.clubmanager.configuration.JwtService;
 import com.clubmanager.entity.Role;
@@ -26,13 +26,13 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse registrarUsuario(RegisterRequest request) {
+    public AuthenticationResponse registerUser(RegisterRequest request) {
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .dni(request.getDni())
-                .telefono(request.getTelefono())
-                .direccion(request.getDireccion())
+                .phone(request.getPhone())
+                .address(request.getAddress())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole().equals(Role.USER.name()) ? Role.USER : Role.ADMIN)
@@ -47,17 +47,14 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
-        // Buscar al usuario en la base de datos
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new CredencialesInvalidasException("Usuario no encontrado."));
+                .orElseThrow(() -> new InvalidCredentialsException("Usuario no encontrado."));
 
-        // Verificar si el usuario está deshabilitado
         if (!user.isEnabled()) {
-            throw new UsuarioDeshabilitadoException("El usuario está deshabilitado.");
+            throw new DisabledUserException("El usuario está deshabilitado.");
         }
 
         try {
-            // Verificar las credenciales del usuario
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
@@ -65,10 +62,9 @@ public class AuthenticationService {
                     )
             );
         } catch (Exception e) {
-            throw new CredencialesInvalidasException("Usuario o contraseña incorrectos.");
+            throw new InvalidCredentialsException("Usuario o contraseña incorrectos.");
         }
 
-        // Generar el token JWT
         Map<String, Object> claims = new HashMap<>();
         String jwt = jwtService.generateToken(claims, user);
 

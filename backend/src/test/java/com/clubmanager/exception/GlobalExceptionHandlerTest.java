@@ -13,36 +13,36 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
     @Test
-    void registroInexistenteResponde404ConElMensaje() {
-        ResponseEntity<Map<String, String>> respuesta =
-                handler.noEncontrado(new RecursoNoEncontradoException("Socio no encontrado con el ID: 9"));
+    void missingRecordReturns404WithMessage() {
+        ResponseEntity<Map<String, String>> response =
+                handler.notFound(new ResourceNotFoundException("Socio no encontrado con el ID: 9"));
 
-        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(respuesta.getBody()).containsEntry("error", "Socio no encontrado con el ID: 9");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).containsEntry("error", "Socio no encontrado con el ID: 9");
     }
 
     @Test
-    void datoDuplicadoResponde409() {
-        ResponseEntity<Map<String, String>> respuesta =
-                handler.duplicado(new DatoDuplicadoException("Ya existe un socio con el DNI: 30111222"));
+    void duplicateValueReturns409() {
+        ResponseEntity<Map<String, String>> response =
+                handler.duplicate(new DuplicateValueException("Ya existe un socio con el DNI: 30111222"));
 
-        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 
     @Test
-    void datoInvalidoResponde400() {
-        ResponseEntity<Map<String, String>> respuesta =
-                handler.invalido(new DatoInvalidoException("El DNI del socio es obligatorio."));
+    void invalidValueReturns400() {
+        ResponseEntity<Map<String, String>> response =
+                handler.invalid(new InvalidValueException("El DNI del socio es obligatorio."));
 
-        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    void errorInesperadoNoExponeElDetalleInterno() {
-        ResponseEntity<Map<String, String>> respuesta =
-                handler.inesperado(new IllegalStateException("SQL: tabla socios bloqueada"));
+    void unexpectedErrorHidesInternalDetail() {
+        ResponseEntity<Map<String, String>> response =
+                handler.unexpected(new IllegalStateException("SQL: tabla socios bloqueada"));
 
-        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(respuesta.getBody().get("error")).doesNotContain("SQL");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody().get("error")).doesNotContain("SQL");
     }
 }

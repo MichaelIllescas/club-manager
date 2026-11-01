@@ -1,8 +1,8 @@
 package com.clubmanager.service;
 
-import com.clubmanager.exception.RecursoNoEncontradoException;
+import com.clubmanager.exception.ResourceNotFoundException;
 
-import com.clubmanager.dto.EstadoUsuarioDTO;
+import com.clubmanager.dto.UserStatusDTO;
 import com.clubmanager.dto.UserDTO;
 import com.clubmanager.entity.Role;
 import com.clubmanager.repository.UserRepository;
@@ -24,16 +24,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository usuarioRepository;
 
-    // Crear un nuevo usuario
     public UserDTO createUser(UserDTO userDTO) {
         User user = toEntity(userDTO);
         User savedUser = userRepository.save(user);
         return toDTO(savedUser);
     }
 
-    // Obtener todos los usuarios
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
@@ -41,145 +38,133 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // Obtener un usuario por ID
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return toDTO(user);
     }
 
-    // Actualizar un usuario
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        user.setFirstName(userDTO.getNombre());
-        user.setLastName(userDTO.getApellido());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
         user.setDni(userDTO.getDni());
-        user.setTelefono(userDTO.getTelefono());
-        user.setDireccion(userDTO.getDireccion());
+        user.setPhone(userDTO.getPhone());
+        user.setAddress(userDTO.getAddress());
         user.setEmail(userDTO.getEmail());
-        user.setEnabled(userDTO.getEstado().equals("ACTIVO")?true:false);
-        user.setRole(userDTO.getRol());
+        user.setEnabled(userDTO.getStatus().equals("ACTIVE")?true:false);
+        user.setRole(userDTO.getRole());
 
         User updatedUser = userRepository.save(user);
         return toDTO(updatedUser);
     }
 
-    // Eliminar un usuario (cambio de estado en lugar de eliminación física)
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
-        user.setEnabled(false); // Deshabilitar el usuario
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        user.setEnabled(false);
         userRepository.save(user);
     }
 
-    // Conversión de entidad a DTO
     public UserDTO toDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
-                .nombre(user.getFirstName())
-                .apellido(user.getLastName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .dni(user.getDni())
-                .telefono(user.getTelefono())
-                .direccion(user.getDireccion())
+                .phone(user.getPhone())
+                .address(user.getAddress())
                 .email(user.getEmail())
-                .estado(user.isEnabled()?"ACTIVO":"INACTIVO")
-                .rol(user.getRole())
+                .status(user.isEnabled()?"ACTIVE":"INACTIVE")
+                .role(user.getRole())
                 .build();
     }
 
-    // Conversión de DTO a entidad
     private User toEntity(UserDTO userDTO) {
         return User.builder()
                 .id(userDTO.getId())
-                .firstName(userDTO.getNombre())
-                .lastName(userDTO.getApellido())
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
                 .dni(userDTO.getDni())
-                .telefono(userDTO.getTelefono())
-                .direccion(userDTO.getDireccion())
+                .phone(userDTO.getPhone())
+                .address(userDTO.getAddress())
                 .email(userDTO.getEmail())
-                .enabled(userDTO.getEstado().equals("ACTIVO")?true:false)
-                .role(userDTO.getRol().equals(Role.ADMIN.toString())?Role.ADMIN:Role.USER)
+                .enabled(userDTO.getStatus().equals("ACTIVE")?true:false)
+                .role(userDTO.getRole().equals(Role.ADMIN.toString())?Role.ADMIN:Role.USER)
                 .build();
     }
 
-    public void anularUsuario(Long id) {
+    public void deactivateUser(Long id) {
         Optional<User> user = userRepository.findById(id);
         user.get().setEnabled(false);
         userRepository.save(user.get());
     }
 
-    public void habilitarUsuario(Long id) {
+    public void activateUser(Long id) {
         Optional<User> user = userRepository.findById(id);
         user.get().setEnabled(true);
         userRepository.save(user.get());
     }
 
-    public List<EstadoUsuarioDTO> getEstadosSocios() {
+    public List<UserStatusDTO> getUserStatuses() {
         return userRepository.findAll()
-                .stream().map(this::toEstadoUsuarioDTO)
+                .stream().map(this::toUserStatusDTO)
                 .collect(Collectors.toList());
     }
 
-    public EstadoUsuarioDTO toEstadoUsuarioDTO(User user){
-        return EstadoUsuarioDTO.builder()
+    public UserStatusDTO toUserStatusDTO(User user){
+        return UserStatusDTO.builder()
                 .id(user.getId())
-                .nombre(user.getFirstName())
-                .apellido(user.getLastName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .dni(user.getDni())
                 .email(user.getEmail())
-                .estado(user.isEnabled()?"ACTIVO":"INACTIVO")
+                .status(user.isEnabled()?"ACTIVE":"INACTIVE")
                 .build();
     }
 
-    public UserDTO getPerfil() {
-        return toDTO(obtenerUsuarioActual());
+    public UserDTO getProfile() {
+        return toDTO(getCurrentUser());
     }
 
     public boolean updatePassword(String currentPassword, String newPassword) {
-        User user = obtenerUsuarioActual();
+        User user = getCurrentUser();
 
-        // Verificar si la contraseña actual coincide
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            return false; // La contraseña actual es incorrecta
+            return false;
         }
 
-        // Actualizar la contraseña en la base de datos
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         return true;
     }
 
-    // Restablecer la contraseña
-    public void resetearClave(Long userId) {
+    public void resetPassword(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        // Obtener el DNI del usuario
         String dni = user.getDni();
 
-        // Encriptar la nueva contraseña usando el DNI
-        String claveEncriptada = passwordEncoder.encode(dni);
+        String encodedPassword = passwordEncoder.encode(dni);
 
-        // Establecer la nueva contraseña encriptada
-        user.setPassword(claveEncriptada);
+        user.setPassword(encodedPassword);
 
-        // Guardar el usuario con la nueva contraseña
         userRepository.save(user);
     }
 
     public void insertAdminUser(){
         Optional<User> existingUser = userRepository.findByEmail("admin@admin.com");
 
-        if (existingUser.isEmpty()) { // Solo si no existe, lo creamos
+        if (existingUser.isEmpty()) {
             User admin = User.builder()
                     .firstName("Administrador")
                     .lastName("General")
                     .dni("00000000")
-                    .telefono("0000000000")
-                    .direccion("Sin dirección")
-                    .email("admin@admin.com") // Usar el mismo email que estás buscando
+                    .phone("0000000000")
+                    .address("Sin dirección")
+                    .email("admin@admin.com")
                     .password(passwordEncoder.encode("admin"))
                     .role(Role.ADMIN)
                     .enabled(true)
@@ -188,10 +173,10 @@ public class UserService {
         }
     }
 
-    // El filtro JWT ya autenticó al usuario: se toma del contexto de seguridad
-    public User obtenerUsuarioActual() {
+    // The JWT filter already authenticated the user: read it from the security context
+    public User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
     }
 }

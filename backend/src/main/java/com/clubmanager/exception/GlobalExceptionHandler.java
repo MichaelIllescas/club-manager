@@ -14,72 +14,72 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.Map;
 import java.util.stream.Collectors;
 
-// Único lugar donde los errores se convierten en respuestas HTTP.
-// Todas las respuestas de error tienen la forma {"error": "mensaje"}.
+// The only place where errors are turned into HTTP responses.
+// Every error response has the shape {"error": "message"}.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(RecursoNoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> noEncontrado(RecursoNoEncontradoException ex) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> notFound(ResourceNotFoundException ex) {
         return error(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(DatoDuplicadoException.class)
-    public ResponseEntity<Map<String, String>> duplicado(DatoDuplicadoException ex) {
+    @ExceptionHandler(DuplicateValueException.class)
+    public ResponseEntity<Map<String, String>> duplicate(DuplicateValueException ex) {
         return error(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    @ExceptionHandler(DatoInvalidoException.class)
-    public ResponseEntity<Map<String, String>> invalido(DatoInvalidoException ex) {
+    @ExceptionHandler(InvalidValueException.class)
+    public ResponseEntity<Map<String, String>> invalid(InvalidValueException ex) {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(CredencialesInvalidasException.class)
-    public ResponseEntity<Map<String, String>> credencialesInvalidas(CredencialesInvalidasException ex) {
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> invalidCredentials(InvalidCredentialsException ex) {
         return error(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
-    @ExceptionHandler(UsuarioDeshabilitadoException.class)
-    public ResponseEntity<Map<String, String>> usuarioDeshabilitado(UsuarioDeshabilitadoException ex) {
+    @ExceptionHandler(DisabledUserException.class)
+    public ResponseEntity<Map<String, String>> disabledUser(DisabledUserException ex) {
         return error(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, String>> parametroInvalido(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<Map<String, String>> invalidParameter(MethodArgumentTypeMismatchException ex) {
         return error(HttpStatus.BAD_REQUEST, "Parámetro inválido: " + ex.getName());
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Map<String, String>> parametroFaltante(MissingServletRequestParameterException ex) {
+    public ResponseEntity<Map<String, String>> missingParameter(MissingServletRequestParameterException ex) {
         return error(HttpStatus.BAD_REQUEST, "Falta el parámetro: " + ex.getParameterName());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> validacion(MethodArgumentNotValidException ex) {
-        String mensaje = ex.getBindingResult().getFieldErrors().stream()
-                .map(campo -> campo.getDefaultMessage())
+    public ResponseEntity<Map<String, String>> validationError(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(field -> field.getDefaultMessage())
                 .collect(Collectors.joining(" "));
-        return error(HttpStatus.BAD_REQUEST, mensaje);
+        return error(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, String>> restriccion(ConstraintViolationException ex) {
-        String mensaje = ex.getConstraintViolations().stream()
-                .map(violacion -> violacion.getMessage())
+    public ResponseEntity<Map<String, String>> constraintViolation(ConstraintViolationException ex) {
+        String message = ex.getConstraintViolations().stream()
+                .map(violation -> violation.getMessage())
                 .collect(Collectors.joining(" "));
-        return error(HttpStatus.BAD_REQUEST, mensaje);
+        return error(HttpStatus.BAD_REQUEST, message);
     }
 
-    // Cualquier otro error: se registra el detalle y al cliente se le da un mensaje genérico
+    // Any other error: log the details and give the client a generic message
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> inesperado(Exception ex) {
+    public ResponseEntity<Map<String, String>> unexpected(Exception ex) {
         log.error("Error inesperado", ex);
         return error(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error inesperado. Intentá nuevamente.");
     }
 
-    private ResponseEntity<Map<String, String>> error(HttpStatus estado, String mensaje) {
-        return ResponseEntity.status(estado).body(Map.of("error", mensaje));
+    private ResponseEntity<Map<String, String>> error(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(Map.of("error", message));
     }
 }

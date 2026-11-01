@@ -13,34 +13,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtServiceTest {
 
-    // Clave de prueba en Base64 (256 bits), sólo para los tests
-    private static final String CLAVE_TEST = "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdHMtMDEyMzQ1Njc4OQ==";
+    // Base64 test key (256 bits), tests only
+    private static final String TEST_KEY = "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdHMtMDEyMzQ1Njc4OQ==";
 
     private JwtService jwtService;
-    private UserDetails usuario;
+    private UserDetails user;
 
     @BeforeEach
     void setUp() {
         jwtService = new JwtService();
-        ReflectionTestUtils.setField(jwtService, "secretKey", CLAVE_TEST);
-        usuario = User.withUsername("admin@club.com").password("x")
+        ReflectionTestUtils.setField(jwtService, "secretKey", TEST_KEY);
+        user = User.withUsername("admin@club.com").password("x")
                 .authorities(List.of(new SimpleGrantedAuthority("ADMIN"))).build();
     }
 
     @Test
-    void generaUnTokenConElUsuarioYSuRol() {
-        String token = jwtService.generateToken(usuario);
+    void generatesTokenWithUserAndRole() {
+        String token = jwtService.generateToken(user);
 
         assertThat(jwtService.extractUserName(token)).isEqualTo("admin@club.com");
         assertThat(jwtService.extractAllClaims(token).get("role")).isEqualTo("ADMIN");
     }
 
     @Test
-    void elTokenEsValidoSoloParaSuUsuario() {
-        String token = jwtService.generateToken(usuario);
-        UserDetails otro = User.withUsername("otro@club.com").password("x").authorities(List.of()).build();
+    void tokenIsValidOnlyForItsUser() {
+        String token = jwtService.generateToken(user);
+        UserDetails other = User.withUsername("otro@club.com").password("x").authorities(List.of()).build();
 
-        assertThat(jwtService.isTokenValid(token, usuario)).isTrue();
-        assertThat(jwtService.isTokenValid(token, otro)).isFalse();
+        assertThat(jwtService.isTokenValid(token, user)).isTrue();
+        assertThat(jwtService.isTokenValid(token, other)).isFalse();
     }
 }
