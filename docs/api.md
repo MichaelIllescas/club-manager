@@ -1,6 +1,6 @@
 # API REST
 
-Todas las rutas, salvo las de `/auth`, requieren la cookie de sesión `authToken`. La documentación interactiva completa está en `/swagger-ui` con el backend en ejecución.
+Todas las rutas, salvo `/auth/login` y `/auth/logout`, requieren la cookie de sesión `authToken`. Sin sesión válida, el backend responde `401`; sin el rol necesario, `403`. La documentación interactiva completa está en `/swagger-ui` con el backend en ejecución.
 
 ## Autenticación (`/auth`)
 
@@ -8,7 +8,7 @@ Todas las rutas, salvo las de `/auth`, requieren la cookie de sesión `authToken
 |---|---|---|
 | POST | `/auth/login` | Inicia sesión y devuelve la cookie |
 | POST | `/auth/logout` | Cierra la sesión |
-| POST | `/auth/registrarUsuario` | Registra un usuario |
+| POST | `/auth/registrarUsuario` | Registra un usuario (sólo `ADMIN`) |
 | GET | `/auth/roles` | Lista los roles disponibles |
 
 ## Socios (`/api/socios`)
@@ -38,7 +38,7 @@ Todas las rutas, salvo las de `/auth`, requieren la cookie de sesión `authToken
 
 ## Categorías (`/api/categorias`) y cuotas (`/api/cuotas`)
 
-Ambos recursos tienen el mismo conjunto de operaciones:
+Ambos recursos tienen el mismo conjunto de operaciones. Crear una categoría y crear, modificar o eliminar una cuota requiere rol `ADMIN`.
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -64,6 +64,8 @@ Ambos recursos tienen el mismo conjunto de operaciones:
 
 ## Recaudaciones y panel
 
+Las recaudaciones son sólo para `ADMIN`.
+
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/api/recaudaciones/mensuales` | Recaudación de cada mes de un año |
@@ -71,6 +73,8 @@ Ambos recursos tienen el mismo conjunto de operaciones:
 | GET | `/api/dashboard` | Totales y datos del gráfico del panel de inicio |
 
 ## Usuarios (`/api/users`)
+
+Sólo `ADMIN`, salvo `/perfil` y `/update-password`, disponibles para cualquier usuario logueado.
 
 | Método | Ruta | Descripción |
 |---|---|---|

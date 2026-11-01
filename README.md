@@ -28,8 +28,8 @@ Sistema web para la administración de clubes deportivos: socios, jugadores por 
 - Exportación de tablas a Excel.
 
 **Usuarios**
-- Inicio de sesión con JWT guardado en una cookie.
-- Roles `ADMIN` y `USER`.
+- Inicio de sesión con JWT guardado en una cookie HttpOnly.
+- Roles `ADMIN` y `USER`. El backend reserva al administrador la gestión de usuarios, las recaudaciones y el alta y modificación de cuotas y categorías.
 - Alta, edición, baja y rehabilitación de usuarios, cambio y reseteo de contraseña.
 
 ## Stack
@@ -100,7 +100,7 @@ cd backend && mvn test
 cd frontend && npm test
 ```
 
-El backend cubre las reglas de socios, jugadores, pagos, recaudaciones y la generación y validación de tokens. El frontend cubre el formato de moneda, la lectura de cookies y la tabla genérica (paginación, búsqueda y acciones).
+El backend cubre las reglas de socios, jugadores, pagos, recaudaciones, la generación y validación de tokens y los atributos de la cookie de sesión. El frontend cubre el formato de moneda y la tabla genérica (paginación, búsqueda, columnas, acciones y carga tardía de datos).
 
 ## Primer acceso
 

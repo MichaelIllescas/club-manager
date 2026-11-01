@@ -66,14 +66,8 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        // Crear una cookie con tiempo de vida de 0 para eliminarla
-        ResponseCookie cookie = ResponseCookie.from("authToken", "")
-                .httpOnly(false)
-                .secure(false)
-                .path("/")
-                .maxAge(0) // Expira inmediatamente
-                .sameSite("Lax")
-                .build();
+        // Cookie con tiempo de vida 0 y los mismos atributos, para eliminarla
+        ResponseCookie cookie = cookieService.clearAuthCookie();
 
         // Agregar la cookie a la respuesta HTTP
         response.addHeader("Set-Cookie", cookie.toString());
