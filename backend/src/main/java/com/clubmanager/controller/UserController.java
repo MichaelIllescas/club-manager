@@ -4,7 +4,6 @@ import com.clubmanager.dto.EstadoUsuarioDTO;
 import com.clubmanager.dto.UpdatePasswordRequestDTO;
 import com.clubmanager.dto.UserDTO;
 import com.clubmanager.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -86,17 +85,15 @@ public class UserController {
         }
 
         @GetMapping("/perfil")
-        public ResponseEntity<UserDTO> getDatosPerfil( HttpServletRequest request){
-            return ResponseEntity.ok(userService.getPerfil(request));
+        public ResponseEntity<UserDTO> getDatosPerfil() {
+            return ResponseEntity.ok(userService.getPerfil());
         }
 
         @PutMapping("/update-password")
         public ResponseEntity<Map<String, String>> updatePassword(
-                @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO,
-                HttpServletRequest request
+                @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO
         ) {
             boolean isUpdated = userService.updatePassword(
-                    request,
                     updatePasswordRequestDTO.getCurrentPassword(),
                     updatePasswordRequestDTO.getNewPassword()
             );

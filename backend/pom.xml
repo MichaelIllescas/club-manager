@@ -14,7 +14,7 @@
 	<!-- Información del proyecto -->
 	<groupId>com.clubmanager</groupId>
 	<artifactId>club-manager</artifactId>
-	<version>1.2.0</version>
+	<version>1.0.0</version>
 	<name>club-manager</name>
 	<description>API para gestión de socios, jugadores y pagos</description>
 

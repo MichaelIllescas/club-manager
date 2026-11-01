@@ -23,8 +23,7 @@ Organizado en capas dentro de `com.clubmanager`:
 | `repository` | Acceso a datos con Spring Data JPA |
 | `entity` | Entidades JPA |
 | `dto` | Objetos de entrada y salida de la API |
-| `configuration` | Seguridad, filtros JWT y servicio de tokens |
-| `security` | CORS y configuración web |
+| `configuration` | Seguridad (incluido CORS), filtro JWT de la cookie y servicio de tokens |
 | `exception` | Excepciones propias y manejador global |
 
 ### Autenticación

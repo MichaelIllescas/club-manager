@@ -1,12 +1,10 @@
 package com.clubmanager.service;
 
-import com.clubmanager.configuration.JwtCookieAuthenticationFilter;
-import com.clubmanager.configuration.JwtService;
 import com.clubmanager.dto.EstadoUsuarioDTO;
 import com.clubmanager.dto.UserDTO;
 import com.clubmanager.entity.Role;
 import com.clubmanager.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,8 +21,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter;
-    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository usuarioRepository;
 
@@ -135,22 +131,12 @@ public class UserService {
                 .build();
     }
 
-    public UserDTO getPerfil(HttpServletRequest request) {
-        String token = jwtCookieAuthenticationFilter.extractTokenFromCookies(request);
-        String username= jwtService.extractUserName(token);
-        User user= userRepository.findByEmail(username).get();
-        UserDTO userDTO= toDTO(user);
-        return userDTO;
+    public UserDTO getPerfil() {
+        return toDTO(obtenerUsuarioActual());
     }
 
-    public boolean updatePassword(HttpServletRequest request, String currentPassword, String newPassword) {
-        String token = jwtCookieAuthenticationFilter.extractTokenFromCookies(request);
-        String username= jwtService.extractUserName(token);
-        User user= userRepository.findByEmail(username).get();
-
-        if (user == null) {
-            throw new RuntimeException("Usuario no encontrado.");
-        }
+    public boolean updatePassword(String currentPassword, String newPassword) {
+        User user = obtenerUsuarioActual();
 
         // Verificar si la contraseña actual coincide
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
@@ -200,10 +186,10 @@ public class UserService {
         }
     }
 
-    public User obtenerUsuarioActual(HttpServletRequest request) {
-        String token = jwtCookieAuthenticationFilter.extractTokenFromCookies(request);
-        String username= jwtService.extractUserName(token);
-        User user= userRepository.findByEmail(username).get();
-        return user;
+    // El filtro JWT ya autenticó al usuario: se toma del contexto de seguridad
+    public User obtenerUsuarioActual() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 }

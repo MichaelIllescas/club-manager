@@ -5,7 +5,6 @@ import com.clubmanager.dto.PagoDTO;
 import com.clubmanager.dto.PagoFullDataDTO;
 import com.clubmanager.entity.Pago;
 import com.clubmanager.service.PagoService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +24,9 @@ public class PagoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> registrarPago(@RequestBody Pago pago, HttpServletRequest request) {
+    public ResponseEntity<?> registrarPago(@RequestBody Pago pago) {
         try {
-            PagoFullDataDTO nuevoPago = pagoService.guardarPago(pago, request);
+            PagoFullDataDTO nuevoPago = pagoService.guardarPago(pago);
             return ResponseEntity.ok(nuevoPago);
         } catch (Exception e) {
             System.out.println(e.getMessage());

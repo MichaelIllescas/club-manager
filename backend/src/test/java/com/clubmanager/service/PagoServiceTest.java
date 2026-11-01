@@ -94,7 +94,7 @@ class PagoServiceTest {
 
     @Test
     void guardarPago_exigeUnaCuota() {
-        assertThatThrownBy(() -> pagoService.guardarPago(new Pago(), null))
+        assertThatThrownBy(() -> pagoService.guardarPago(new Pago()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -106,7 +106,7 @@ class PagoServiceTest {
         pago.setCuota(cuota);
         when(cuotaRepository.findById(5L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> pagoService.guardarPago(pago, null))
+        assertThatThrownBy(() -> pagoService.guardarPago(pago))
                 .hasMessageContaining("no existe");
     }
 

@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
     @RequiredArgsConstructor
     public class SecurityConfig {
 
-        private final JwtAthenticationFilter jwtAthenticationFilter;
         private final AuthenticationProvider authenticationProvider;
         private final JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter;
 
@@ -59,8 +58,7 @@ import org.springframework.beans.factory.annotation.Value;
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                     .and()
                     .authenticationProvider(authenticationProvider)
-                    .addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                    .addFilterBefore(jwtAthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
             return http.build();
         }

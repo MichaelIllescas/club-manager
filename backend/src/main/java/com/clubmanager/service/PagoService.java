@@ -6,7 +6,6 @@ import com.clubmanager.repository.CuotaRepository;
 import com.clubmanager.repository.JugadorRepository;
 import com.clubmanager.repository.PagoRepository;
 import com.clubmanager.repository.SocioRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +35,7 @@ public class PagoService {
         this.userService = userService;
     }
 
-    public PagoFullDataDTO guardarPago(Pago pago, HttpServletRequest request) {
+    public PagoFullDataDTO guardarPago(Pago pago) {
         // Verificar que la cuota no sea nula
         if (pago.getCuota() == null || pago.getCuota().getId() == null) {
             throw new IllegalArgumentException("La cuota no puede ser nula y debe contener un ID válido.");
@@ -62,7 +61,7 @@ public class PagoService {
         }
 
         pago.setFechaRegistro(LocalDate.now());
-        User usuarioActual = userService.obtenerUsuarioActual(request); // Método que obtiene el usuario autenticado
+        User usuarioActual = userService.obtenerUsuarioActual(); // Método que obtiene el usuario autenticado
         pago.setUsuario(usuarioActual);
 
          pagoRepository.save(pago);
