@@ -1,6 +1,6 @@
-/* Pantallas de alta: formulario a la izquierda y lo ya registrado a la derecha */
+/* Create screens: the form on the left and existing records on the right */
 
-.alta {
+.form-page {
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: 1.5rem;
@@ -9,84 +9,84 @@
   padding-bottom: 3rem;
 }
 
-.alta__panel {
+.form-page__panel {
   padding: 1.75rem;
 }
 
-.alta__titulo {
+.form-page__title {
   font-size: 2rem;
   margin: 0;
 }
 
-.alta__intro {
-  color: var(--cm-tinta-suave);
+.form-page__intro {
+  color: var(--cm-ink-soft);
   margin: 0.25rem 0 1.5rem;
   max-width: 34rem;
 }
 
-.alta__ayuda {
+.form-page__help {
   font-size: 0.85rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
   margin-top: 0.35rem;
 }
 
-.alta__contador {
+.form-page__counter {
   float: right;
   font-size: 0.8rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-/* Vista previa de cómo va a quedar el registro */
-.alta__vista {
+/* Preview of how the record will look */
+.form-page__preview {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   margin: 1.5rem 0;
   padding: 1rem 1.25rem;
-  background: var(--cm-cancha-claro);
-  border-left: 4px solid var(--cm-cancha);
+  background: var(--cm-green-light);
+  border-left: 4px solid var(--cm-green);
   border-radius: 6px;
 }
 
-.alta__vista-etiqueta {
+.form-page__preview-label {
   display: block;
   font-size: 0.8rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.alta__vista-nombre {
+.form-page__preview-name {
   font-weight: 700;
   font-size: 1.1rem;
 }
 
-.alta__vista-monto {
-  font-family: var(--cm-fuente-titulos);
+.form-page__preview-amount {
+  font-family: var(--cm-font-display);
   font-weight: 700;
   font-size: 1.75rem;
-  color: var(--cm-cancha-oscuro);
+  color: var(--cm-green-dark);
   white-space: nowrap;
 }
 
-.alta__acciones {
+.form-page__actions {
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
 }
 
-/* Lista de lo ya registrado */
-.alta__lista-titulo {
+/* List of existing records */
+.form-page__list-title {
   font-size: 1.4rem;
   margin-bottom: 0.25rem;
 }
 
-.alta__lista-sub {
-  color: var(--cm-tinta-suave);
+.form-page__list-subtitle {
+  color: var(--cm-ink-soft);
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
 
-.alta__lista {
+.form-page__list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -94,97 +94,97 @@
   overflow-y: auto;
 }
 
-.alta__item {
+.form-page__item {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
   padding: 0.7rem 0;
-  border-bottom: 1px solid var(--cm-linea);
+  border-bottom: 1px solid var(--cm-line);
 }
 
-.alta__item:last-child {
+.form-page__item:last-child {
   border-bottom: 0;
 }
 
-.alta__item-nombre {
+.form-page__item-name {
   font-weight: 600;
 }
 
-.alta__item-detalle {
+.form-page__item-detail {
   display: block;
   font-size: 0.85rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.alta__item-valor {
+.form-page__item-value {
   font-weight: 700;
-  color: var(--cm-cancha-oscuro);
+  color: var(--cm-green-dark);
   white-space: nowrap;
 }
 
-.alta__item--nuevo {
+.form-page__item--new {
   background: #fdf6e3;
   margin: 0 -0.75rem;
   padding: 0.7rem 0.75rem;
   border-radius: 6px;
 }
 
-.alta__vacio {
-  color: var(--cm-tinta-suave);
+.form-page__empty {
+  color: var(--cm-ink-soft);
   padding: 1.5rem 0;
   text-align: center;
 }
 
 @media (max-width: 992px) {
-  .alta {
+  .form-page {
     grid-template-columns: 1fr;
   }
 }
 
-.alta--sola {
+.form-page--single {
   grid-template-columns: minmax(0, 46rem);
   justify-content: center;
 }
 
-.alta__nota {
-  color: var(--cm-tinta-suave);
+.form-page__note {
+  color: var(--cm-ink-soft);
 }
 
-.alta__nota ul {
+.form-page__note ul {
   padding-left: 1.1rem;
   margin: 0.75rem 0 0;
 }
 
-.alta__nota li + li {
+.form-page__note li + li {
   margin-top: 0.4rem;
 }
 
-.alta--ancha {
+.form-page--wide {
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* Datos de solo lectura, como en el perfil */
-.perfil {
+/* Read-only details, as in the profile */
+.profile-list {
   display: grid;
   grid-template-columns: 8rem 1fr;
   gap: 0;
   margin: 0 0 1.5rem;
-  border-top: 1px solid var(--cm-linea);
+  border-top: 1px solid var(--cm-line);
 }
 
-.perfil dt,
-.perfil dd {
+.profile-list dt,
+.profile-list dd {
   margin: 0;
   padding: 0.75rem 0;
-  border-bottom: 1px solid var(--cm-linea);
+  border-bottom: 1px solid var(--cm-line);
 }
 
-.perfil dt {
+.profile-list dt {
   font-weight: 500;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.perfil dd {
+.profile-list dd {
   font-weight: 600;
 }

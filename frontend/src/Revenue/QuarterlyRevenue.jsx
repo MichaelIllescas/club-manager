@@ -1,7 +1,7 @@
-import Footer from "../Index/Footer";
-import { formatearMoneda } from "../Utils/formatearMoneda";
+import Footer from "../Pages/Footer";
+import { formatCurrency } from "../Utils/formatCurrency";
 import Header from "../Navbar/Header";
-import { COLOR_ANIO, COLOR_ANTERIOR, opcionesGrafico } from "../Utils/estiloGraficos";
+import { SELECTED_YEAR_COLOR, PREVIOUS_YEAR_COLOR, chartOptions } from "../Utils/chartStyles";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import { Bar } from "react-chartjs-2";
@@ -14,45 +14,43 @@ import {
   Legend,
 } from "chart.js";
 
-// Registrar los componentes de Chart.js
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const VerRecaudacionesTrimestrales = () => {
-  const [anioSeleccionado, setAnioSeleccionado] = useState(new Date().getFullYear());
-  const [datosTrimestrales, setDatosTrimestrales] = useState([]);
-  const [datosAnioAnterior, setDatosAnioAnterior] = useState([]);
+const QuarterlyRevenue = () => {
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [quarterlyData, setQuarterlyData] = useState([]);
+  const [previousYearData, setPreviousYearData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchRecaudaciones = async () => {
+    const fetchRevenues = async () => {
       try {
         setLoading(true);
         const response = await apiClient.get(
-          `/api/recaudaciones/mensuales?year=${anioSeleccionado}`
+          `/api/revenue/monthly?year=${selectedYear}`
         );
 
-        const datos = response.data;
-        const trimestres = [
-          datos.slice(0, 3).reduce((acc, val) => acc + val, 0),
-          datos.slice(3, 6).reduce((acc, val) => acc + val, 0),
-          datos.slice(6, 9).reduce((acc, val) => acc + val, 0),
-          datos.slice(9, 12).reduce((acc, val) => acc + val, 0),
+        const data = response.data;
+        const quarters = [
+          data.slice(0, 3).reduce((acc, val) => acc + val, 0),
+          data.slice(3, 6).reduce((acc, val) => acc + val, 0),
+          data.slice(6, 9).reduce((acc, val) => acc + val, 0),
+          data.slice(9, 12).reduce((acc, val) => acc + val, 0),
         ];
-        setDatosTrimestrales(trimestres);
+        setQuarterlyData(quarters);
 
-        // Obtener datos del año anterior para comparación
-        const responseAnterior = await apiClient.get(
-          `/api/recaudaciones/mensuales?year=${anioSeleccionado - 1}`
+        const previousResponse = await apiClient.get(
+          `/api/revenue/monthly?year=${selectedYear - 1}`
         );
-        const datosAnteriores = responseAnterior.data;
-        const trimestresAnteriores = [
-          datosAnteriores.slice(0, 3).reduce((acc, val) => acc + val, 0),
-          datosAnteriores.slice(3, 6).reduce((acc, val) => acc + val, 0),
-          datosAnteriores.slice(6, 9).reduce((acc, val) => acc + val, 0),
-          datosAnteriores.slice(9, 12).reduce((acc, val) => acc + val, 0),
+        const previousData = previousResponse.data;
+        const previousQuarters = [
+          previousData.slice(0, 3).reduce((acc, val) => acc + val, 0),
+          previousData.slice(3, 6).reduce((acc, val) => acc + val, 0),
+          previousData.slice(6, 9).reduce((acc, val) => acc + val, 0),
+          previousData.slice(9, 12).reduce((acc, val) => acc + val, 0),
         ];
-        setDatosAnioAnterior(trimestresAnteriores);
+        setPreviousYearData(previousQuarters);
       } catch (err) {
         console.error("Error al obtener las recaudaciones:", err);
         setError("No se pudieron cargar las recaudaciones. Intente nuevamente.");
@@ -61,38 +59,38 @@ const VerRecaudacionesTrimestrales = () => {
       }
     };
 
-    fetchRecaudaciones();
-  }, [anioSeleccionado]);
+    fetchRevenues();
+  }, [selectedYear]);
 
-  const trimestresLabels = ["Q1 (Ene-Mar)", "Q2 (Abr-Jun)", "Q3 (Jul-Sep)", "Q4 (Oct-Dic)"];
+  const quarterLabels = ["Q1 (Ene-Mar)", "Q2 (Abr-Jun)", "Q3 (Jul-Sep)", "Q4 (Oct-Dic)"];
 
   const data = {
-    labels: trimestresLabels,
+    labels: quarterLabels,
     datasets: [
       {
-        label: `${anioSeleccionado}`,
-        data: datosTrimestrales,
-        backgroundColor: COLOR_ANIO,
+        label: `${selectedYear}`,
+        data: quarterlyData,
+        backgroundColor: SELECTED_YEAR_COLOR,
         borderRadius: 4,
         borderWidth: 1,
       },
       {
-        label: `${anioSeleccionado - 1} (año anterior)`,
-        data: datosAnioAnterior,
-        backgroundColor: COLOR_ANTERIOR,
+        label: `${selectedYear - 1} (año anterior)`,
+        data: previousYearData,
+        backgroundColor: PREVIOUS_YEAR_COLOR,
         borderRadius: 4,
         borderWidth: 1,
       },
     ],
   };
 
-  const options = opcionesGrafico();
+  const options = chartOptions();
 
-  const totalRecaudaciones = datosTrimestrales.reduce((total, valor) => total + (valor || 0), 0);
-  const totalRecaudacionesAnterior = datosAnioAnterior.reduce((total, valor) => total + (valor || 0), 0);
-  const diferencia = totalRecaudaciones - totalRecaudacionesAnterior;
-  const porcentajeCrecimiento = totalRecaudacionesAnterior !== 0 
-    ? ((diferencia / totalRecaudacionesAnterior) * 100).toFixed(2) 
+  const totalRevenue = quarterlyData.reduce((total, value) => total + (value || 0), 0);
+  const totalPreviousRevenue = previousYearData.reduce((total, value) => total + (value || 0), 0);
+  const difference = totalRevenue - totalPreviousRevenue;
+  const percentageGrowth = totalPreviousRevenue !== 0 
+    ? ((difference / totalPreviousRevenue) * 100).toFixed(2) 
     : "N/A";
 
   return (
@@ -102,11 +100,11 @@ const VerRecaudacionesTrimestrales = () => {
         <div className="container my-5 panel py-3 rounded my-5">
           <div className="text-center mb-4">
             <h1>Recaudación trimestral</h1>
-            <label htmlFor="anio"className="">Seleccione el año: </label>
+            <label htmlFor="year"className="">Seleccione el año: </label>
             <select
-              id="anio"
-              value={anioSeleccionado}
-              onChange={(e) => setAnioSeleccionado(parseInt(e.target.value))}
+              id="year"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
               className="form-select w-auto d-inline-block ms-3"
             >
               {[...Array(10)].map((_, i) => (
@@ -128,11 +126,11 @@ const VerRecaudacionesTrimestrales = () => {
                 <div className="col-lg-4">
                   <div className="panel p-4 rounded">
                     <h3 className="mb-3">Resumen trimestral</h3>
-                    <p><strong>Año seleccionado:</strong> {anioSeleccionado}</p>
-                    <p><strong>Total recaudado en {anioSeleccionado}:</strong> {formatearMoneda(totalRecaudaciones)}</p>
-                    <p><strong>Total recaudado en {anioSeleccionado - 1}:</strong> {formatearMoneda(totalRecaudacionesAnterior)}</p>
-                    <p><strong>Diferencia:</strong> {diferencia >= 0 ? `+${formatearMoneda(diferencia)}` : `-${formatearMoneda(Math.abs(diferencia))}`}</p>
-                    <p><strong>Crecimiento:</strong> {porcentajeCrecimiento !== "N/A" ? `${porcentajeCrecimiento}%` : "No disponible"}</p>
+                    <p><strong>Año seleccionado:</strong> {selectedYear}</p>
+                    <p><strong>Total recaudado en {selectedYear}:</strong> {formatCurrency(totalRevenue)}</p>
+                    <p><strong>Total recaudado en {selectedYear - 1}:</strong> {formatCurrency(totalPreviousRevenue)}</p>
+                    <p><strong>Diferencia:</strong> {difference >= 0 ? `+${formatCurrency(difference)}` : `-${formatCurrency(Math.abs(difference))}`}</p>
+                    <p><strong>Crecimiento:</strong> {percentageGrowth !== "N/A" ? `${percentageGrowth}%` : "No disponible"}</p>
                   </div>
                 </div>
               </div>
@@ -146,15 +144,15 @@ const VerRecaudacionesTrimestrales = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {trimestresLabels.map((trimestre, index) => (
+                    {quarterLabels.map((quarter, index) => (
                       <tr key={index}>
-                        <td>{trimestre}</td>
-                        <td>{formatearMoneda(datosTrimestrales[index])}</td>
+                        <td>{quarter}</td>
+                        <td>{formatCurrency(quarterlyData[index])}</td>
                       </tr>
                     ))}
                     <tr>
                       <td><strong>Total</strong></td>
-                      <td><strong>{formatearMoneda(totalRecaudaciones)}</strong></td>
+                      <td><strong>{formatCurrency(totalRevenue)}</strong></td>
                     </tr>
                   </tbody>
                 </table>
@@ -170,4 +168,4 @@ const VerRecaudacionesTrimestrales = () => {
   );
 };
 
-export default VerRecaudacionesTrimestrales;
+export default QuarterlyRevenue;

@@ -2,19 +2,19 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const EditarUsuario = ({ userId, onClose, onUpdate }) => {
+const EditUser = ({ userId, onClose, onUpdate }) => {
   const [user, setUser] = useState({
     id: null,
-    nombre: "",
-    apellido: "",
+    firstName: "",
+    lastName: "",
     dni: "",
-    telefono: "",
-    direccion: "",
+    phone: "",
+    address: "",
     email: "",
-    estado: "activo",
-    rol: "", // Rol inicial como string vacío
+    status: "ACTIVE",
+    role: "",
   });
-  const [roles, setRoles] = useState([]); // Para almacenar roles como strings
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,15 +23,15 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
       try {
         const [userResponse, rolesResponse] = await Promise.all([
           apiClient.get(`/api/users/${userId}`),
-          apiClient.get("/auth/roles"), // Los roles vienen como ["USER", "ADMIN"]
+          apiClient.get("/auth/roles"),
         ]);
 
         setUser({
           ...userResponse.data,
-          estado: userResponse.data.estado || "Activo",
-          rol: userResponse.data.rol || "", // Asegura que 'rol' sea un string
+          status: userResponse.data.status || "ACTIVE",
+          role: userResponse.data.role || "",
         });
-        setRoles(rolesResponse.data || []); // Los roles se guardan como strings
+        setRoles(rolesResponse.data || []);
       } catch (err) {
         console.error("Error al cargar datos:", err);
         setError("Hubo un error al cargar los datos. Intente nuevamente.");
@@ -89,9 +89,9 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
                 <label>Nombre:</label>
                 <input
                   type="text"
-                  name="nombre"
+                  name="firstName"
                   className="form-control"
-                  value={user.nombre}
+                  value={user.firstName}
                   onChange={handleChange}
                   required
                 />
@@ -100,9 +100,9 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
                 <label>Apellido:</label>
                 <input
                   type="text"
-                  name="apellido"
+                  name="lastName"
                   className="form-control"
-                  value={user.apellido}
+                  value={user.lastName}
                   onChange={handleChange}
                   required
                 />
@@ -122,9 +122,9 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
                 <label>Teléfono:</label>
                 <input
                   type="text"
-                  name="telefono"
+                  name="phone"
                   className="form-control"
-                  value={user.telefono}
+                  value={user.phone}
                   onChange={handleChange}
                   required
                 />
@@ -133,9 +133,9 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
                 <label>Dirección:</label>
                 <input
                   type="text"
-                  name="direccion"
+                  name="address"
                   className="form-control"
-                  value={user.direccion}
+                  value={user.address}
                   onChange={handleChange}
                   required
                 />
@@ -154,22 +154,22 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
               <div className="mb-3">
                 <label>Estado:</label>
                 <select
-                  name="estado"
+                  name="status"
                   className="form-select"
-                  value={user.estado}
+                  value={user.status}
                   onChange={handleChange}
                   required
                 >
-                  <option value="ACTIVO">Activo</option>
-                  <option value="INACTIVO">Inactivo</option>
+                  <option value="ACTIVE">Activo</option>
+                  <option value="INACTIVE">Inactivo</option>
                 </select>
               </div>
               <div className="mb-3">
                 <label>Rol:</label>
                 <select
-                  name="rol"
+                  name="role"
                   className="form-select"
-                  value={user.rol}
+                  value={user.role}
                   onChange={handleChange}
                   required
                 >
@@ -201,10 +201,10 @@ const EditarUsuario = ({ userId, onClose, onUpdate }) => {
   );
 };
 
-EditarUsuario.propTypes = {
+EditUser.propTypes = {
   userId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   onClose: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
 };
 
-export default EditarUsuario;
+export default EditUser;

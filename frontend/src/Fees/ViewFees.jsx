@@ -1,30 +1,30 @@
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import Header from "../Navbar/Header";
 import TableGeneric from "../Components/TableGeneric";
-import ResumenLista from "../Components/ResumenLista";
+import SummaryStrip from "../Components/SummaryStrip";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiClient from "../Config/axiosConfig";
 import { useSession } from "../Auth/useSession";
-import { formatearMoneda } from "../Utils/formatearMoneda";
-import { formatearFecha } from "../Utils/formatearFecha";
+import { formatCurrency } from "../Utils/formatCurrency";
+import { formatDate } from "../Utils/formatDate";
 
-const VerCuotas = () => {
-  const { rol } = useSession();
-  const [cuotas, setCuotas] = useState([]);
-  const [pagos, setPagos] = useState([]);
+const ViewFees = () => {
+  const { role } = useSession();
+  const [fees, setFees] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDatos = async () => {
+    const fetchData = async () => {
       try {
-        const [respuestaCuotas, respuestaPagos] = await Promise.all([
-          apiClient.get("/api/cuotas"),
-          apiClient.get("/api/pagos/listadoGeneralPagos").catch(() => ({ data: [] })),
+        const [feesResponse, paymentsResponse] = await Promise.all([
+          apiClient.get("/api/fees"),
+          apiClient.get("/api/payments/details").catch(() => ({ data: [] })),
         ]);
-        setCuotas(respuestaCuotas.data);
-        setPagos(Array.isArray(respuestaPagos.data) ? respuestaPagos.data : []);
+        setFees(feesResponse.data);
+        setPayments(Array.isArray(paymentsResponse.data) ? paymentsResponse.data : []);
       } catch (err) {
         console.error("Error al obtener las cuotas:", err);
         setError("No se pudieron cargar las cuotas. Intente nuevamente.");
@@ -33,25 +33,25 @@ const VerCuotas = () => {
       }
     };
 
-    fetchDatos();
+    fetchData();
   }, []);
 
-  // Cuántos pagos tiene cada cuota y cuánto se recaudó con ella
-  const filas = cuotas.map((cuota) => {
-    const pagosDeLaCuota = pagos.filter((pago) => pago.tipo === cuota.tipo);
-    const recaudado = pagosDeLaCuota.reduce((total, pago) => total + Number(pago.monto || 0), 0);
+  // How many payments each fee has and how much it collected
+  const rows = fees.map((fee) => {
+    const feePayments = payments.filter((payment) => payment.feeName === fee.name);
+    const collected = feePayments.reduce((total, payment) => total + Number(payment.amount || 0), 0);
     return {
-      id: cuota.id,
-      tipo: cuota.tipo,
-      monto: formatearMoneda(cuota.monto),
-      pagos: pagosDeLaCuota.length,
-      recaudado: formatearMoneda(recaudado),
-      actualizada: formatearFecha(cuota.fechaUltimaActualizacion),
+      id: fee.id,
+      name: fee.name,
+      amount: formatCurrency(fee.amount),
+      payments: feePayments.length,
+      collected: formatCurrency(collected),
+      lastUpdated: formatDate(fee.lastUpdated),
     };
   });
 
-  const masAlta = cuotas.reduce((max, cuota) => (cuota.monto > (max?.monto ?? -1) ? cuota : max), null);
-  const recaudadoTotal = pagos.reduce((total, pago) => total + Number(pago.monto || 0), 0);
+  const highestFee = fees.reduce((max, fee) => (fee.amount > (max?.amount ?? -1) ? fee : max), null);
+  const totalCollected = payments.reduce((total, payment) => total + Number(payment.amount || 0), 0);
 
   return (
     <>
@@ -63,23 +63,23 @@ const VerCuotas = () => {
           <div className="alert alert-danger mt-4">{error}</div>
         ) : (
           <>
-            <ResumenLista
-              datos={[
-                { nombre: "Cuotas registradas", valor: cuotas.length },
+            <SummaryStrip
+              data={[
+                { label: "Cuotas registradas", value: fees.length },
                 {
-                  nombre: masAlta ? `Cuota más alta (${masAlta.tipo})` : "Cuota más alta",
-                  valor: masAlta ? formatearMoneda(masAlta.monto) : "—",
+                  label: highestFee ? `Cuota más alta (${highestFee.name})` : "Cuota más alta",
+                  value: highestFee ? formatCurrency(highestFee.amount) : "—",
                 },
-                { nombre: "Recaudado con todas las cuotas", valor: formatearMoneda(recaudadoTotal) },
+                { label: "Recaudado con todas las cuotas", value: formatCurrency(totalCollected) },
               ]}
             />
             <TableGeneric
-              columnas={["id", "tipo", "monto", "pagos", "recaudado", "actualizada"]}
-              mensajeVacio="Todavía no hay cuotas registradas."
-              titulo="Cuotas"
-              data={filas}
-              accionPrincipal={
-                rol === "ADMIN" && (
+              columns={["id", "name", "amount", "payments", "collected", "lastUpdated"]}
+              emptyMessage="Todavía no hay cuotas registradas."
+              title="Cuotas"
+              data={rows}
+              primaryAction={
+                role === "ADMIN" && (
                   <Link to="/cuotas/nueva" className="btn btn-primary">
                     <i className="fas fa-plus me-2" aria-hidden="true"></i>Nueva cuota
                   </Link>
@@ -94,4 +94,4 @@ const VerCuotas = () => {
   );
 };
 
-export default VerCuotas;
+export default ViewFees;

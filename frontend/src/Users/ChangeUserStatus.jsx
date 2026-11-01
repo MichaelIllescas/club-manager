@@ -1,24 +1,26 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
 
-const CambioEstadoUsuario = () => {
-  const [usuarios, setUsuarios] = useState([]); // Estado para almacenar los usuarios
-  const [loading, setLoading] = useState(true); // Estado para manejar el spinner o carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [selectedUsuario, setSelectedUsuario] = useState(null); // Estado para el usuario seleccionado
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [action, setAction] = useState(""); // Acción actual: habilitar o anular
+// Text shown to the user for each action
+const ACTION_LABELS = { deactivate: "anular", activate: "habilitar" };
 
-  // Función para obtener los usuarios desde el backend
-  const fetchUsuarios = async () => {
+const ChangeUserStatus = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [action, setAction] = useState("");
+
+  const fetchUsers = async () => {
     try {
-      const response = await apiClient.get("/api/users/estados-usuarios");
-      setUsuarios(response.data);
+      const response = await apiClient.get("/api/users/statuses");
+      setUsers(response.data);
     } catch (err) {
       console.error("Error al obtener los usuarios:", err);
       setError("No se pudieron cargar los usuarios. Intente nuevamente.");
@@ -28,49 +30,46 @@ const CambioEstadoUsuario = () => {
   };
 
   useEffect(() => {
-    fetchUsuarios(); // Llama a la función al montar el componente
+    fetchUsers();
   }, []);
 
-  // Mostrar el modal y establecer la acción (habilitar/anular)
-  const handleActionClick = (usuario, actionType) => {
-    setSelectedUsuario(usuario); // Establece el usuario seleccionado
-    setAction(actionType); // Define la acción
-    setShowModal(true); // Muestra el modal
+  const handleActionClick = (user, actionType) => {
+    setSelectedUser(user);
+    setAction(actionType);
+    setShowModal(true);
   };
 
-  // Confirmar la acción (habilitar/anular)
   const handleConfirmAction = async () => {
     try {
       const endpoint =
-        action === "anular"
-          ? `/api/users/${selectedUsuario.id}/anular`
-          : `/api/users/${selectedUsuario.id}/habilitar`;
+        action === "deactivate"
+          ? `/api/users/${selectedUser.id}/deactivate`
+          : `/api/users/${selectedUser.id}/activate`;
 
-      await apiClient.put(endpoint); // Llamada al backend
-      setShowModal(false); // Cierra el modal
-      fetchUsuarios(); // Refresca la lista de usuarios
+      await apiClient.put(endpoint);
+      setShowModal(false);
+      fetchUsers();
     } catch (err) {
-      console.error(`Error al ${action} el usuario:`, err);
-      setError(`No se pudo ${action} el usuario. Intente nuevamente.`);
+      console.error(`Error al ${ACTION_LABELS[action]} el usuario:`, err);
+      setError(`No se pudo ${ACTION_LABELS[action]} el usuario. Intente nuevamente.`);
     }
   };
 
-  // Generar datos con acciones embebidas
-  const usuariosConAcciones = usuarios.map((usuario) => ({
-    ...usuario,
-    acciones: (
+  const usersWithActions = users.map((user) => ({
+    ...user,
+    actions: (
       <button
         className={`btn ${
-          usuario.estado === "ACTIVO" ? "btn-danger" : "btn-success"
+          user.status === "ACTIVE" ? "btn-danger" : "btn-success"
         } me-2`}
         onClick={() =>
           handleActionClick(
-            usuario,
-            usuario.estado === "ACTIVO" ? "anular" : "habilitar",
+            user,
+            user.status === "ACTIVE" ? "deactivate" : "activate",
           )
         }
       >
-        {usuario.estado === "ACTIVO" ? "Anular" : "Habilitar"}
+        {user.status === "ACTIVE" ? "Anular" : "Habilitar"}
       </button>
     ),
   }));
@@ -88,18 +87,18 @@ const CambioEstadoUsuario = () => {
                 <p className="text-center text-danger">{error}</p>
               ) : (
                 <TableGeneric
-                  columnas={[
+                  columns={[
                     "id",
-                    "nombre",
-                    "apellido",
+                    "firstName",
+                    "lastName",
                     "dni",
                     "email",
-                    "estado",
-                    "acciones",
+                    "status",
+                    "actions",
                   ]}
-                  mensajeVacio="Todavía no hay usuarios registrados."
-                  titulo={"Estado de los usuarios"}
-                  data={usuariosConAcciones}
+                  emptyMessage="Todavía no hay usuarios registrados."
+                  title={"Estado de los usuarios"}
+                  data={usersWithActions}
                 />
               )}
             </div>
@@ -107,20 +106,19 @@ const CambioEstadoUsuario = () => {
         </div>
       </div>
 
-      {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar Acción</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro de que quieres {action} a {selectedUsuario?.nombre}?
+          ¿Estás seguro de que quieres {ACTION_LABELS[action]} a {selectedUser?.firstName}?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
           <Button
-            variant={action === "anular" ? "danger" : "success"}
+            variant={action === "deactivate" ? "danger" : "success"}
             onClick={handleConfirmAction}
           >
             Confirmar
@@ -133,4 +131,4 @@ const CambioEstadoUsuario = () => {
   );
 };
 
-export default CambioEstadoUsuario;
+export default ChangeUserStatus;

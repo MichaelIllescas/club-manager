@@ -2,23 +2,23 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
-  const [socio, setSocio] = useState({
-    nombre: "",
-    apellido: "",
+const UpdateMember = ({ memberId, onClose, onUpdate }) => {
+  const [member, setMember] = useState({
+    firstName: "",
+    lastName: "",
     dni: "",
-    telefono: "",
+    phone: "",
     email: "",
-    direccion: "",
-    numeroSocio: ""
+    address: "",
+    memberNumber: ""
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSocio = async () => {
+    const fetchMember = async () => {
       try {
-        const response = await apiClient.get(`/api/socios/${socioId}`);
-        setSocio(response.data);
+        const response = await apiClient.get(`/api/members/${memberId}`);
+        setMember(response.data);
       } catch (error) {
         console.error("Error al cargar los datos del socio:", error);
       } finally {
@@ -26,20 +26,20 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
       }
     };
 
-    fetchSocio();
-  }, [socioId]);
+    fetchMember();
+  }, [memberId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSocio({ ...socio, [name]: value });
+    setMember({ ...member, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await apiClient.put(`/api/socios/${socioId}`, socio);
-      onUpdate(); // Actualiza la lista de socios
-      onClose(); // Cierra el modal
+      await apiClient.put(`/api/members/${memberId}`, member);
+      onUpdate();
+      onClose();
     } catch (error) {
       console.error("Error al actualizar el socio:", error);
     }
@@ -68,9 +68,9 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                 <label>Nombre:</label>
                 <input
                   type="text"
-                  name="nombre"
+                  name="firstName"
                   className="form-control"
-                  value={socio.nombre}
+                  value={member.firstName}
                   onChange={handleChange}
                   required
                 />
@@ -79,9 +79,9 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                 <label>Apellido:</label>
                 <input
                   type="text"
-                  name="apellido"
+                  name="lastName"
                   className="form-control"
-                  value={socio.apellido}
+                  value={member.lastName}
                   onChange={handleChange}
                   required
                 />
@@ -92,7 +92,7 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                   type="text"
                   name="dni"
                   className="form-control"
-                  value={socio.dni}
+                  value={member.dni}
                   onChange={handleChange}
                   required
                 />
@@ -101,9 +101,9 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                 <label>Teléfono:</label>
                 <input
                   type="text"
-                  name="telefono"
+                  name="phone"
                   className="form-control"
-                  value={socio.telefono}
+                  value={member.phone}
                   onChange={handleChange}
                   required
                 />
@@ -114,7 +114,7 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                   type="email"
                   name="email"
                   className="form-control"
-                  value={socio.email}
+                  value={member.email}
                   onChange={handleChange}
                   
                 />
@@ -123,9 +123,9 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                 <label>Dirección:</label>
                 <input
                   type="text"
-                  name="direccion"
+                  name="address"
                   className="form-control"
-                  value={socio.direccion}
+                  value={member.address}
                   onChange={handleChange}
                   required
                 />
@@ -134,9 +134,9 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                 <label>Número de socio:</label>
                 <input
                   type="text"
-                  name="numeroSocio"
+                  name="memberNumber"
                   className="form-control"
-                  value={socio.numeroSocio}
+                  value={member.memberNumber}
                   onChange={handleChange}
                   
                 />
@@ -161,10 +161,10 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
   );
 };
 
-ActualizarSocio.propTypes = {
-  socioId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+UpdateMember.propTypes = {
+  memberId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   onClose: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
 };
 
-export default ActualizarSocio;
+export default UpdateMember;

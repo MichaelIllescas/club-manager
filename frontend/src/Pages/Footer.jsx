@@ -2,7 +2,7 @@ import "./Footer.css";
 
 const Footer = () => {
   return (
-    <footer className="sitio-footer">
+    <footer className="site-footer">
       <span>© {new Date().getFullYear()} Club Manager</span>
       <span>
         Desarrollado por{" "}

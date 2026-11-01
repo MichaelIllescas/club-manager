@@ -3,26 +3,25 @@ import apiClient from "../Config/axiosConfig";
 import CountUp from "react-countup";
 import Header from "../Navbar/Header";
 import Footer from "./Footer";
-import GraficoIndex from "./Grafico"; // Asegúrate de que la ruta sea correcta
+import RevenueChart from "./RevenueChart";
 import { useSession } from "../Auth/useSession";
 import { Link } from "react-router-dom";
-import "./Inicio.css";
+import "./Home.css";
 
 function App() {
-  const { rol: role, usuario } = useSession();
+  const { role: role, user } = useSession();
 
 
   const [dashboardData, setDashboardData] = useState({
-    cantidadJugadores: 0,
-    cantidadSocios: 0,
-    recaudacionTotal: 0,
-    categoriasActivas: 0,
-    graficoData: [],
+    playerCount: 0,
+    memberCount: 0,
+    totalRevenue: 0,
+    activeCategories: 0,
+    chartData: [],
   });
 
   useEffect(() => {
-    // Llamada al backend para obtener datos
-    apiClient.get("/api/dashboard") // Cambia la URL si es necesario
+    apiClient.get("/api/dashboard")
       .then((response) => {
         setDashboardData(response.data);
       })
@@ -31,60 +30,60 @@ function App() {
       });
   }, []);
 
-  const sinAnimacion =
+  const reducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  const duracion = sinAnimacion ? 0 : 1.2;
+  const duration = reducedMotion ? 0 : 1.2;
 
-  const accesos = [
-    { to: "/pagos/nuevo", icono: "fa-hand-holding-usd", texto: "Registrar pago" },
-    { to: "/socios/nuevo", icono: "fa-user-plus", texto: "Registrar socio" },
-    { to: "/jugadores/nuevo", icono: "fa-running", texto: "Registrar jugador" },
-    { to: "/pagos", icono: "fa-list", texto: "Ver pagos" },
+  const shortcuts = [
+    { to: "/pagos/nuevo", icon: "fa-hand-holding-usd", text: "Registrar pago" },
+    { to: "/socios/nuevo", icon: "fa-user-plus", text: "Registrar socio" },
+    { to: "/jugadores/nuevo", icon: "fa-running", text: "Registrar jugador" },
+    { to: "/pagos", icon: "fa-list", text: "Ver pagos" },
   ];
 
   return (
     <>
       <Header />
 
-      <main className="container inicio">
-        <div className="inicio__encabezado">
-          <h1>Hola{usuario?.nombre ? `, ${usuario.nombre}` : ""}</h1>
+      <main className="container home">
+        <div className="home__header">
+          <h1>Hola{user?.firstName ? `, ${user.firstName}` : ""}</h1>
           <p>Este es el estado del club hoy.</p>
         </div>
 
         {role === "ADMIN" && (
-          <section className="marcador" aria-label="Resumen del club">
-            <div className="marcador__dato">
-              <span className="marcador__valor">
-                <CountUp start={0} end={dashboardData.cantidadSocios} duration={duracion} />
+          <section className="scoreboard" aria-label="Resumen del club">
+            <div className="scoreboard__item">
+              <span className="scoreboard__value">
+                <CountUp start={0} end={dashboardData.memberCount} duration={duration} />
               </span>
-              <span className="marcador__nombre">Socios</span>
+              <span className="scoreboard__label">Socios</span>
             </div>
-            <div className="marcador__dato">
-              <span className="marcador__valor">
-                <CountUp start={0} end={dashboardData.cantidadJugadores} duration={duracion} />
+            <div className="scoreboard__item">
+              <span className="scoreboard__value">
+                <CountUp start={0} end={dashboardData.playerCount} duration={duration} />
               </span>
-              <span className="marcador__nombre">Jugadores</span>
+              <span className="scoreboard__label">Jugadores</span>
             </div>
-            <div className="marcador__dato">
-              <span className="marcador__valor">
-                <CountUp start={0} end={dashboardData.categoriasActivas} duration={duracion} />
+            <div className="scoreboard__item">
+              <span className="scoreboard__value">
+                <CountUp start={0} end={dashboardData.activeCategories} duration={duration} />
               </span>
-              <span className="marcador__nombre">Categorías</span>
+              <span className="scoreboard__label">Categorías</span>
             </div>
-            <div className="marcador__dato marcador__dato--total">
-              <span className="marcador__valor">
+            <div className="scoreboard__item scoreboard__item--total">
+              <span className="scoreboard__value">
                 $<CountUp
                   start={0}
-                  end={dashboardData.recaudacionTotal}
-                  duration={duracion}
+                  end={dashboardData.totalRevenue}
+                  duration={duration}
                   separator="."
                   decimal=","
                   decimals={2}
                 />
               </span>
-              <span className="marcador__nombre">Recaudado</span>
+              <span className="scoreboard__label">Recaudado</span>
             </div>
           </section>
         )}
@@ -93,12 +92,12 @@ function App() {
           <div className={role === "ADMIN" ? "col-lg-8" : "col-12"}>
             {role === "ADMIN" ? (
               <section className="panel p-4 h-100">
-                <h2 className="inicio__titulo">Recaudación por mes</h2>
-                <GraficoIndex data={dashboardData.graficoData} />
+                <h2 className="home__title">Recaudación por mes</h2>
+                <RevenueChart data={dashboardData.chartData} />
               </section>
             ) : (
               <section className="panel p-4">
-                <h2 className="inicio__titulo">¿Qué querés hacer?</h2>
+                <h2 className="home__title">¿Qué querés hacer?</h2>
                 <p className="text-secondary mb-0">
                   Elegí una tarea de la lista o usá el menú de arriba para ver todas las secciones.
                 </p>
@@ -107,12 +106,12 @@ function App() {
           </div>
           <div className={role === "ADMIN" ? "col-lg-4" : "col-12"}>
             <section className="panel p-4 h-100">
-              <h2 className="inicio__titulo">Accesos rápidos</h2>
-              <nav className="accesos">
-                {accesos.map((acceso) => (
-                  <Link key={acceso.to} to={acceso.to} className="accesos__item">
-                    <i className={`fas ${acceso.icono}`} aria-hidden="true"></i>
-                    {acceso.texto}
+              <h2 className="home__title">Accesos rápidos</h2>
+              <nav className="shortcuts">
+                {shortcuts.map((shortcut) => (
+                  <Link key={shortcut.to} to={shortcut.to} className="shortcuts__item">
+                    <i className={`fas ${shortcut.icon}`} aria-hidden="true"></i>
+                    {shortcut.text}
                   </Link>
                 ))}
               </nav>

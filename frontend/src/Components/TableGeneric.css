@@ -1,9 +1,9 @@
-.tabla {
+.data-table {
   padding: 1.5rem;
   margin-top: 1.5rem;
 }
 
-.tabla__encabezado {
+.data-table__header {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -12,52 +12,52 @@
   margin-bottom: 1.25rem;
 }
 
-.tabla__titulo {
+.data-table__title {
   font-size: 2rem;
   margin: 0;
 }
 
-.tabla__total {
-  color: var(--cm-tinta-suave);
+.data-table__total {
+  color: var(--cm-ink-soft);
 }
 
-.tabla__herramientas {
+.data-table__toolbar {
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.tabla__buscar {
+.data-table__search {
   position: relative;
   flex: 1;
 }
 
-.tabla__buscar i {
+.data-table__search i {
   position: absolute;
   left: 0.85rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.tabla__buscar .form-control {
+.data-table__search .form-control {
   padding-left: 2.4rem;
 }
 
-.tabla__columnas {
+.data-table__columns {
   min-width: 14rem;
   padding: 0.75rem 1rem;
 }
 
-.tabla__columnas .form-check + .form-check {
+.data-table__columns .form-check + .form-check {
   margin-top: 0.35rem;
 }
 
-.tabla .table td {
+.data-table .table td {
   white-space: nowrap;
 }
 
-.tabla__orden {
+.data-table__sort {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -69,25 +69,25 @@
   white-space: nowrap;
 }
 
-.tabla__orden i {
+.data-table__sort i {
   opacity: 0.6;
   font-size: 0.8em;
 }
 
-.tabla__acciones {
+.data-table__actions {
   display: flex;
   gap: 0.4rem;
 }
 
-.tabla__paginas {
+.data-table__pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.estado {
+.status-badge {
   display: inline-block;
   padding: 0.15rem 0.6rem;
   border-radius: 999px;
@@ -95,24 +95,24 @@
   font-weight: 600;
 }
 
-.estado--activo {
-  background: var(--cm-cancha-claro);
-  color: var(--cm-cancha-oscuro);
+.status-badge--active {
+  background: var(--cm-green-light);
+  color: var(--cm-green-dark);
 }
 
-.estado--anulado {
+.status-badge--inactive {
   background: #f6e3df;
-  color: var(--cm-deuda);
+  color: var(--cm-red);
 }
 
-.tabla .table td.tabla__vacia {
+.data-table .table td.data-table__empty {
   padding: 2.5rem 1rem;
   text-align: center;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
   white-space: normal;
 }
 
-.tabla__botones {
+.data-table__buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;

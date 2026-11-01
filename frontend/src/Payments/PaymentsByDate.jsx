@@ -2,30 +2,29 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import TableGeneric from "../Components/TableGeneric";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
-import DescargarComprobante from "../Components/ComprobantePagoPDF";
+import Footer from "../Pages/Footer";
+import DownloadReceipt from "../Components/PaymentReceiptPDF";
 
-const VerPagosPorPeriodo = () => {
-  const [diaSeleccionado, setDiaSeleccionado] = useState("");
-  const [mesSeleccionado, setMesSeleccionado] = useState("");
-  const [añoSeleccionado, setAñoSeleccionado] = useState("");
-  const [pagos, setPagos] = useState([]);
-  const [pagosConBoton, setPagosConBoton] = useState([]); // Estado con la columna agregada
+const PaymentsByDate = () => {
+  const [selectedDay, setSelectedDay] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [payments, setPayments] = useState([]);
+  const [paymentsWithButton, setPaymentsWithButton] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Función para obtener los pagos según los filtros seleccionados
-  const fetchPagos = async () => {
+  const fetchPayments = async () => {
     setLoading(true);
     try {
-      let url = "/api/pagos/por-periodo?";
-      if (añoSeleccionado) url += `año=${añoSeleccionado}&`;
-      if (mesSeleccionado) url += `mes=${mesSeleccionado}&`;
-      if (diaSeleccionado) url += `dia=${diaSeleccionado}`;
+      let url = "/api/payments/by-period?";
+      if (selectedYear) url += `year=${selectedYear}&`;
+      if (selectedMonth) url += `month=${selectedMonth}&`;
+      if (selectedDay) url += `day=${selectedDay}`;
 
-      url = url.endsWith("&") ? url.slice(0, -1) : url; // Eliminar el último "&" si queda
+      url = url.endsWith("&") ? url.slice(0, -1) : url;
 
       const response = await apiClient.get(url);
-      setPagos(response.data);
+      setPayments(response.data);
     } catch (error) {
       console.error("Error al obtener pagos:", error);
     } finally {
@@ -33,22 +32,20 @@ const VerPagosPorPeriodo = () => {
     }
   };
 
-  // Actualiza la lista de pagos automáticamente cuando cambian los filtros
   useEffect(() => {
-    fetchPagos();
+    fetchPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [diaSeleccionado, mesSeleccionado, añoSeleccionado]);
+  }, [selectedDay, selectedMonth, selectedYear]);
 
-  // Agregar la columna de "Descargar Comprobante" después de recibir los datos
   useEffect(() => {
-    if (pagos.length > 0) {
-      const pagosConDescarga = pagos.map((pago) => ({
-        ...pago,
-        Comprobante: <DescargarComprobante pago={pago} />,
+    if (payments.length > 0) {
+      const paymentsWithDownload = payments.map((payment) => ({
+        ...payment,
+        receipt: <DownloadReceipt payment={payment} />,
       }));
-      setPagosConBoton(pagosConDescarga);
+      setPaymentsWithButton(paymentsWithDownload);
     }
-  }, [pagos]);
+  }, [payments]);
 
   return (
     <>
@@ -58,13 +55,12 @@ const VerPagosPorPeriodo = () => {
           <div className="panel p-4 rounded">
             <h2>Historial de pagos por fecha</h2>
 
-            {/* Selector de Año */}
             <div className="mb-3">
               <label className="form-label">Seleccionar año:</label>
               <select
                 className="form-select w-100"
-                value={añoSeleccionado}
-                onChange={(e) => setAñoSeleccionado(e.target.value)}
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
               >
                 <option value="">Todos los años</option>
                 {Array.from({ length: 10 }, (_, i) => (
@@ -75,13 +71,12 @@ const VerPagosPorPeriodo = () => {
               </select>
             </div>
 
-            {/* Selector de Mes */}
             <div className="mb-3">
               <label className="form-label">Seleccionar mes:</label>
               <select
                 className="form-select w-100"
-                value={mesSeleccionado}
-                onChange={(e) => setMesSeleccionado(e.target.value)}
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
               >
                 <option value="">Todos los meses</option>
                 {Array.from({ length: 12 }, (_, i) => (
@@ -92,13 +87,12 @@ const VerPagosPorPeriodo = () => {
               </select>
             </div>
 
-            {/* Selector de Día */}
             <div className="mb-3">
               <label className="form-label">Seleccionar día:</label>
               <select
                 className="form-select w-100"
-                value={diaSeleccionado}
-                onChange={(e) => setDiaSeleccionado(e.target.value)}
+                value={selectedDay}
+                onChange={(e) => setSelectedDay(e.target.value)}
               >
                 <option value="">Todos los días</option>
                 {Array.from({ length: 31 }, (_, i) => (
@@ -109,27 +103,26 @@ const VerPagosPorPeriodo = () => {
               </select>
             </div>
 
-            {/* Tabla de Pagos */}
             {loading ? (
               <p>Cargando pagos...</p>
             ) : (
               <TableGeneric
-                columnas={[
+                columns={[
                   "id",
-                  "nombre",
-                  "apellido",
+                  "firstName",
+                  "lastName",
                   "dni",
-                  "categoria",
-                  "fechaPago",
-                  "monto",
-                  "descripcion",
-                  "tipo",
-                  "usuario_registro",
-                  "Comprobante",
+                  "category",
+                  "paymentDate",
+                  "amount",
+                  "description",
+                  "feeName",
+                  "registeredBy",
+                  "receipt",
                 ]}
-                mensajeVacio="No hay pagos en el período elegido."
-                titulo="Pagos encontrados"
-                data={pagosConBoton} // 🔥 Ahora los datos incluyen el botón de descarga
+                emptyMessage="No hay pagos en el período elegido."
+                title="Pagos encontrados"
+                data={paymentsWithButton}
               />
             )}
           </div>
@@ -140,4 +133,4 @@ const VerPagosPorPeriodo = () => {
   );
 };
 
-export default VerPagosPorPeriodo;
+export default PaymentsByDate;

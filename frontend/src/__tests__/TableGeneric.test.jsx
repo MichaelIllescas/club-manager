@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import TableGeneric from "../Components/TableGeneric";
 
-const socios = Array.from({ length: 12 }, (_, i) => ({
-  nombre: `Socio ${String(i + 1).padStart(2, "0")}`,
+const members = Array.from({ length: 12 }, (_, i) => ({
+  firstName: `Socio ${String(i + 1).padStart(2, "0")}`,
   dni: `3000000${i}`,
 }));
 
@@ -16,14 +16,14 @@ describe("TableGeneric", () => {
   });
 
   it("pagina de a 10 filas", () => {
-    render(<TableGeneric data={socios} />);
+    render(<TableGeneric data={members} />);
     expect(screen.getByText("Socio 01")).toBeTruthy();
     expect(screen.queryByText("Socio 11")).toBeNull();
     expect(screen.getByText(/Página 1 de 2/)).toBeTruthy();
   });
 
   it("filtra las filas con el buscador", () => {
-    render(<TableGeneric data={socios} />);
+    render(<TableGeneric data={members} />);
     fireEvent.change(screen.getByPlaceholderText("Buscar en la tabla..."), {
       target: { value: "Socio 12" },
     });
@@ -32,10 +32,10 @@ describe("TableGeneric", () => {
   });
 
   it("ejecuta la acción con la fila correspondiente", () => {
-    const editar = vi.fn();
-    render(<TableGeneric data={socios.slice(0, 1)} actions={[{ label: "Editar", onClick: editar }]} />);
+    const edit = vi.fn();
+    render(<TableGeneric data={members.slice(0, 1)} actions={[{ label: "Editar", onClick: edit }]} />);
     fireEvent.click(screen.getByText("Editar"));
-    expect(editar).toHaveBeenCalledWith(socios[0]);
+    expect(edit).toHaveBeenCalledWith(members[0]);
   });
 });
 
@@ -46,12 +46,12 @@ describe("TableGeneric con datos que llegan después", () => {
     const { rerender } = render(<TableGeneric data={[]} />);
     expect(screen.getByText("Todavía no hay registros.")).toBeTruthy();
 
-    rerender(<TableGeneric data={socios} />);
+    rerender(<TableGeneric data={members} />);
     expect(screen.getByText("Socio 01")).toBeTruthy();
   });
 
   it("oculta una columna al destildarla", () => {
-    render(<TableGeneric data={socios.slice(0, 1)} />);
+    render(<TableGeneric data={members.slice(0, 1)} />);
     fireEvent.click(screen.getByLabelText("DNI"));
     expect(screen.queryByText("30000000")).toBeNull();
   });

@@ -1,7 +1,7 @@
-// Las fechas llegan como "AAAA-MM-DD": se leen como fecha local para no correr un día
-export const formatearFecha = (valor) => {
-  if (!valor) return "Sin fecha";
-  const [anio, mes, dia] = String(valor).slice(0, 10).split("-");
-  if (!anio || !mes || !dia) return "Sin fecha";
-  return `${dia}/${mes}/${anio}`;
+// Dates arrive as "YYYY-MM-DD": read them as local dates so they do not shift by a day
+export const formatDate = (value) => {
+  if (!value) return "Sin fecha";
+  const [year, month, day] = String(value).slice(0, 10).split("-");
+  if (!year || !month || !day) return "Sin fecha";
+  return `${day}/${month}/${year}`;
 };

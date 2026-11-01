@@ -4,68 +4,82 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ExportToExcelButton from "./ExportToExcelButton";
 import "./TableGeneric.css";
 
-// Nombres legibles para las columnas que vienen del backend
-const NOMBRES = {
+// Readable labels for the columns sent by the backend
+const COLUMN_LABELS = {
   id: "ID",
+  firstName: "Nombre",
+  lastName: "Apellido",
+  name: "Nombre",
   dni: "DNI",
-  telefono: "Teléfono",
-  direccion: "Dirección",
+  phone: "Teléfono",
+  address: "Dirección",
   email: "Email",
-  rol: "Rol",
-  numeroSocio: "N° de socio",
-  fechaRegistro: "Fecha de registro",
-  fechaPago: "Fecha de pago",
-  usuario_registro: "Registró",
-  descripcion: "Descripción",
-  categoria: "Categoría",
-  actualizada: "Última actualización",
-  recaudado: "Recaudado",
+  role: "Rol",
+  status: "Estado",
+  actions: "Acciones",
+  memberNumber: "N° de socio",
+  registrationDate: "Fecha de registro",
+  paymentDate: "Fecha de pago",
+  registeredBy: "Registró",
+  description: "Descripción",
+  category: "Categoría",
+  feeName: "Cuota",
+  amount: "Monto",
+  payments: "Pagos",
+  players: "Jugadores",
+  collected: "Recaudado",
+  lastUpdated: "Última actualización",
+  receipt: "Comprobante",
+}
+
+// Statuses are shown as badges so they stand out at a glance
+const STATUS_STYLES = {
+  ACTIVE: { label: "Activo", modifier: "active" },
+  INACTIVE: { label: "Anulado", modifier: "inactive" },
 };
 
-// Los estados se muestran como etiquetas para distinguirlos de un vistazo
-const ESTADOS = { ACTIVO: "activo", HABILITADO: "activo", ANULADO: "anulado", INACTIVO: "anulado", DESHABILITADO: "anulado" };
-
-const celda = (valor) =>
-  typeof valor === "string" && ESTADOS[valor] ? (
-    <span className={`estado estado--${ESTADOS[valor]}`}>{valor.charAt(0) + valor.slice(1).toLowerCase()}</span>
+const renderCell = (value) =>
+  typeof value === "string" && STATUS_STYLES[value] ? (
+    <span className={`status-badge status-badge--${STATUS_STYLES[value].modifier}`}>
+      {STATUS_STYLES[value].label}
+    </span>
   ) : (
-    valor
+    value
   );
 
-const nombreColumna = (clave) =>
-  NOMBRES[clave] ??
-  clave
+const columnLabel = (key) =>
+  COLUMN_LABELS[key] ??
+  key
     .replace(/_/g, " ")
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .toLowerCase()
-    .replace(/^./, (letra) => letra.toUpperCase());
+    .replace(/^./, (letter) => letter.toUpperCase());
 
-// `filtros`: controles extra opcionales que se muestran debajo de "Mostrar columnas"
+// `filters`: optional extra controls shown above the table
 const TableGeneric = ({
-  titulo = "Título de la tabla",
+  title = "Título de la tabla",
   data,
-  columnas = [],
+  columns: defaultColumns = [],
   actions = [],
-  filtros = null,
-  mensajeVacio = "Todavía no hay registros.",
-  accionPrincipal = null,
+  filters = null,
+  emptyMessage = "Todavía no hay registros.",
+  primaryAction = null,
 }) => {
-  const [filterInput, setFilterInput] = useState(""); // Estado del filtro
-  const [currentPage, setCurrentPage] = useState(1); // Estado de la página actual
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" }); // Estado de ordenamiento
-  const [hiddenColumns, setHiddenColumns] = useState({}); // Columnas ocultas por el usuario
-  const itemsPerPage = 10; // Elementos por página
+  const [filterInput, setFilterInput] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [hiddenColumns, setHiddenColumns] = useState({});
+  const itemsPerPage = 10;
 
-  // Los hooks van antes de cualquier return: si la tabla pasa de vacía a tener datos,
-  // React necesita que se llamen siempre en el mismo orden.
+  // Hooks run before any return: when the table goes from empty to having data,
+  // React needs them to be called in the same order.
   const rows = useMemo(() => data ?? [], [data]);
-  // Sin datos, la tabla igual se muestra con las columnas que indica la pantalla
+  // With no data, the table still shows the columns provided by the screen
   const columns = useMemo(
-    () => (rows.length > 0 ? Object.keys(rows[0]) : columnas),
-    [rows, columnas]
+    () => (rows.length > 0 ? Object.keys(rows[0]) : defaultColumns),
+    [rows, defaultColumns]
   );
 
-  // Filtrar datos por búsqueda
   const filteredData = useMemo(() => {
     return rows.filter((item) =>
       Object.values(item)
@@ -75,7 +89,6 @@ const TableGeneric = ({
     );
   }, [filterInput, rows]);
 
-  // Ordenar datos
   const sortedData = useMemo(() => {
     if (sortConfig.key) {
       return [...filteredData].sort((a, b) => {
@@ -94,7 +107,6 @@ const TableGeneric = ({
     return filteredData;
   }, [sortConfig, filteredData]);
 
-  // Paginación
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -130,25 +142,25 @@ const TableGeneric = ({
 
   const isVisible = (column) => !hiddenColumns[column];
 
-  const columnasVisibles = columns.filter(isVisible).length + (actions.length > 0 ? 1 : 0);
+  const visibleColumns = columns.filter(isVisible).length + (actions.length > 0 ? 1 : 0);
 
   return (
-    <section className="tabla panel">
-      <header className="tabla__encabezado">
+    <section className="data-table panel">
+      <header className="data-table__header">
         <div>
-          <h3 className="tabla__titulo">{titulo}</h3>
-          <span className="tabla__total">
+          <h3 className="data-table__title">{title}</h3>
+          <span className="data-table__total">
             {filteredData.length} {filteredData.length === 1 ? "registro" : "registros"}
           </span>
         </div>
-        <div className="tabla__botones">
+        <div className="data-table__buttons">
           <ExportToExcelButton data={filteredData} fileName="tabla_datos.xlsx" />
-          {accionPrincipal}
+          {primaryAction}
         </div>
       </header>
 
-      <div className="tabla__herramientas">
-        <div className="tabla__buscar">
+      <div className="data-table__toolbar">
+        <div className="data-table__search">
           <i className="fas fa-search" aria-hidden="true"></i>
           <input
             type="search"
@@ -172,7 +184,7 @@ const TableGeneric = ({
           >
             <i className="fas fa-columns me-2" aria-hidden="true"></i>Columnas
           </button>
-          <div className="dropdown-menu dropdown-menu-end tabla__columnas">
+          <div className="dropdown-menu dropdown-menu-end data-table__columns">
             {columns.map((column) => (
               <div key={column} className="form-check">
                 <input
@@ -183,7 +195,7 @@ const TableGeneric = ({
                   onChange={() => handleColumnToggle(column)}
                 />
                 <label className="form-check-label" htmlFor={`column-${column}`}>
-                  {nombreColumna(column)}
+                  {columnLabel(column)}
                 </label>
               </div>
             ))}
@@ -191,7 +203,7 @@ const TableGeneric = ({
         </div>
       </div>
 
-      {filtros && <div className="mb-3">{filtros}</div>}
+      {filters && <div className="mb-3">{filters}</div>}
 
       <div className="table-responsive">
         <table className="table table-striped table-hover align-middle">
@@ -213,11 +225,11 @@ const TableGeneric = ({
                     >
                       <button
                         type="button"
-                        className="tabla__orden"
+                        className="data-table__sort"
                         onClick={() => handleSort(column)}
-                        title={`Ordenar por ${nombreColumna(column)}`}
+                        title={`Ordenar por ${columnLabel(column)}`}
                       >
-                        {nombreColumna(column)}
+                        {columnLabel(column)}
                         <i
                           className={`fas ${
                             sortConfig.key !== column
@@ -238,19 +250,19 @@ const TableGeneric = ({
           <tbody>
             {paginatedData.length === 0 && (
               <tr>
-                <td colSpan={Math.max(columnasVisibles, 1)} className="tabla__vacia">
-                  {rows.length === 0 ? mensajeVacio : "Ningún registro coincide con la búsqueda."}
+                <td colSpan={Math.max(visibleColumns, 1)} className="data-table__empty">
+                  {rows.length === 0 ? emptyMessage : "Ningún registro coincide con la búsqueda."}
                 </td>
               </tr>
             )}
             {paginatedData.map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {columns.map(
-                  (column) => isVisible(column) && <td key={column}>{celda(row[column])}</td>
+                  (column) => isVisible(column) && <td key={column}>{renderCell(row[column])}</td>
                 )}
                 {actions.length > 0 && (
                   <td>
-                    <div className="tabla__acciones">
+                    <div className="data-table__actions">
                       {actions.map((action, actionIndex) => (
                         <button
                           key={actionIndex}
@@ -271,7 +283,7 @@ const TableGeneric = ({
       </div>
 
       {totalPages > 1 && (
-        <nav className="tabla__paginas" aria-label="Paginación">
+        <nav className="data-table__pagination" aria-label="Paginación">
           <button
             type="button"
             className="btn btn-secondary btn-sm"
@@ -298,7 +310,7 @@ const TableGeneric = ({
 };
 
 TableGeneric.propTypes = {
-  titulo: PropTypes.string,
+  title: PropTypes.string,
   data: PropTypes.arrayOf(PropTypes.object),
   actions: PropTypes.arrayOf(
     PropTypes.shape({
@@ -308,10 +320,10 @@ TableGeneric.propTypes = {
       icon: PropTypes.elementType,
     })
   ),
-  columnas: PropTypes.arrayOf(PropTypes.string),
-  filtros: PropTypes.node,
-  mensajeVacio: PropTypes.string,
-  accionPrincipal: PropTypes.node,
+  columns: PropTypes.arrayOf(PropTypes.string),
+  filters: PropTypes.node,
+  emptyMessage: PropTypes.string,
+  primaryAction: PropTypes.node,
 };
 
 export default TableGeneric;

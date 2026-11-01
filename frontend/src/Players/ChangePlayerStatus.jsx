@@ -1,24 +1,26 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
 
-const CambioEstadoJugador = () => {
-  const [jugadores, setJugadores] = useState([]); // Estado para almacenar los jugadores
-  const [loading, setLoading] = useState(true); // Estado para manejar el spinner o carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [selectedPlayer, setSelectedPlayer] = useState(null); // Estado para el jugador seleccionado
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [action, setAction] = useState(""); // Acción actual: habilitar o deshabilitar
+// Text shown to the user for each action
+const ACTION_LABELS = { deactivate: "deshabilitar", activate: "habilitar" };
 
-  // Función para obtener los jugadores desde el backend
-  const fetchJugadores = async () => {
+const ChangePlayerStatus = () => {
+  const [players, setPlayers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [action, setAction] = useState("");
+
+  const fetchPlayers = async () => {
     try {
-      const response = await apiClient.get("/api/jugadores/estados");
-      setJugadores(Array.isArray(response.data) ? response.data : []);
+      const response = await apiClient.get("/api/players/statuses");
+      setPlayers(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Error al obtener los jugadores:", err);
       setError("No se pudieron cargar los jugadores. Intente nuevamente.");
@@ -28,49 +30,46 @@ const CambioEstadoJugador = () => {
   };
 
   useEffect(() => {
-    fetchJugadores(); // Llama a la función al montar el componente
+    fetchPlayers();
   }, []);
 
-  // Mostrar el modal y establecer la acción (habilitar/deshabilitar)
   const handleActionClick = (player, actionType) => {
-    setSelectedPlayer(player); // Establece el jugador seleccionado
-    setAction(actionType); // Define la acción
-    setShowModal(true); // Muestra el modal
+    setSelectedPlayer(player);
+    setAction(actionType);
+    setShowModal(true);
   };
 
-  // Confirmar la acción (habilitar/deshabilitar)
   const handleConfirmAction = async () => {
     try {
       const endpoint =
-        action == "deshabilitar"
-          ? `/api/jugadores/deshabilitar/${selectedPlayer.id}`
-          : `/api/jugadores/habilitar/${selectedPlayer.id}`;
+        action === "deactivate"
+          ? `/api/players/${selectedPlayer.id}/deactivate`
+          : `/api/players/${selectedPlayer.id}/activate`;
 
-      await apiClient.put(endpoint); // Llamada al backend
-      setShowModal(false); // Cierra el modal
-      fetchJugadores(); // Refresca la lista de jugadores
+      await apiClient.put(endpoint);
+      setShowModal(false);
+      fetchPlayers();
     } catch (err) {
-      console.error(`Error al ${action} el jugador:`, err);
-      setError(`No se pudo ${action} el jugador. Intente nuevamente.`);
+      console.error(`Error al ${ACTION_LABELS[action]} el jugador:`, err);
+      setError(`No se pudo ${ACTION_LABELS[action]} el jugador. Intente nuevamente.`);
     }
   };
 
-  // Generar datos con acciones embebidas
-  const jugadoresConAcciones = jugadores.map((jugador) => ({
-    ...jugador,
-    acciones: (
+  const playersWithActions = players.map((player) => ({
+    ...player,
+    actions: (
       <button
         className={`btn ${
-          jugador.estado == "ACTIVO" ? "btn-danger" : "btn-success"
+          player.status == "ACTIVE" ? "btn-danger" : "btn-success"
         } me-2`}
         onClick={() =>
           handleActionClick(
-            jugador,
-            jugador.estado == "ACTIVO" ? "deshabilitar" : "habilitar",
+            player,
+            player.status == "ACTIVE" ? "deactivate" : "activate",
           )
         }
       >
-        {jugador.estado == "ACTIVO" ? "Deshabilitar" : "Habilitar"}
+        {player.status == "ACTIVE" ? "Deshabilitar" : "Habilitar"}
       </button>
     ),
   }));
@@ -86,36 +85,35 @@ const CambioEstadoJugador = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              columnas={[
+              columns={[
                 "id",
-                "nombre",
-                "apellido",
+                "firstName",
+                "lastName",
                 "dni",
-                "estado",
-                "acciones",
+                "status",
+                "actions",
               ]}
-              mensajeVacio="Todavía no hay jugadores registrados."
-              titulo={"Estado de los jugadores"}
-              data={jugadoresConAcciones}
+              emptyMessage="Todavía no hay jugadores registrados."
+              title={"Estado de los jugadores"}
+              data={playersWithActions}
             />
           )}
         </div>
       </div>
 
-      {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar Acción</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro de que quieres {action} a {selectedPlayer?.nombre}?
+          ¿Estás seguro de que quieres {ACTION_LABELS[action]} a {selectedPlayer?.firstName}?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
           <Button
-            variant={action === "deshabilitar" ? "danger" : "success"}
+            variant={action === "deactivate" ? "danger" : "success"}
             onClick={handleConfirmAction}
           >
             Confirmar
@@ -128,4 +126,4 @@ const CambioEstadoJugador = () => {
   );
 };
 
-export default CambioEstadoJugador;
+export default ChangePlayerStatus;

@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Evento que se dispara cuando el backend rechaza la sesión
-export const SESION_EXPIRADA = 'sesion-expirada';
+// Event fired when the backend rejects the session
+export const SESSION_EXPIRED = 'session-expired';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080',
-  withCredentials: true, // Envía la cookie de sesión
+  withCredentials: true, // Send the session cookie
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,9 +14,9 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const esLogin = error.config?.url?.includes('/auth/login');
-    if (error.response?.status === 401 && !esLogin) {
-      window.dispatchEvent(new Event(SESION_EXPIRADA));
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+    if (error.response?.status === 401 && !isLoginRequest) {
+      window.dispatchEvent(new Event(SESSION_EXPIRED));
     }
     return Promise.reject(error);
   }

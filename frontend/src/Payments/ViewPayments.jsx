@@ -1,46 +1,45 @@
 import { useState, useEffect } from "react";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import Header from "../Navbar/Header";
 import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
-import DescargarComprobante from "../Components/ComprobantePagoPDF";
+import DownloadReceipt from "../Components/PaymentReceiptPDF";
 
-const VerListadoGeneralPagos = () => {
-  const [pagos, setPagos] = useState([]);
+const ViewPayments = () => {
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [tipoFiltro, setTipoFiltro] = useState("todos");
+  const [typeFilter, setTypeFilter] = useState("all");
 
-  // El backend solo completa `categoria` en pagos de jugadores; en los de socios viene vacía
-  const esPagoDeJugador = (pago) => Boolean(pago.categoria?.trim());
+  // The backend only fills `category` for player payments; for members it is empty
+  const isPlayerPayment = (payment) => Boolean(payment.category?.trim());
 
-  const pagosFiltrados =
-    tipoFiltro === "todos"
-      ? pagos
-      : pagos.filter(
-          (pago) => esPagoDeJugador(pago) === (tipoFiltro === "jugador"),
+  const filteredPayments =
+    typeFilter === "all"
+      ? payments
+      : payments.filter(
+          (payment) => isPlayerPayment(payment) === (typeFilter === "player"),
         );
 
   useEffect(() => {
-    const fetchPagos = async () => {
+    const fetchPayments = async () => {
       try {
-        const response = await apiClient.get("/api/pagos/listadoGeneralPagos");
+        const response = await apiClient.get("/api/payments/details");
 
-        // Formatear fechas y agregar la columna con el botón de descarga
-        // Del más nuevo al más viejo (se ordena antes de formatear la fecha)
-        const ordenados = [...response.data].sort(
+        // Newest first (sorted before the date is formatted)
+        const sorted = [...response.data].sort(
           (a, b) =>
-            new Date(b.fechaPago) - new Date(a.fechaPago) ||
+            new Date(b.paymentDate) - new Date(a.paymentDate) ||
             (b.id ?? 0) - (a.id ?? 0),
         );
 
-        const formattedPagos = ordenados.map((cuota) => ({
-          ...cuota,
-          fechaPago: formatDate(cuota.fechaPago),
-          Comprobante: <DescargarComprobante pago={cuota} />, // Agregamos el botón aquí
+        const formattedPayments = sorted.map((payment) => ({
+          ...payment,
+          paymentDate: formatDate(payment.paymentDate),
+          receipt: <DownloadReceipt payment={payment} />,
         }));
 
-        setPagos(formattedPagos);
+        setPayments(formattedPayments);
       } catch (err) {
         console.error("Error al obtener los pagos:", err);
         setError("No se pudieron cargar los pagos. Intente nuevamente.");
@@ -49,14 +48,13 @@ const VerListadoGeneralPagos = () => {
       }
     };
 
-    fetchPagos();
+    fetchPayments();
   }, []);
 
-  // Función para formatear fechas
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Los meses empiezan en 0
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
@@ -72,35 +70,35 @@ const VerListadoGeneralPagos = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              columnas={[
+              columns={[
                 "id",
-                "nombre",
-                "apellido",
+                "firstName",
+                "lastName",
                 "dni",
-                "categoria",
-                "fechaPago",
-                "monto",
-                "descripcion",
-                "tipo",
-                "usuario_registro",
-                "Comprobante",
+                "category",
+                "paymentDate",
+                "amount",
+                "description",
+                "feeName",
+                "registeredBy",
+                "receipt",
               ]}
-              mensajeVacio="Todavía no hay pagos registrados."
-              key={tipoFiltro}
-              titulo={"Pagos registrados"}
-              data={pagosFiltrados} // 🔥 Ahora los datos incluyen el botón sin modificar TableGeneric
-              filtros={
+              emptyMessage="Todavía no hay pagos registrados."
+              key={typeFilter}
+              title={"Pagos registrados"}
+              data={filteredPayments}
+              filters={
                 <div className="d-flex align-items-center gap-2">
                   <h5 className="mb-0">Pagos de:</h5>
                   <select
-                    id="tipoFiltro"
+                    id="typeFilter"
                     className="form-select w-auto"
-                    value={tipoFiltro}
-                    onChange={(e) => setTipoFiltro(e.target.value)}
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
                   >
-                    <option value="todos">Todos</option>
-                    <option value="jugador">Jugadores</option>
-                    <option value="socio">Socios</option>
+                    <option value="all">Todos</option>
+                    <option value="player">Jugadores</option>
+                    <option value="member">Socios</option>
                   </select>
                 </div>
               }
@@ -113,4 +111,4 @@ const VerListadoGeneralPagos = () => {
   );
 };
 
-export default VerListadoGeneralPagos;
+export default ViewPayments;

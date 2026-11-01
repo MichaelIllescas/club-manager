@@ -1,112 +1,115 @@
-import PaginaAlta from "../Components/PaginaAlta";
-import { formatearFecha } from "../Utils/formatearFecha";
-import { formatearMoneda } from "../Utils/formatearMoneda";
-import "./RegistrarPago.css";
+import FormPage from "../Components/FormPage";
+import { formatDate } from "../Utils/formatDate";
+import { formatCurrency } from "../Utils/formatCurrency";
+import "./RegisterPayment.css";
 import { useState, useEffect, useRef } from "react";
 import apiClient from "../Config/axiosConfig";
-import DescargarComprobante from "../Components/ComprobantePagoPDF";
+import DownloadReceipt from "../Components/PaymentReceiptPDF";
 
-const RegistrarPago = () => {
-  const [pago, setPago] = useState({
-    fechaPago: "",
-    descripcion: "",
-    cuotaId: "",
-    jugadorId: null,
-    socioId: null,
-    monto: 0,
+// Text shown to the user for each person type
+const PERSON_LABELS = { player: "jugador", member: "socio" };
+
+const RegisterPayment = () => {
+  const [payment, setPayment] = useState({
+    paymentDate: "",
+    description: "",
+    feeId: "",
+    playerId: null,
+    memberId: null,
+    amount: 0,
   });
 
-  const [cuotas, setCuotas] = useState([]);
-  const [personas, setPersonas] = useState([]);
-  const [personasFiltradas, setPersonasFiltradas] = useState([]);
-  const [filtroNombre, setFiltroNombre] = useState("");
-  const [filtroTipo, setFiltroTipo] = useState("jugador");
+  const [fees, setFees] = useState([]);
+  const [people, setPeople] = useState([]);
+  const [filteredPeople, setFilteredPeople] = useState([]);
+  const [nameFilter, setNameFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("player");
   const [menuVisible, setMenuVisible] = useState(false);
-  const [personaSeleccionada, setPersonaSeleccionada] = useState(null);
-  const [cuotaSeleccionada, setCuotaSeleccionada] = useState(null);
-  const [mensaje, setMensaje] = useState("");
-  const [mostrarModal, setMostrarModal] = useState(false);
-  const [pagoRegistrado, setPagoRegistrado] = useState(null); // Guardar el pago confirmado
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [selectedFee, setSelectedFee] = useState(null);
+  const [message, setMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [registeredPayment, setRegisteredPayment] = useState(null);
 
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const requestAbortController = useRef(null);
 
   useEffect(() => {
-    const fetchCuotas = async () => {
+    const fetchFees = async () => {
       try {
-        const response = await apiClient.get("/api/cuotas");
-        setCuotas(response.data);
+        const response = await apiClient.get("/api/fees");
+        setFees(response.data);
       } catch (error) {
         console.error("Error al obtener las cuotas:", error);
       }
     };
-    fetchCuotas();
+    fetchFees();
   }, []);
 
   useEffect(() => {
-    const fetchPersonas = async () => {
+    const fetchPeople = async () => {
       try {
-        const response = await apiClient.get("/api/pagos/listadoGeneral");
-        setPersonas(response.data);
+        const response = await apiClient.get("/api/payments/people");
+        setPeople(response.data);
       } catch (error) {
         console.error("Error al obtener las personas:", error);
       }
     };
-    fetchPersonas();
+    fetchPeople();
   }, []);
 
   useEffect(() => {
-    if (filtroNombre.trim() === "") {
-      setPersonasFiltradas([]);
+    if (nameFilter.trim() === "") {
+      setFilteredPeople([]);
       return;
     }
 
-    const filtrados = personas.filter(
-      (persona) =>
-        persona.tipo === filtroTipo &&
-        `${persona.nombre} ${persona.apellido}`
+    const filtered = people.filter(
+      (person) =>
+        person.type === typeFilter &&
+        `${person.firstName} ${person.lastName}`
           .toLowerCase()
-          .includes(filtroNombre.toLowerCase()),
+          .includes(nameFilter.toLowerCase()),
     );
-    setPersonasFiltradas(filtrados);
-  }, [filtroNombre, filtroTipo, personas]);
+    setFilteredPeople(filtered);
+  }, [nameFilter, typeFilter, people]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPago({ ...pago, [name]: value });
+    setPayment({ ...payment, [name]: value });
 
     if (name === "cuotaId") {
-      const cuota = cuotas.find((cuota) => cuota.id === parseInt(value));
-      setPago((prevPago) => ({
-        ...prevPago,
-        monto: cuota ? cuota.monto : 0,
+      const fee = fees.find((fee) => fee.id === parseInt(value));
+      setPayment((prevPayment) => ({
+        ...prevPayment,
+        amount: fee ? fee.amount : 0,
       }));
-      setCuotaSeleccionada(cuota);
+      setSelectedFee(fee);
     }
   };
 
-  const handleSeleccionarPersona = (persona) => {
-    if (filtroTipo === "jugador") {
-      setPago({ ...pago, jugadorId: persona.id, socioId: null });
+  const handleSelectPerson = (person) => {
+    if (typeFilter === "player") {
+      setPayment({ ...payment, playerId: person.id, memberId: null });
     } else {
-      setPago({ ...pago, socioId: persona.id, jugadorId: null });
+      setPayment({ ...payment, memberId: person.id, playerId: null });
     }
-    setFiltroNombre(`${persona.nombre} ${persona.apellido}`);
-    setPersonaSeleccionada(persona);
+    setNameFilter(`${person.firstName} ${person.lastName}`);
+    setSelectedPerson(person);
     setMenuVisible(false);
   };
 
-  const handleAbrirModal = (e) => {
+  const handleOpenModal = (e) => {
     e.preventDefault();
-    if (!personaSeleccionada) {
-      setMensaje("Debe seleccionar un jugador o socio antes de continuar.");
+    if (!selectedPerson) {
+      setMessage("Debe seleccionar un jugador o socio antes de continuar.");
       return;
     }
-    setMostrarModal(true);
+    setShowModal(true);
   };
 
-  const handleConfirmarPago = async () => {
+  const handleConfirmPayment = async () => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
@@ -116,37 +119,36 @@ const RegistrarPago = () => {
     }
     requestAbortController.current = new AbortController();
 
-    const pagoRequest = {
-      fechaPago: pago.fechaPago,
-      monto: pago.monto,
-      descripcion: pago.descripcion,
-      cuota: { id: parseInt(pago.cuotaId) },
-      jugador: pago.jugadorId ? { id: pago.jugadorId } : null,
-      socio: pago.socioId ? { id: pago.socioId } : null,
+    const paymentRequest = {
+      paymentDate: payment.paymentDate,
+      amount: payment.amount,
+      description: payment.description,
+      fee: { id: parseInt(payment.feeId) },
+      player: payment.playerId ? { id: payment.playerId } : null,
+      member: payment.memberId ? { id: payment.memberId } : null,
     };
 
     try {
-      const response = await apiClient.post("/api/pagos", pagoRequest, {
+      const response = await apiClient.post("/api/payments", paymentRequest, {
         signal: requestAbortController.current.signal,
       });
 
-      // Actualizar pagoRegistrado con la respuesta completa del backend
-      setPagoRegistrado({
+      setRegisteredPayment({
         id: response.data.id,
-        nombre: response.data.nombre,
-        apellido: response.data.apellido,
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
         dni: response.data.dni,
-        categoria: response.data.categoria,
-        fechaPago: response.data.fechaPago,
-        monto: response.data.monto,
-        descripcion: response.data.descripcion,
-        tipo: response.data.tipo,
-        usuario_registro: response.data.usuario_registro,
+        category: response.data.category,
+        paymentDate: response.data.paymentDate,
+        amount: response.data.amount,
+        description: response.data.description,
+        feeName: response.data.feeName,
+        registeredBy: response.data.registeredBy,
       });
 
-      setMensaje("Pago registrado exitosamente.");
+      setMessage("Pago registrado exitosamente.");
     } catch (error) {
-      setMensaje("Error al registrar el pago.");
+      setMessage("Error al registrar el pago.");
       console.log(error);
     } finally {
       isSubmittingRef.current = false;
@@ -155,95 +157,94 @@ const RegistrarPago = () => {
     }
   };
 
-  const handleCerrarModal = () => {
-    setMostrarModal(false);
-    setPagoRegistrado(null); // Limpiar comprobante al cerrar modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setRegisteredPayment(null);
 
-    // Restablecer los campos del formulario a sus valores iniciales
-    setPago({
-      fechaPago: "",
-      descripcion: "",
-      cuotaId: "",
-      jugadorId: null,
-      socioId: null,
-      monto: 0,
+    setPayment({
+      paymentDate: "",
+      description: "",
+      feeId: "",
+      playerId: null,
+      memberId: null,
+      amount: 0,
     });
-    setPersonaSeleccionada(null);
-    setCuotaSeleccionada(null);
-    setFiltroNombre("");
-    setPersonasFiltradas([]);
-    setMensaje("");
+    setSelectedPerson(null);
+    setSelectedFee(null);
+    setNameFilter("");
+    setFilteredPeople([]);
+    setMessage("");
   };
-  const handleResetSeleccion = () => {
-    setPersonaSeleccionada(null);
-    setPago({ ...pago, jugadorId: null, socioId: null });
-    setFiltroNombre("");
+  const handleResetSelection = () => {
+    setSelectedPerson(null);
+    setPayment({ ...payment, playerId: null, memberId: null });
+    setNameFilter("");
   };
 
   return (
     <>
-      <PaginaAlta
-        titulo="Registrar pago"
+      <FormPage
+        title="Registrar pago"
         intro="Buscá al socio o jugador, elegí la cuota y la fecha. Antes de guardar vas a poder revisar el pago y después descargar el comprobante."
-        ancha
+        wide
       >
-        <form onSubmit={handleAbrirModal}>
+        <form onSubmit={handleOpenModal}>
           <div className="row">
             <div className="col-lg-7 col-12">
               <div className="mb-3">
                 <label className="form-label">Tipo de persona</label>
                 <select
                   className="form-select w-100"
-                  value={filtroTipo}
+                  value={typeFilter}
                   onChange={(e) => {
-                    setFiltroTipo(e.target.value);
-                    setPersonaSeleccionada(null);
-                    setFiltroNombre("");
+                    setTypeFilter(e.target.value);
+                    setSelectedPerson(null);
+                    setNameFilter("");
                   }}
                 >
-                  <option value="jugador">Jugador</option>
-                  <option value="socio">Socio</option>
+                  <option value="player">Jugador</option>
+                  <option value="member">Socio</option>
                 </select>
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Buscar {filtroTipo}</label>
+                <label className="form-label">Buscar {PERSON_LABELS[typeFilter]}</label>
                 <div className="d-flex align-items-center">
                   <input
                     type="text"
                     className="form-control w-100"
-                    placeholder={`Buscar ${filtroTipo}...`}
-                    value={filtroNombre}
+                    placeholder={`Buscar ${PERSON_LABELS[typeFilter]}...`}
+                    value={nameFilter}
                     onChange={(e) => {
-                      if (!personaSeleccionada) {
-                        setFiltroNombre(e.target.value);
+                      if (!selectedPerson) {
+                        setNameFilter(e.target.value);
                         setMenuVisible(true);
                       }
                     }}
                     onFocus={() => setMenuVisible(true)}
                     onBlur={() => setTimeout(() => setMenuVisible(false), 200)}
-                    disabled={!!personaSeleccionada}
+                    disabled={!!selectedPerson}
                   />
 
-                  {personaSeleccionada && (
+                  {selectedPerson && (
                     <button
                       className="btn btn-danger ms-2"
-                      onClick={handleResetSeleccion}
+                      onClick={handleResetSelection}
                     >
                       X
                     </button>
                   )}
                 </div>
 
-                {menuVisible && personasFiltradas.length > 0 && (
+                {menuVisible && filteredPeople.length > 0 && (
                   <ul className="dropdown-menu show">
-                    {personasFiltradas.map((persona) => (
+                    {filteredPeople.map((person) => (
                       <li
-                        key={persona.id}
+                        key={person.id}
                         className="dropdown-item"
-                        onClick={() => handleSeleccionarPersona(persona)}
+                        onClick={() => handleSelectPerson(person)}
                       >
-                        {persona.nombre} {persona.apellido} DNI N° {persona.dni}
+                        {person.firstName} {person.lastName} DNI N° {person.dni}
                       </li>
                     ))}
                   </ul>
@@ -254,9 +255,9 @@ const RegistrarPago = () => {
                 <label className="form-label">Fecha de pago</label>
                 <input
                   type="date"
-                  name="fechaPago"
+                  name="paymentDate"
                   className="form-control w-100"
-                  value={pago.fechaPago}
+                  value={payment.paymentDate}
                   onChange={handleChange}
                   required
                 />
@@ -266,9 +267,9 @@ const RegistrarPago = () => {
                 <label className="form-label">Observaciones</label>
                 <input
                   type="text"
-                  name="descripcion"
+                  name="description"
                   className="form-control w-100"
-                  value={pago.descripcion}
+                  value={payment.description}
                   onChange={handleChange}
                   placeholder="Ingrese las observaciones del pago..."
                 />
@@ -277,16 +278,16 @@ const RegistrarPago = () => {
               <div className="mb-3">
                 <label className="form-label">Cuota</label>
                 <select
-                  name="cuotaId"
+                  name="feeId"
                   className="form-select w-100"
-                  value={pago.cuotaId}
+                  value={payment.feeId}
                   onChange={handleChange}
                   required
                 >
                   <option value="">Seleccione una cuota</option>
-                  {cuotas.map((cuota) => (
-                    <option key={cuota.id} value={cuota.id}>
-                      {cuota.tipo} - {formatearMoneda(cuota.monto)}
+                  {fees.map((fee) => (
+                    <option key={fee.id} value={fee.id}>
+                      {fee.name} - {formatCurrency(fee.amount)}
                     </option>
                   ))}
                 </select>
@@ -294,44 +295,44 @@ const RegistrarPago = () => {
             </div>
 
             <div className="col-lg-5 col-12">
-              <aside className="resumen-pago" aria-live="polite">
-                <h2 className="resumen-pago__titulo">Resumen del pago</h2>
+              <aside className="payment-summary" aria-live="polite">
+                <h2 className="payment-summary__title">Resumen del pago</h2>
                 <dl>
                   <dt>Paga</dt>
                   <dd>
-                    {personaSeleccionada
-                      ? `${personaSeleccionada.nombre} ${personaSeleccionada.apellido}`
+                    {selectedPerson
+                      ? `${selectedPerson.firstName} ${selectedPerson.lastName}`
                       : "Elegí un socio o jugador"}
-                    {personaSeleccionada && (
-                      <span className="resumen-pago__detalle">
-                        DNI {personaSeleccionada.dni}
+                    {selectedPerson && (
+                      <span className="payment-summary__detail">
+                        DNI {selectedPerson.dni}
                       </span>
                     )}
                   </dd>
                   <dt>Cuota</dt>
                   <dd>
-                    {cuotaSeleccionada
-                      ? cuotaSeleccionada.tipo
+                    {selectedFee
+                      ? selectedFee.name
                       : "Elegí una cuota"}
                   </dd>
                   <dt>Fecha de pago</dt>
                   <dd>
-                    {pago.fechaPago
-                      ? formatearFecha(pago.fechaPago)
+                    {payment.paymentDate
+                      ? formatDate(payment.paymentDate)
                       : "Elegí la fecha"}
                   </dd>
-                  {pago.descripcion && (
+                  {payment.description && (
                     <>
                       <dt>Observaciones</dt>
-                      <dd>{pago.descripcion}</dd>
+                      <dd>{payment.description}</dd>
                     </>
                   )}
                 </dl>
-                <div className="resumen-pago__total">
+                <div className="payment-summary__total">
                   <span>Total</span>
                   <strong>
-                    {formatearMoneda(
-                      cuotaSeleccionada ? cuotaSeleccionada.monto : 0,
+                    {formatCurrency(
+                      selectedFee ? selectedFee.amount : 0,
                     )}
                   </strong>
                 </div>
@@ -339,16 +340,15 @@ const RegistrarPago = () => {
             </div>
           </div>
 
-          <div className="alta__acciones mt-3">
+          <div className="form-page__actions mt-3">
             <button type="submit" className="btn btn-primary">
               Revisar y registrar
             </button>
           </div>
         </form>
-      </PaginaAlta>
+      </FormPage>
 
-      {/* Modal */}
-      {mostrarModal && (
+      {showModal && (
         <div className="modal d-block" tabIndex="-1">
           <div className="modal-dialog">
             <div className="modal-content">
@@ -357,60 +357,60 @@ const RegistrarPago = () => {
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={handleCerrarModal}
+                  onClick={handleCloseModal}
                 ></button>
               </div>
               <div className="modal-body">
                 <p>
                   <strong>Fecha de pago:</strong>{" "}
-                  {pago.fechaPago
-                    ? formatearFecha(pago.fechaPago)
+                  {payment.paymentDate
+                    ? formatDate(payment.paymentDate)
                     : "No seleccionada"}
                 </p>
                 <p>
-                  <strong>Monto:</strong> {formatearMoneda(pago.monto)}
+                  <strong>Monto:</strong> {formatCurrency(payment.amount)}
                 </p>
                 <p>
                   <strong>Cuota:</strong>{" "}
-                  {cuotaSeleccionada?.tipo || "No seleccionada"}
+                  {selectedFee?.name || "No seleccionada"}
                 </p>
-                {personaSeleccionada && (
+                {selectedPerson && (
                   <>
                     <p>
-                      <strong>Nombre:</strong> {personaSeleccionada.nombre}
+                      <strong>Nombre:</strong> {selectedPerson.firstName}
                     </p>
                     <p>
-                      <strong>Apellido:</strong> {personaSeleccionada.apellido}
+                      <strong>Apellido:</strong> {selectedPerson.lastName}
                     </p>
                     <p>
-                      <strong>DNI:</strong> {personaSeleccionada.dni}
+                      <strong>DNI:</strong> {selectedPerson.dni}
                     </p>
                   </>
                 )}
               </div>
-              {mensaje && (
+              {message && (
                 <p className="mt-3 mx-4 alert alert-info text-center">
-                  {mensaje}
+                  {message}
                 </p>
               )}
               <div className="modal-footer">
                 <button
                   className="btn btn-secondary"
-                  onClick={handleCerrarModal}
+                  onClick={handleCloseModal}
                 >
                   Cerrar
                 </button>
 
-                {pagoRegistrado ? (
+                {registeredPayment ? (
                   <div className="text-center">
                     <button className="btn">
-                      <DescargarComprobante pago={pagoRegistrado} />
+                      <DownloadReceipt payment={registeredPayment} />
                     </button>
                   </div>
                 ) : (
                   <button
                     className="btn btn-primary"
-                    onClick={handleConfirmarPago}
+                    onClick={handleConfirmPayment}
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Registrando..." : "Confirmar"}
@@ -425,4 +425,4 @@ const RegistrarPago = () => {
   );
 };
 
-export default RegistrarPago;
+export default RegisterPayment;

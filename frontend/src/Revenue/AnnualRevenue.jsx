@@ -1,6 +1,6 @@
-import Footer from "../Index/Footer";
-import { formatearMoneda } from "../Utils/formatearMoneda";
-import { COLOR_ANIO, COLOR_ANIO_RELLENO, COLOR_ANTERIOR, opcionesGrafico } from "../Utils/estiloGraficos";
+import Footer from "../Pages/Footer";
+import { formatCurrency } from "../Utils/formatCurrency";
+import { SELECTED_YEAR_COLOR, SELECTED_YEAR_FILL, PREVIOUS_YEAR_COLOR, chartOptions } from "../Utils/chartStyles";
 import Header from "../Navbar/Header";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
@@ -16,35 +16,33 @@ import {
   Filler,
 } from "chart.js";
 
-// Registrar los componentes de Chart.js
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend, Filler);
 
-const VerRecaudacionesAnuales = () => {
-  const [anioSeleccionado, setAnioSeleccionado] = useState(new Date().getFullYear());
-  const [datosAnuales, setDatosAnuales] = useState([]);
-  const [datosAnioAnterior, setDatosAnioAnterior] = useState([]);
+const AnnualRevenue = () => {
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [annualData, setAnnualData] = useState([]);
+  const [previousYearData, setPreviousYearData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const meses = [
+  const months = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
   ];
 
   useEffect(() => {
-    const fetchRecaudaciones = async () => {
+    const fetchRevenues = async () => {
       try {
         setLoading(true);
         const response = await apiClient.get(
-          `/api/recaudaciones/mensuales?year=${anioSeleccionado}`
+          `/api/revenue/monthly?year=${selectedYear}`
         );
-        setDatosAnuales(response.data);
+        setAnnualData(response.data);
 
-        // Obtener datos del año anterior para comparación
-        const responseAnterior = await apiClient.get(
-          `/api/recaudaciones/mensuales?year=${anioSeleccionado - 1}`
+        const previousResponse = await apiClient.get(
+          `/api/revenue/monthly?year=${selectedYear - 1}`
         );
-        setDatosAnioAnterior(responseAnterior.data);
+        setPreviousYearData(previousResponse.data);
       } catch (err) {
         console.error("Error al obtener las recaudaciones:", err);
         setError("No se pudieron cargar las recaudaciones. Intente nuevamente.");
@@ -53,28 +51,28 @@ const VerRecaudacionesAnuales = () => {
       }
     };
 
-    fetchRecaudaciones();
-  }, [anioSeleccionado]);
+    fetchRevenues();
+  }, [selectedYear]);
 
   const data = {
-    labels: meses,
+    labels: months,
     datasets: [
       {
-        label: `${anioSeleccionado}`,
-        data: datosAnuales,
-        borderColor: COLOR_ANIO,
-        backgroundColor: COLOR_ANIO_RELLENO,
-        pointBackgroundColor: COLOR_ANIO,
+        label: `${selectedYear}`,
+        data: annualData,
+        borderColor: SELECTED_YEAR_COLOR,
+        backgroundColor: SELECTED_YEAR_FILL,
+        pointBackgroundColor: SELECTED_YEAR_COLOR,
         borderWidth: 3,
         fill: true,
         tension: 0.25,
       },
       {
-        label: `${anioSeleccionado - 1} (año anterior)`,
-        data: datosAnioAnterior,
-        borderColor: COLOR_ANTERIOR,
-        backgroundColor: COLOR_ANTERIOR,
-        pointBackgroundColor: COLOR_ANTERIOR,
+        label: `${selectedYear - 1} (año anterior)`,
+        data: previousYearData,
+        borderColor: PREVIOUS_YEAR_COLOR,
+        backgroundColor: PREVIOUS_YEAR_COLOR,
+        pointBackgroundColor: PREVIOUS_YEAR_COLOR,
         borderWidth: 2,
         borderDash: [6, 4],
         tension: 0.25,
@@ -82,13 +80,13 @@ const VerRecaudacionesAnuales = () => {
     ],
   };
 
-  const options = opcionesGrafico();
+  const options = chartOptions();
 
-  const totalRecaudaciones = datosAnuales.reduce((total, valor) => total + (valor || 0), 0);
-  const totalRecaudacionesAnterior = datosAnioAnterior.reduce((total, valor) => total + (valor || 0), 0);
-  const diferencia = totalRecaudaciones - totalRecaudacionesAnterior;
-  const porcentajeCrecimiento = totalRecaudacionesAnterior !== 0 
-    ? ((diferencia / totalRecaudacionesAnterior) * 100).toFixed(2) 
+  const totalRevenue = annualData.reduce((total, value) => total + (value || 0), 0);
+  const totalPreviousRevenue = previousYearData.reduce((total, value) => total + (value || 0), 0);
+  const difference = totalRevenue - totalPreviousRevenue;
+  const percentageGrowth = totalPreviousRevenue !== 0 
+    ? ((difference / totalPreviousRevenue) * 100).toFixed(2) 
     : "N/A";
 
   return (
@@ -98,11 +96,11 @@ const VerRecaudacionesAnuales = () => {
         <div className="container my-5 pt-5 pb-5 mb-5 panel rounded">
         <div className="text-center mb-4">
           <h1>Recaudación anual</h1>
-          <label htmlFor="anio" className="">Seleccione el año: </label>
+          <label htmlFor="year" className="">Seleccione el año: </label>
           <select
-            id="anio"
-            value={anioSeleccionado}
-            onChange={(e) => setAnioSeleccionado(parseInt(e.target.value))}
+            id="year"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
             className="form-select w-auto d-inline-block ms-3"
           >
             {[...Array(10)].map((_, i) => (
@@ -124,23 +122,22 @@ const VerRecaudacionesAnuales = () => {
               <div className="col-lg-4">
                 <div className="panel p-4 rounded">
                   <h3 className="mb-3">Resumen anual</h3>
-                  <p><strong>Año seleccionado:</strong> {anioSeleccionado}</p>
-                  <p><strong>Total recaudado en {anioSeleccionado}:</strong> {formatearMoneda(totalRecaudaciones)}</p>
-                  <p><strong>Total recaudado en {anioSeleccionado - 1}:</strong> {formatearMoneda(totalRecaudacionesAnterior)}</p>
-                  {totalRecaudacionesAnterior !== 0 && (
+                  <p><strong>Año seleccionado:</strong> {selectedYear}</p>
+                  <p><strong>Total recaudado en {selectedYear}:</strong> {formatCurrency(totalRevenue)}</p>
+                  <p><strong>Total recaudado en {selectedYear - 1}:</strong> {formatCurrency(totalPreviousRevenue)}</p>
+                  {totalPreviousRevenue !== 0 && (
                     <p>
                       <strong>Diferencia respecto al año anterior:</strong> 
-                      {diferencia >= 0 ? ` +${formatearMoneda(diferencia)}` : ` -${formatearMoneda(Math.abs(diferencia))}`}
+                      {difference >= 0 ? ` +${formatCurrency(difference)}` : ` -${formatCurrency(Math.abs(difference))}`}
                     </p>
                   )}
                   <p>
-                    <strong>Porcentaje de crecimiento:</strong> {porcentajeCrecimiento !== "N/A" ? `${porcentajeCrecimiento}%` : "No disponible"}
+                    <strong>Porcentaje de crecimiento:</strong> {percentageGrowth !== "N/A" ? `${percentageGrowth}%` : "No disponible"}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Tabla de recaudaciones debajo de la gráfica */}
             <div className="mt-4">
               <table className="table table-striped">
                 <thead>
@@ -150,27 +147,26 @@ const VerRecaudacionesAnuales = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {meses.map((mes, index) => (
+                  {months.map((month, index) => (
                     <tr key={index}>
-                      <td>{mes}</td>
-                      <td>{datosAnuales[index] ? formatearMoneda(datosAnuales[index]) : formatearMoneda(0)}</td>
+                      <td>{month}</td>
+                      <td>{annualData[index] ? formatCurrency(annualData[index]) : formatCurrency(0)}</td>
                     </tr>
                   ))}
                   <tr>
                     <td><strong>Total</strong></td>
-                    <td><strong>{formatearMoneda(totalRecaudaciones)}</strong></td>
+                    <td><strong>{formatCurrency(totalRevenue)}</strong></td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            {/* Información al final en dispositivos pequeños */}
             <div className="d-lg-none panel p-4 rounded mt-4">
               <h3 className="mb-3">Resumen anual</h3>
-              <p><strong>Año seleccionado:</strong> {anioSeleccionado}</p>
-              <p><strong>Total recaudado en {anioSeleccionado}:</strong> {formatearMoneda(totalRecaudaciones)}</p>
-              <p><strong>Total recaudado en {anioSeleccionado - 1}:</strong> {formatearMoneda(totalRecaudacionesAnterior)}</p>
-              <p><strong>Porcentaje de crecimiento:</strong> {porcentajeCrecimiento !== "N/A" ? `${porcentajeCrecimiento}%` : "No disponible"}</p>
+              <p><strong>Año seleccionado:</strong> {selectedYear}</p>
+              <p><strong>Total recaudado en {selectedYear}:</strong> {formatCurrency(totalRevenue)}</p>
+              <p><strong>Total recaudado en {selectedYear - 1}:</strong> {formatCurrency(totalPreviousRevenue)}</p>
+              <p><strong>Porcentaje de crecimiento:</strong> {percentageGrowth !== "N/A" ? `${percentageGrowth}%` : "No disponible"}</p>
             </div>
           </>
         )}
@@ -182,4 +178,4 @@ const VerRecaudacionesAnuales = () => {
   );
 };
 
-export default VerRecaudacionesAnuales;
+export default AnnualRevenue;

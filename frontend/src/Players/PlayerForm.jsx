@@ -2,61 +2,60 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const FormularioJugador = ({ onRegistrado }) => {
-  const [jugador, setJugador] = useState({
-    nombre: "",
-    apellido: "",
+const PlayerForm = ({ onRegistered }) => {
+  const [player, setPlayer] = useState({
+    firstName: "",
+    lastName: "",
     dni: "",
-    telefono: "",
+    phone: "",
     email: "",
-    categoriaId: "", // ID de la categoría seleccionada
+    categoryId: "",
   });
 
-  const [categorias, setCategorias] = useState([]); // Lista de categorías
-  const [mensaje, setMensaje] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [message, setMessage] = useState("");
 
-  // Llamada a la API para obtener las categorías
   useEffect(() => {
-    const fetchCategorias = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await apiClient.get("/api/categorias");
-        setCategorias(response.data); // Guardamos las categorías en el estado
+        const response = await apiClient.get("/api/categories");
+        setCategories(response.data);
       } catch (error) {
         console.error("Error al cargar las categorías:", error);
       }
     };
 
-    fetchCategorias();
+    fetchCategories();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setJugador({ ...jugador, [name]: value });
+    setPlayer({ ...player, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await apiClient.post("/api/jugadores", {
-        nombre: jugador.nombre,
-        apellido: jugador.apellido,
-        dni: jugador.dni,
-        telefono: jugador.telefono,
-        email: jugador.email,
-        categoria: { id: jugador.categoriaId },
+      await apiClient.post("/api/players", {
+        firstName: player.firstName,
+        lastName: player.lastName,
+        dni: player.dni,
+        phone: player.phone,
+        email: player.email,
+        category: { id: player.categoryId },
       });
-      setMensaje("Jugador registrado con éxito");
-      onRegistrado?.();
-      setJugador({
-        nombre: "",
-        apellido: "",
+      setMessage("Jugador registrado con éxito");
+      onRegistered?.();
+      setPlayer({
+        firstName: "",
+        lastName: "",
         dni: "",
-        telefono: "",
+        phone: "",
         email: "",
-        categoriaId: "",
+        categoryId: "",
       });
     } catch (error) {
-      setMensaje(
+      setMessage(
         error.response?.data?.message ||
           "Ocurrió un error al registrar el jugador",
       );
@@ -67,39 +66,36 @@ const FormularioJugador = ({ onRegistrado }) => {
     <div className="mt-1">
       <form onSubmit={handleSubmit} className="p-1 rounded">
         <div className="row g-3">
-          {/* Nombre */}
           <div className="col-md-6">
-            <label htmlFor="nombre" className="form-label">
+            <label htmlFor="firstName" className="form-label">
               Nombre
             </label>
             <input
               type="text"
-              id="nombre"
-              name="nombre"
+              id="firstName"
+              name="firstName"
               className="form-control"
               placeholder="Ingrese el nombre"
-              value={jugador.nombre}
+              value={player.firstName}
               onChange={handleChange}
               required
             />
           </div>
-          {/* Apellido */}
           <div className="col-md-6">
-            <label htmlFor="apellido" className="form-label">
+            <label htmlFor="lastName" className="form-label">
               Apellido
             </label>
             <input
               type="text"
-              id="apellido"
-              name="apellido"
+              id="lastName"
+              name="lastName"
               className="form-control"
               placeholder="Ingrese el apellido"
-              value={jugador.apellido}
+              value={player.lastName}
               onChange={handleChange}
               required
             />
           </div>
-          {/* DNI */}
           <div className="col-md-6">
             <label htmlFor="dni" className="form-label">
               DNI
@@ -110,28 +106,26 @@ const FormularioJugador = ({ onRegistrado }) => {
               name="dni"
               className="form-control"
               placeholder="Ingrese el DNI"
-              value={jugador.dni}
+              value={player.dni}
               onChange={handleChange}
               required
             />
           </div>
-          {/* Teléfono */}
           <div className="col-md-6">
-            <label htmlFor="telefono" className="form-label">
+            <label htmlFor="phone" className="form-label">
               Teléfono
             </label>
             <input
               type="text"
-              id="telefono"
-              name="telefono"
+              id="phone"
+              name="phone"
               className="form-control"
               placeholder="Ingrese el teléfono"
-              value={jugador.telefono}
+              value={player.phone}
               onChange={handleChange}
               required
             />
           </div>
-          {/* Email */}
           <div className="col-md-6">
             <label htmlFor="email" className="form-label">
               Email
@@ -142,28 +136,27 @@ const FormularioJugador = ({ onRegistrado }) => {
               name="email"
               className="form-control"
               placeholder="Ingrese el correo electrónico"
-              value={jugador.email}
+              value={player.email}
               onChange={handleChange}
               required
             />
           </div>
-          {/* Categoría */}
           <div className="col-md-6 d-flex flex-column">
-            <label htmlFor="categoriaId" className="form-label">
+            <label htmlFor="categoryId" className="form-label">
               Categoría
             </label>
             <select
-              id="categoriaId"
-              name="categoriaId"
+              id="categoryId"
+              name="categoryId"
               className="form-control form-select w-75 m-auto"
-              value={jugador.categoriaId}
+              value={player.categoryId}
               onChange={handleChange}
               required
             >
               <option value="">Seleccione una categoría</option>
-              {categorias.map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.nombre}
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -175,16 +168,16 @@ const FormularioJugador = ({ onRegistrado }) => {
             Registrar
           </button>
         </div>
-        {mensaje && (
-          <div className="alert alert-info text-center mt-3">{mensaje}</div>
+        {message && (
+          <div className="alert alert-info text-center mt-3">{message}</div>
         )}
       </form>
     </div>
   );
 };
 
-FormularioJugador.propTypes = {
-  onRegistrado: PropTypes.func,
+PlayerForm.propTypes = {
+  onRegistered: PropTypes.func,
 };
 
-export default FormularioJugador;
+export default PlayerForm;

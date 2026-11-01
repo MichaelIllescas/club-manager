@@ -2,89 +2,84 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import TableGeneric from "../Components/TableGeneric";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
-import DescargarComprobante from "../Components/ComprobantePagoPDF";
+import Footer from "../Pages/Footer";
+import DownloadReceipt from "../Components/PaymentReceiptPDF";
 
-const FiltrarHistorial = () => {
-  const [filtro, setFiltro] = useState("");
-  const [personas, setPersonas] = useState([]);
-  const [personasFiltradas, setPersonasFiltradas] = useState([]);
-  const [historial, setHistorial] = useState([]);
-  const [personaSeleccionada, setPersonaSeleccionada] = useState(null);
-  const [historialConBoton, setHistorialConBoton] = useState([]);
+const PaymentHistory = () => {
+  const [filter, setFilter] = useState("");
+  const [people, setPeople] = useState([]);
+  const [filteredPeople, setFilteredPeople] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [historyWithButton, setHistoryWithButton] = useState([]);
 
-  // Obtener jugadores y socios
   useEffect(() => {
-    const fetchPersonas = async () => {
+    const fetchPeople = async () => {
       try {
-        const jugadoresResponse = await apiClient.get("/api/jugadores");
-        const sociosResponse = await apiClient.get("/api/socios");
+        const playersResponse = await apiClient.get("/api/players");
+        const membersResponse = await apiClient.get("/api/members");
 
-        const jugadores = jugadoresResponse.data.map((jugador) => ({
-          ...jugador,
-          tipo: "jugador",
+        const players = playersResponse.data.map((player) => ({
+          ...player,
+          type: "player",
         }));
 
-        const socios = sociosResponse.data.map((socio) => ({
-          ...socio,
-          tipo: "socio",
+        const members = membersResponse.data.map((member) => ({
+          ...member,
+          type: "member",
         }));
 
-        setPersonas([...jugadores, ...socios]);
+        setPeople([...players, ...members]);
       } catch (error) {
         console.error("Error al obtener jugadores y socios:", error);
       }
     };
-    fetchPersonas();
+    fetchPeople();
   }, []);
 
-  // Filtrar personas en tiempo real
   useEffect(() => {
-    if (filtro.trim() === "") {
-      setPersonasFiltradas([]);
+    if (filter.trim() === "") {
+      setFilteredPeople([]);
       return;
     }
 
-    const filtrados = personas.filter((persona) =>
-      `${persona.nombre} ${persona.apellido}`
+    const filtered = people.filter((person) =>
+      `${person.firstName} ${person.lastName}`
         .toLowerCase()
-        .includes(filtro.toLowerCase()),
+        .includes(filter.toLowerCase()),
     );
-    setPersonasFiltradas(filtrados);
-  }, [filtro, personas]);
+    setFilteredPeople(filtered);
+  }, [filter, people]);
 
-  // Obtener historial de la persona seleccionada
-  const fetchHistorial = async (id, tipo) => {
+  const fetchHistory = async (id, type) => {
     try {
       const url =
-        tipo === "jugador"
-          ? `/api/pagos/jugador/${id}`
-          : `/api/pagos/socio/${id}`;
+        type === "player"
+          ? `/api/payments/player/${id}`
+          : `/api/payments/member/${id}`;
       const response = await apiClient.get(url);
 
-      setHistorial(response.data); //  PASAMOS LOS DATOS SIN FORMATEAR
+      setHistory(response.data);
     } catch (error) {
       console.error("Error al obtener historial:", error);
     }
   };
 
-  // Agregar la columna del botón de descarga después de obtener el historial
   useEffect(() => {
-    if (historial.length > 0) {
-      const historialConDescarga = historial.map((pago) => ({
-        ...pago,
-        Comprobante: <DescargarComprobante pago={pago} />,
+    if (history.length > 0) {
+      const historyWithDownload = history.map((payment) => ({
+        ...payment,
+        receipt: <DownloadReceipt payment={payment} />,
       }));
-      setHistorialConBoton(historialConDescarga);
+      setHistoryWithButton(historyWithDownload);
     }
-  }, [historial]);
+  }, [history]);
 
-  // Manejar selección de persona
-  const handleSeleccionarPersona = (persona) => {
-    setPersonaSeleccionada(persona);
-    fetchHistorial(persona.id, persona.tipo);
-    setFiltro(`${persona.nombre} ${persona.apellido} DNI N° ${persona.dni}`);
-    setPersonasFiltradas([]);
+  const handleSelectPerson = (person) => {
+    setSelectedPerson(person);
+    fetchHistory(person.id, person.type);
+    setFilter(`${person.firstName} ${person.lastName} DNI N° ${person.dni}`);
+    setFilteredPeople([]);
   };
 
   return (
@@ -100,55 +95,55 @@ const FiltrarHistorial = () => {
                 type="text"
                 className="form-control w-100"
                 placeholder="Ingrese nombre o apellido"
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
               />
-              {personasFiltradas.length > 0 && (
+              {filteredPeople.length > 0 && (
                 <ul
                   className="list-group mt-2"
                   style={{ maxHeight: "200px", overflowY: "auto" }}
                 >
-                  {personasFiltradas.map((persona) => (
+                  {filteredPeople.map((person) => (
                     <li
-                      key={persona.id}
+                      key={person.id}
                       className="list-group-item"
-                      onClick={() => handleSeleccionarPersona(persona)}
+                      onClick={() => handleSelectPerson(person)}
                       style={{ cursor: "pointer" }}
                     >
-                      {persona.tipo === "jugador" ? "Jugador" : "Socio"}:{" "}
-                      {persona.nombre} {persona.apellido} DNI N° {persona.dni}
+                      {person.type === "player" ? "Jugador" : "Socio"}:{" "}
+                      {person.firstName} {person.lastName} DNI N° {person.dni}
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            {personaSeleccionada && (
+            {selectedPerson && (
               <div className="mt-1">
                 <h4>
-                  Historial de {personaSeleccionada.nombre}{" "}
-                  {personaSeleccionada.apellido} (
-                  {personaSeleccionada.tipo === "jugador" ? "Jugador" : "Socio"}
+                  Historial de {selectedPerson.firstName}{" "}
+                  {selectedPerson.lastName} (
+                  {selectedPerson.type === "player" ? "Jugador" : "Socio"}
                   )
                 </h4>
                 {
                   <TableGeneric
-                    columnas={[
+                    columns={[
                       "id",
-                      "nombre",
-                      "apellido",
+                      "firstName",
+                      "lastName",
                       "dni",
-                      "categoria",
-                      "fechaPago",
-                      "monto",
-                      "descripcion",
-                      "tipo",
-                      "usuario_registro",
-                      "Comprobante",
+                      "category",
+                      "paymentDate",
+                      "amount",
+                      "description",
+                      "feeName",
+                      "registeredBy",
+                      "receipt",
                     ]}
-                    mensajeVacio="Esta persona todavía no tiene pagos registrados."
-                    titulo="Historial"
-                    data={historialConBoton} // Ahora incluye la columna con el botón
+                    emptyMessage="Esta persona todavía no tiene pagos registrados."
+                    title="Historial"
+                    data={historyWithButton}
                   />
                 }
               </div>
@@ -161,4 +156,4 @@ const FiltrarHistorial = () => {
   );
 };
 
-export default FiltrarHistorial;
+export default PaymentHistory;

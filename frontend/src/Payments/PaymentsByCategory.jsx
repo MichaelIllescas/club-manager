@@ -2,49 +2,46 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import TableGeneric from "../Components/TableGeneric";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 
-const FiltrarPagosPorCategoria = () => {
-  const [categorias, setCategorias] = useState([]); // Lista de categorías
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(""); // ID de la categoría seleccionada
-  const [mesSeleccionado, setMesSeleccionado] = useState(""); // Mes seleccionado
-  const [añoSeleccionado, setAñoSeleccionado] = useState(""); // Año seleccionado
-  const [pagosFiltrados, setPagosFiltrados] = useState([]); // Lista de pagos filtrados
-  const [loading, setLoading] = useState(false); // Indicador de carga
+const PaymentsByCategory = () => {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [filteredPayments, setFilteredPayments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Obtener categorías
   useEffect(() => {
-    const fetchCategorias = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await apiClient.get("/api/categorias");
-        setCategorias(response.data);
+        const response = await apiClient.get("/api/categories");
+        setCategories(response.data);
       } catch (error) {
         console.error("Error al obtener categorías:", error);
       }
     };
-    fetchCategorias();
+    fetchCategories();
   }, []);
 
-  // Filtrar pagos por categoría, mes y año seleccionados
-  // Actualizar el listado cuando cambian los filtros
   useEffect(() => {
-    // El backend necesita los tres filtros para calcular quién pagó y quién debe
-    if (!categoriaSeleccionada || !mesSeleccionado || !añoSeleccionado) {
-      setPagosFiltrados([]);
+    // The backend needs all three filters to work out who paid and who owes
+    if (!selectedCategory || !selectedMonth || !selectedYear) {
+      setFilteredPayments([]);
       return;
     }
 
-    const fetchPagosFiltrados = async () => {
+    const fetchFilteredPayments = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get("/api/pagos/estado-pagos", {
+        const response = await apiClient.get("/api/payments/status", {
           params: {
-            categoriaId: categoriaSeleccionada,
-            mes: mesSeleccionado,
-            año: añoSeleccionado,
+            categoryId: selectedCategory,
+            month: selectedMonth,
+            year: selectedYear,
           },
         });
-        setPagosFiltrados(response.data);
+        setFilteredPayments(response.data);
       } catch (error) {
         console.error("Error al filtrar pagos:", error);
       } finally {
@@ -52,8 +49,8 @@ const FiltrarPagosPorCategoria = () => {
       }
     };
 
-    fetchPagosFiltrados();
-  }, [categoriaSeleccionada, mesSeleccionado, añoSeleccionado]);
+    fetchFilteredPayments();
+  }, [selectedCategory, selectedMonth, selectedYear]);
 
   return (
     <>
@@ -66,15 +63,15 @@ const FiltrarPagosPorCategoria = () => {
               <label className="form-label">Seleccionar categoría:</label>
               <select
                 className="form-select w-100"
-                value={categoriaSeleccionada}
-                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="" disabled>
                   Selecciona una categoría
                 </option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.id} value={categoria.id}>
-                    {categoria.nombre}
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
                 ))}
               </select>
@@ -83,8 +80,8 @@ const FiltrarPagosPorCategoria = () => {
               <label className="form-label">Seleccionar mes:</label>
               <select
                 className="form-select w-100"
-                value={mesSeleccionado}
-                onChange={(e) => setMesSeleccionado(e.target.value)}
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
               >
                 <option value="" disabled>
                   Selecciona un meses
@@ -100,14 +97,14 @@ const FiltrarPagosPorCategoria = () => {
               <label className="form-label">Seleccionar año:</label>
               <select
                 className="form-select w-100"
-                value={añoSeleccionado}
-                onChange={(e) => setAñoSeleccionado(e.target.value)}
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
               >
                 <option value="" disabled>
                   Selecciona el año
                 </option>
                 {Array.from({ length: 10 }, (_, i) => {
-                  const year = 2025 + i; // Comenzar desde 2025
+                  const year = 2025 + i;
                   return (
                     <option key={year} value={year}>
                       {year}
@@ -121,14 +118,14 @@ const FiltrarPagosPorCategoria = () => {
               <p>Cargando pagos...</p>
             ) : (
               <TableGeneric
-                columnas={["nombre", "apellido", "dni", "estado"]}
-                mensajeVacio={
-                  categoriaSeleccionada && mesSeleccionado && añoSeleccionado
+                columns={["firstName", "lastName", "dni", "status"]}
+                emptyMessage={
+                  selectedCategory && selectedMonth && selectedYear
                     ? "No hay jugadores activos en esa categoría."
                     : "Elegí una categoría, un mes y un año para ver quién pagó y quién debe."
                 }
-                titulo="Pagos encontrados"
-                data={pagosFiltrados}
+                title="Pagos encontrados"
+                data={filteredPayments}
                 actions={[]}
               />
             )}
@@ -140,4 +137,4 @@ const FiltrarPagosPorCategoria = () => {
   );
 };
 
-export default FiltrarPagosPorCategoria;
+export default PaymentsByCategory;

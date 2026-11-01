@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
-import ResumenLista from "../Components/ResumenLista";
+import SummaryStrip from "../Components/SummaryStrip";
 import apiClient from "../Config/axiosConfig";
 import { useSession } from "../Auth/useSession";
 
-const VerCategoria = () => {
-  const { rol } = useSession();
-  const [categorias, setCategorias] = useState([]);
-  const [jugadores, setJugadores] = useState([]);
+const ViewCategory = () => {
+  const { role } = useSession();
+  const [categories, setCategories] = useState([]);
+  const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDatos = async () => {
+    const fetchData = async () => {
       try {
-        const [respuestaCategorias, respuestaJugadores] = await Promise.all([
-          apiClient.get("/api/categorias"),
-          apiClient.get("/api/jugadores").catch(() => ({ data: [] })),
+        const [categoriesResponse, playersResponse] = await Promise.all([
+          apiClient.get("/api/categories"),
+          apiClient.get("/api/players").catch(() => ({ data: [] })),
         ]);
-        setCategorias(respuestaCategorias.data);
-        setJugadores(Array.isArray(respuestaJugadores.data) ? respuestaJugadores.data : []);
+        setCategories(categoriesResponse.data);
+        setPlayers(Array.isArray(playersResponse.data) ? playersResponse.data : []);
       } catch (err) {
         console.error("Error al obtener las categorías:", err);
         setError("No se pudieron cargar las categorías. Intente nuevamente.");
@@ -31,19 +31,19 @@ const VerCategoria = () => {
       }
     };
 
-    fetchDatos();
+    fetchData();
   }, []);
 
-  // Jugadores activos de cada categoría
-  const activos = jugadores.filter((jugador) => jugador.estado === "ACTIVO");
-  const filas = categorias.map((categoria) => ({
-    id: categoria.id,
-    nombre: categoria.nombre,
-    descripcion: categoria.descripcion || "Sin descripción",
-    jugadores: activos.filter((jugador) => jugador.categoria === categoria.nombre).length,
+  // Active players in each category
+  const active = players.filter((player) => player.status === "ACTIVE");
+  const rows = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+    description: category.description || "Sin descripción",
+    players: active.filter((player) => player.category === category.name).length,
   }));
 
-  const masJugadores = filas.reduce((max, fila) => (fila.jugadores > (max?.jugadores ?? 0) ? fila : max), null);
+  const largestCategory = rows.reduce((max, row) => (row.players > (max?.players ?? 0) ? row : max), null);
 
   return (
     <>
@@ -55,25 +55,25 @@ const VerCategoria = () => {
           <div className="alert alert-danger mt-4">{error}</div>
         ) : (
           <>
-            <ResumenLista
-              datos={[
-                { nombre: "Categorías", valor: categorias.length },
-                { nombre: "Jugadores activos", valor: activos.length },
+            <SummaryStrip
+              data={[
+                { label: "Categorías", value: categories.length },
+                { label: "Jugadores activos", value: active.length },
                 {
-                  nombre: masJugadores
-                    ? `La más numerosa (${masJugadores.jugadores} jugadores)`
+                  label: largestCategory
+                    ? `La más numerosa (${largestCategory.players} jugadores)`
                     : "La más numerosa",
-                  valor: masJugadores ? masJugadores.nombre : "—",
+                  value: largestCategory ? largestCategory.name : "—",
                 },
               ]}
             />
             <TableGeneric
-              columnas={["id", "nombre", "descripcion", "jugadores"]}
-              mensajeVacio="Todavía no hay categorías registradas."
-              titulo="Categorías"
-              data={filas}
-              accionPrincipal={
-                rol === "ADMIN" && (
+              columns={["id", "name", "description", "players"]}
+              emptyMessage="Todavía no hay categorías registradas."
+              title="Categorías"
+              data={rows}
+              primaryAction={
+                role === "ADMIN" && (
                   <Link to="/categorias/nueva" className="btn btn-primary">
                     <i className="fas fa-plus me-2" aria-hidden="true"></i>Nueva categoría
                   </Link>
@@ -88,4 +88,4 @@ const VerCategoria = () => {
   );
 };
 
-export default VerCategoria;
+export default ViewCategory;

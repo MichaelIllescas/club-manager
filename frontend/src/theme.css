@@ -1,42 +1,42 @@
-/*
- * Tema visual de Club Manager.
- * Se carga después de Bootstrap y redefine sus variables y componentes.
+/* 
+ * Club Manager theme.
+ * Loaded after Bootstrap; it overrides Bootstrap variables and components.
  *
- * Paleta "club de barrio":
- *   cancha  #1F5E3B  verde principal (botones, encabezados de tabla, foco)
- *   tiza    #F4F6F1  fondo de la aplicación
- *   tinta   #172A22  texto
- *   escudo  #E0A731  acento puntual (sección activa, logo)
- *   deuda   #B8432E  errores y montos adeudados
- */
+ * Palette:
+ *   green  #1F5E3B  primary color (buttons, table headers, focus)
+ *   chalk  #F4F6F1  app background
+ *   ink    #172A22  text
+ *   gold   #E0A731  accent (active section, logo)
+ *   red    #B8432E  errors and amounts owed
+  */
 
 :root {
-  --cm-cancha: #1f5e3b;
-  --cm-cancha-oscuro: #164a2e;
-  --cm-cancha-claro: #e6efe8;
-  --cm-tiza: #f4f6f1;
-  --cm-tinta: #172a22;
-  --cm-tinta-suave: #4e5d55;
-  --cm-escudo: #e0a731;
-  --cm-deuda: #b8432e;
-  --cm-linea: #d9e0d6;
-  --cm-blanco: #ffffff;
-  --cm-radio: 8px;
-  --cm-fuente: "Barlow", system-ui, sans-serif;
-  --cm-fuente-titulos: "Barlow Condensed", "Barlow", sans-serif;
+  --cm-green: #1f5e3b;
+  --cm-green-dark: #164a2e;
+  --cm-green-light: #e6efe8;
+  --cm-chalk: #f4f6f1;
+  --cm-ink: #172a22;
+  --cm-ink-soft: #4e5d55;
+  --cm-gold: #e0a731;
+  --cm-red: #b8432e;
+  --cm-line: #d9e0d6;
+  --cm-white: #ffffff;
+  --cm-radius: 8px;
+  --cm-font: "Barlow", system-ui, sans-serif;
+  --cm-font-display: "Barlow Condensed", "Barlow", sans-serif;
 
-  --bs-body-font-family: var(--cm-fuente);
-  --bs-body-color: var(--cm-tinta);
-  --bs-body-bg: var(--cm-tiza);
-  --bs-primary: var(--cm-cancha);
+  --bs-body-font-family: var(--cm-font);
+  --bs-body-color: var(--cm-ink);
+  --bs-body-bg: var(--cm-chalk);
+  --bs-primary: var(--cm-green);
   --bs-primary-rgb: 31, 94, 59;
-  --bs-danger: var(--cm-deuda);
+  --bs-danger: var(--cm-red);
   --bs-danger-rgb: 184, 67, 46;
-  --bs-link-color: var(--cm-cancha);
+  --bs-link-color: var(--cm-green);
   --bs-link-color-rgb: 31, 94, 59;
-  --bs-link-hover-color: var(--cm-cancha-oscuro);
-  --bs-border-color: var(--cm-linea);
-  --bs-border-radius: var(--cm-radio);
+  --bs-link-hover-color: var(--cm-green-dark);
+  --bs-border-color: var(--cm-line);
+  --bs-border-radius: var(--cm-radius);
   --bs-focus-ring-color: rgba(31, 94, 59, 0.25);
 }
 
@@ -44,21 +44,21 @@ html,
 body.body {
   min-height: 100%;
   margin: 0;
-  background: var(--cm-tiza);
-  color: var(--cm-tinta);
-  font-family: var(--cm-fuente);
+  background: var(--cm-chalk);
+  color: var(--cm-ink);
+  font-family: var(--cm-font);
   font-size: 16px;
 }
 
 h1, h2, h3, h4, h5,
 .h1, .h2, .h3, .h4, .h5 {
-  font-family: var(--cm-fuente-titulos);
+  font-family: var(--cm-font-display);
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: var(--cm-tinta);
+  color: var(--cm-ink);
 }
 
-/* Los títulos de página quedan alineados a la izquierda */
+/* Page titles are left-aligned */
 .panel > h3:first-child,
 .panel > h2:first-child,
 .panel h3.text-center:first-child {
@@ -66,43 +66,43 @@ h1, h2, h3, h4, h5,
   font-size: 2rem;
   margin-bottom: 1.25rem !important;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--cm-cancha-claro);
+  border-bottom: 2px solid var(--cm-green-light);
 }
 
-/* ---------- Paneles (antes cajas negras) ---------- */
+/* ---------- Panels ---------- */
 
 .panel {
-  background: var(--cm-blanco) !important;
-  color: var(--cm-tinta) !important;
-  border: 1px solid var(--cm-linea);
-  border-radius: var(--cm-radio);
+  background: var(--cm-white) !important;
+  color: var(--cm-ink) !important;
+  border: 1px solid var(--cm-line);
+  border-radius: var(--cm-radius);
   box-shadow: 0 1px 2px rgba(23, 42, 34, 0.06);
 }
 
 .panel .text-white,
 .panel .text-light {
-  color: var(--cm-tinta) !important;
+  color: var(--cm-ink) !important;
 }
 
-/* ---------- Formularios ---------- */
+/* ---------- Forms ---------- */
 
 .form-label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
   margin-bottom: 0.3rem;
 }
 
 .form-control,
 .form-select {
-  border: 1px solid var(--cm-linea);
+  border: 1px solid var(--cm-line);
   border-radius: 6px;
   padding: 0.55rem 0.75rem;
-  background-color: var(--cm-blanco);
-  color: var(--cm-tinta);
+  background-color: var(--cm-white);
+  color: var(--cm-ink);
 }
 
-/* El selector reserva lugar a la derecha para la flecha */
+/* Leave room on the right for the select arrow */
 .form-select {
   padding-right: 2.5rem !important;
   background-position: right 0.75rem center;
@@ -110,16 +110,16 @@ h1, h2, h3, h4, h5,
 
 .form-control:focus,
 .form-select:focus {
-  border-color: var(--cm-cancha);
+  border-color: var(--cm-green);
   box-shadow: 0 0 0 3px rgba(31, 94, 59, 0.18);
 }
 
 .form-check-input:checked {
-  background-color: var(--cm-cancha);
-  border-color: var(--cm-cancha);
+  background-color: var(--cm-green);
+  border-color: var(--cm-green);
 }
 
-/* ---------- Botones ---------- */
+/* ---------- Buttons ---------- */
 
 .btn {
   font-weight: 600;
@@ -133,67 +133,67 @@ h1, h2, h3, h4, h5,
 
 .btn-primary,
 .btn-success {
-  --bs-btn-bg: var(--cm-cancha);
-  --bs-btn-border-color: var(--cm-cancha);
-  --bs-btn-hover-bg: var(--cm-cancha-oscuro);
-  --bs-btn-hover-border-color: var(--cm-cancha-oscuro);
-  --bs-btn-active-bg: var(--cm-cancha-oscuro);
-  --bs-btn-active-border-color: var(--cm-cancha-oscuro);
-  --bs-btn-disabled-bg: var(--cm-cancha);
-  --bs-btn-disabled-border-color: var(--cm-cancha);
+  --bs-btn-bg: var(--cm-green);
+  --bs-btn-border-color: var(--cm-green);
+  --bs-btn-hover-bg: var(--cm-green-dark);
+  --bs-btn-hover-border-color: var(--cm-green-dark);
+  --bs-btn-active-bg: var(--cm-green-dark);
+  --bs-btn-active-border-color: var(--cm-green-dark);
+  --bs-btn-disabled-bg: var(--cm-green);
+  --bs-btn-disabled-border-color: var(--cm-green);
 }
 
 .btn-danger {
-  --bs-btn-bg: var(--cm-deuda);
-  --bs-btn-border-color: var(--cm-deuda);
+  --bs-btn-bg: var(--cm-red);
+  --bs-btn-border-color: var(--cm-red);
   --bs-btn-hover-bg: #9a3725;
   --bs-btn-hover-border-color: #9a3725;
 }
 
 .btn-warning {
-  --bs-btn-bg: var(--cm-escudo);
-  --bs-btn-border-color: var(--cm-escudo);
-  --bs-btn-color: var(--cm-tinta);
+  --bs-btn-bg: var(--cm-gold);
+  --bs-btn-border-color: var(--cm-gold);
+  --bs-btn-color: var(--cm-ink);
   --bs-btn-hover-bg: #c99223;
   --bs-btn-hover-border-color: #c99223;
 }
 
 .btn-secondary {
-  --bs-btn-bg: var(--cm-blanco);
-  --bs-btn-color: var(--cm-tinta);
-  --bs-btn-border-color: var(--cm-linea);
-  --bs-btn-hover-bg: var(--cm-cancha-claro);
-  --bs-btn-hover-color: var(--cm-tinta);
-  --bs-btn-hover-border-color: var(--cm-linea);
+  --bs-btn-bg: var(--cm-white);
+  --bs-btn-color: var(--cm-ink);
+  --bs-btn-border-color: var(--cm-line);
+  --bs-btn-hover-bg: var(--cm-green-light);
+  --bs-btn-hover-color: var(--cm-ink);
+  --bs-btn-hover-border-color: var(--cm-line);
 }
 
 .btn:focus-visible,
 a:focus-visible {
-  outline: 3px solid var(--cm-escudo);
+  outline: 3px solid var(--cm-gold);
   outline-offset: 2px;
 }
 
-/* ---------- Tablas ---------- */
+/* ---------- Tables ---------- */
 
 .table {
-  --bs-table-bg: var(--cm-blanco);
-  --bs-table-color: var(--cm-tinta);
+  --bs-table-bg: var(--cm-white);
+  --bs-table-color: var(--cm-ink);
   --bs-table-striped-bg: #f7f9f6;
-  --bs-table-striped-color: var(--cm-tinta);
-  --bs-table-hover-bg: var(--cm-cancha-claro);
-  --bs-table-border-color: var(--cm-linea);
+  --bs-table-striped-color: var(--cm-ink);
+  --bs-table-hover-bg: var(--cm-green-light);
+  --bs-table-border-color: var(--cm-line);
   font-size: 0.95rem;
   margin-bottom: 0;
 }
 
 .table > thead th {
-  background: var(--cm-cancha);
-  color: var(--cm-blanco);
-  font-family: var(--cm-fuente-titulos);
+  background: var(--cm-green);
+  color: var(--cm-white);
+  font-family: var(--cm-font-display);
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.02em;
-  border-color: var(--cm-cancha-oscuro);
+  border-color: var(--cm-green-dark);
   vertical-align: middle;
 }
 
@@ -202,15 +202,15 @@ a:focus-visible {
 }
 
 .table-responsive {
-  border: 1px solid var(--cm-linea);
-  border-radius: var(--cm-radio);
+  border: 1px solid var(--cm-line);
+  border-radius: var(--cm-radius);
 }
 
-/* ---------- Paginación y menús ---------- */
+/* ---------- Pagination and menus ---------- */
 
 .dropdown-menu {
-  border: 1px solid var(--cm-linea);
-  border-radius: var(--cm-radio);
+  border: 1px solid var(--cm-line);
+  border-radius: var(--cm-radius);
   box-shadow: 0 8px 24px rgba(23, 42, 34, 0.12);
   padding: 0.35rem;
 }
@@ -218,22 +218,22 @@ a:focus-visible {
 .dropdown-item {
   border-radius: 6px;
   padding: 0.45rem 0.75rem;
-  color: var(--cm-tinta);
+  color: var(--cm-ink);
 }
 
 .dropdown-item:hover,
 .dropdown-item:focus {
-  background: var(--cm-cancha-claro);
-  color: var(--cm-tinta);
+  background: var(--cm-green-light);
+  color: var(--cm-ink);
 }
 
 .dropdown-item.active,
 .dropdown-item:active {
-  background: var(--cm-cancha);
-  color: var(--cm-blanco);
+  background: var(--cm-green);
+  color: var(--cm-white);
 }
 
-/* ---------- Modales ---------- */
+/* ---------- Modals ---------- */
 
 .modal-content {
   border: none;
@@ -242,37 +242,37 @@ a:focus-visible {
 }
 
 .modal-header {
-  border-bottom: 2px solid var(--cm-cancha-claro);
+  border-bottom: 2px solid var(--cm-green-light);
 }
 
 .modal-title {
-  font-family: var(--cm-fuente-titulos);
+  font-family: var(--cm-font-display);
   font-weight: 700;
   font-size: 1.5rem;
 }
 
 .modal-footer {
-  border-top: 1px solid var(--cm-linea);
+  border-top: 1px solid var(--cm-line);
 }
 
-/* ---------- Tarjetas ---------- */
+/* ---------- Cards ---------- */
 
 .card {
-  border: 1px solid var(--cm-linea);
-  border-radius: var(--cm-radio);
+  border: 1px solid var(--cm-line);
+  border-radius: var(--cm-radius);
   box-shadow: none;
 }
 
 .card-header {
-  background: var(--cm-blanco);
-  border-bottom: 1px solid var(--cm-linea);
-  font-family: var(--cm-fuente-titulos);
+  background: var(--cm-white);
+  border-bottom: 1px solid var(--cm-line);
+  font-family: var(--cm-font-display);
   font-weight: 600;
   font-size: 1.2rem;
 }
 
 .text-danger {
-  color: var(--cm-deuda) !important;
+  color: var(--cm-red) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -285,10 +285,10 @@ a:focus-visible {
 }
 
 .btn-info {
-  --bs-btn-bg: var(--cm-blanco);
-  --bs-btn-color: var(--cm-cancha);
-  --bs-btn-border-color: var(--cm-cancha);
-  --bs-btn-hover-bg: var(--cm-cancha);
-  --bs-btn-hover-color: var(--cm-blanco);
-  --bs-btn-hover-border-color: var(--cm-cancha);
+  --bs-btn-bg: var(--cm-white);
+  --bs-btn-color: var(--cm-green);
+  --bs-btn-border-color: var(--cm-green);
+  --bs-btn-hover-bg: var(--cm-green);
+  --bs-btn-hover-color: var(--cm-white);
+  --bs-btn-hover-border-color: var(--cm-green);
 }

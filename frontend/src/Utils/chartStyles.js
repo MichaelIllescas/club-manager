@@ -1,16 +1,16 @@
-import { formatearMoneda } from "./formatearMoneda";
+import { formatCurrency } from "./formatCurrency";
 
-// Colores del tema para los gráficos: el año elegido en verde, el anterior en gris
-export const COLOR_ANIO = "#1f5e3b";
-export const COLOR_ANIO_RELLENO = "rgba(31, 94, 59, 0.12)";
-export const COLOR_ANTERIOR = "#8a978f";
+// Theme colors for charts: the selected year in green, the previous one in gray
+export const SELECTED_YEAR_COLOR = "#1f5e3b";
+export const SELECTED_YEAR_FILL = "rgba(31, 94, 59, 0.12)";
+export const PREVIOUS_YEAR_COLOR = "#8a978f";
 
-const TINTA_SUAVE = "#4e5d55";
-const LINEA = "#e3e8e1";
-const FUENTE = { family: "Barlow", size: 13 };
+const INK_SOFT = "#4e5d55";
+const LINE = "#e3e8e1";
+const FONT = { family: "Barlow", size: 13 };
 
-// Opciones comunes: referencias visibles arriba, montos en pesos en el eje y en el tooltip
-export const opcionesGrafico = () => ({
+// Shared options: legend on top, amounts in pesos on the axis and in the tooltip
+export const chartOptions = () => ({
   responsive: true,
   interaction: { mode: "index", intersect: false },
   plugins: {
@@ -19,8 +19,8 @@ export const opcionesGrafico = () => ({
       position: "top",
       align: "end",
       labels: {
-        color: TINTA_SUAVE,
-        font: { ...FUENTE, weight: "600" },
+        color: INK_SOFT,
+        font: { ...FONT, weight: "600" },
         usePointStyle: true,
         pointStyle: "rectRounded",
         padding: 16,
@@ -28,23 +28,23 @@ export const opcionesGrafico = () => ({
     },
     tooltip: {
       callbacks: {
-        label: (contexto) => `${contexto.dataset.label}: ${formatearMoneda(contexto.parsed.y)}`,
+        label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
       },
     },
   },
   scales: {
     x: {
       grid: { display: false },
-      ticks: { color: TINTA_SUAVE, font: FUENTE },
+      ticks: { color: INK_SOFT, font: FONT },
     },
     y: {
       beginAtZero: true,
-      grid: { color: LINEA },
+      grid: { color: LINE },
       border: { display: false },
       ticks: {
-        color: TINTA_SUAVE,
-        font: FUENTE,
-        callback: (valor) => formatearMoneda(valor).replace(",00", ""),
+        color: INK_SOFT,
+        font: FONT,
+        callback: (value) => formatCurrency(value).replace(",00", ""),
       },
     },
   },

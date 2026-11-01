@@ -3,82 +3,82 @@ import { useSession } from "../Auth/useSession";
 import apiClient from "../Config/axiosConfig";
 import logo from "../assets/img/logo.svg";
 
-// Secciones del menú. "soloAdmin" oculta la sección o el item a los usuarios comunes;
-// el backend también rechaza esas operaciones.
-const SECCIONES = [
+// Menu sections. "adminOnly" hides the section or item from regular users;
+// the backend rejects those operations too.
+const SECTIONS = [
   {
-    nombre: "Socios",
-    icono: "fa-id-card",
+    label: "Socios",
+    icon: "fa-id-card",
     items: [
-      { to: "/socios/nuevo", icono: "fa-user-plus", texto: "Registrar socio" },
-      { to: "/socios", icono: "fa-list", texto: "Lista de socios" },
-      { to: "/socios/estado", icono: "fa-exchange-alt", texto: "Cambiar estado" },
+      { to: "/socios/nuevo", icon: "fa-user-plus", text: "Registrar socio" },
+      { to: "/socios", icon: "fa-list", text: "Lista de socios" },
+      { to: "/socios/estado", icon: "fa-exchange-alt", text: "Cambiar estado" },
     ],
   },
   {
-    nombre: "Jugadores",
-    icono: "fa-users",
+    label: "Jugadores",
+    icon: "fa-users",
     items: [
-      { to: "/jugadores/nuevo", icono: "fa-user-plus", texto: "Registrar jugador" },
-      { to: "/jugadores", icono: "fa-list", texto: "Lista de jugadores" },
-      { to: "/jugadores/por-categoria", icono: "fa-th-list", texto: "Jugadores por categoría" },
-      { to: "/jugadores/estado", icono: "fa-exchange-alt", texto: "Cambiar estado" },
+      { to: "/jugadores/nuevo", icon: "fa-user-plus", text: "Registrar jugador" },
+      { to: "/jugadores", icon: "fa-list", text: "Lista de jugadores" },
+      { to: "/jugadores/por-categoria", icon: "fa-th-list", text: "Jugadores por categoría" },
+      { to: "/jugadores/estado", icon: "fa-exchange-alt", text: "Cambiar estado" },
     ],
   },
   {
-    nombre: "Cuotas",
-    icono: "fa-file-invoice-dollar",
+    label: "Cuotas",
+    icon: "fa-file-invoice-dollar",
     items: [
-      { to: "/cuotas/nueva", icono: "fa-plus-circle", texto: "Registrar cuota", soloAdmin: true },
-      { to: "/cuotas/montos", icono: "fa-edit", texto: "Actualizar montos", soloAdmin: true },
-      { to: "/cuotas", icono: "fa-list", texto: "Lista de cuotas" },
+      { to: "/cuotas/nueva", icon: "fa-plus-circle", text: "Registrar cuota", adminOnly: true },
+      { to: "/cuotas/montos", icon: "fa-edit", text: "Actualizar montos", adminOnly: true },
+      { to: "/cuotas", icon: "fa-list", text: "Lista de cuotas" },
     ],
   },
   {
-    nombre: "Categorías",
-    icono: "fa-tags",
-    soloAdmin: true,
+    label: "Categorías",
+    icon: "fa-tags",
+    adminOnly: true,
     items: [
-      { to: "/categorias/nueva", icono: "fa-plus-circle", texto: "Registrar categoría" },
-      { to: "/categorias", icono: "fa-list", texto: "Lista de categorías" },
-      { to: "/categorias/editar", icono: "fa-edit", texto: "Actualizar categoría" },
+      { to: "/categorias/nueva", icon: "fa-plus-circle", text: "Registrar categoría" },
+      { to: "/categorias", icon: "fa-list", text: "Lista de categorías" },
+      { to: "/categorias/editar", icon: "fa-edit", text: "Actualizar categoría" },
     ],
   },
   {
-    nombre: "Pagos",
-    icono: "fa-money-bill-wave",
+    label: "Pagos",
+    icon: "fa-money-bill-wave",
     items: [
-      { to: "/pagos/nuevo", icono: "fa-plus-circle", texto: "Registrar pago" },
-      { to: "/pagos", icono: "fa-list", texto: "Todos los pagos" },
-      { to: "/pagos/por-persona", icono: "fa-user", texto: "Pagos de un jugador o socio" },
-      { to: "/pagos/por-categoria", icono: "fa-th-list", texto: "Pagos por categoría" },
-      { to: "/pagos/por-fecha", icono: "fa-calendar-alt", texto: "Pagos por fecha" },
+      { to: "/pagos/nuevo", icon: "fa-plus-circle", text: "Registrar pago" },
+      { to: "/pagos", icon: "fa-list", text: "Todos los pagos" },
+      { to: "/pagos/por-persona", icon: "fa-user", text: "Pagos de un jugador o socio" },
+      { to: "/pagos/por-categoria", icon: "fa-th-list", text: "Pagos por categoría" },
+      { to: "/pagos/por-fecha", icon: "fa-calendar-alt", text: "Pagos por fecha" },
     ],
   },
   {
-    nombre: "Recaudaciones",
-    icono: "fa-wallet",
-    soloAdmin: true,
+    label: "Recaudaciones",
+    icon: "fa-wallet",
+    adminOnly: true,
     items: [
-      { to: "/recaudaciones/anuales", icono: "fa-chart-bar", texto: "Recaudación anual" },
-      { to: "/recaudaciones/trimestrales", icono: "fa-chart-line", texto: "Recaudación trimestral" },
+      { to: "/recaudaciones/anuales", icon: "fa-chart-bar", text: "Recaudación anual" },
+      { to: "/recaudaciones/trimestrales", icon: "fa-chart-line", text: "Recaudación trimestral" },
     ],
   },
   {
-    nombre: "Usuarios",
-    icono: "fa-users-cog",
-    soloAdmin: true,
+    label: "Usuarios",
+    icon: "fa-users-cog",
+    adminOnly: true,
     items: [
-      { to: "/usuarios/nuevo", icono: "fa-user-plus", texto: "Registrar usuario" },
-      { to: "/usuarios", icono: "fa-users", texto: "Lista de usuarios" },
-      { to: "/usuarios/estado", icono: "fa-user-times", texto: "Cambiar estado" },
+      { to: "/usuarios/nuevo", icon: "fa-user-plus", text: "Registrar usuario" },
+      { to: "/usuarios", icon: "fa-users", text: "Lista de usuarios" },
+      { to: "/usuarios/estado", icon: "fa-user-times", text: "Cambiar estado" },
     ],
   },
 ];
 
-const cerrarSesion = async () => {
+const logout = async () => {
   try {
-    // El backend borra la cookie de sesión (es HttpOnly)
+    // The backend deletes the session cookie (it is HttpOnly)
     await apiClient.post("/auth/logout");
     window.location.href = "/";
   } catch (error) {
@@ -88,15 +88,15 @@ const cerrarSesion = async () => {
 };
 
 const Navbar = () => {
-  const { rol, usuario } = useSession();
-  const esAdmin = rol === "ADMIN";
-  const visible = (elemento) => esAdmin || !elemento.soloAdmin;
+  const { role, user } = useSession();
+  const isAdmin = role === "ADMIN";
+  const visible = (entry) => isAdmin || !entry.adminOnly;
 
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light fixed-top cm-nav">
         <div className="container">
-          <Link to="/inicio" className="navbar-brand cm-nav__marca">
+          <Link to="/inicio" className="navbar-brand cm-nav__brand">
             <img src={logo} width="40" height="40" alt="" />
             <span>Club Manager</span>
           </Link>
@@ -104,18 +104,18 @@ const Navbar = () => {
             className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#menuPrincipal"
-            aria-controls="menuPrincipal"
+            data-bs-target="#mainMenu"
+            aria-controls="mainMenu"
             aria-expanded="false"
             aria-label="Abrir menú"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          <div className="collapse navbar-collapse" id="menuPrincipal">
+          <div className="collapse navbar-collapse" id="mainMenu">
             <ul className="navbar-nav me-auto">
-              {SECCIONES.filter(visible).map((seccion) => (
-                <li key={seccion.nombre} className="nav-item dropdown">
+              {SECTIONS.filter(visible).map((section) => (
+                <li key={section.label} className="nav-item dropdown">
                   <a
                     className="nav-link dropdown-toggle"
                     href="#"
@@ -123,13 +123,13 @@ const Navbar = () => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <i className={`fas ${seccion.icono}`} aria-hidden="true"></i> {seccion.nombre}
+                    <i className={`fas ${section.icon}`} aria-hidden="true"></i> {section.label}
                   </a>
                   <ul className="dropdown-menu">
-                    {seccion.items.filter(visible).map((item) => (
+                    {section.items.filter(visible).map((item) => (
                       <li key={item.to}>
                         <Link to={item.to} className="dropdown-item">
-                          <i className={`fas ${item.icono}`} aria-hidden="true"></i> {item.texto}
+                          <i className={`fas ${item.icon}`} aria-hidden="true"></i> {item.text}
                         </Link>
                       </li>
                     ))}
@@ -148,7 +148,7 @@ const Navbar = () => {
                   aria-expanded="false"
                 >
                   <i className="fas fa-user-circle fa-lg me-2" aria-hidden="true"></i>
-                  {usuario?.nombre ?? "Mi cuenta"}
+                  {user?.firstName ?? "Mi cuenta"}
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li>
@@ -167,9 +167,9 @@ const Navbar = () => {
                   <li>
                     <button
                       type="button"
-                      className="dropdown-item cm-nav__salir"
+                      className="dropdown-item cm-nav__logout"
                       data-bs-toggle="modal"
-                      data-bs-target="#confirmarCierreSesion"
+                      data-bs-target="#confirmLogout"
                     >
                       <i className="fas fa-sign-out-alt me-2" aria-hidden="true"></i>Cerrar sesión
                     </button>
@@ -183,15 +183,15 @@ const Navbar = () => {
 
       <div
         className="modal fade"
-        id="confirmarCierreSesion"
+        id="confirmLogout"
         tabIndex="-1"
-        aria-labelledby="confirmarCierreSesionTitulo"
+        aria-labelledby="confirmLogoutTitle"
         aria-hidden="true"
       >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="confirmarCierreSesionTitulo">
+              <h5 className="modal-title" id="confirmLogoutTitle">
                 Cerrar sesión
               </h5>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -201,7 +201,7 @@ const Navbar = () => {
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-              <button type="button" className="btn btn-danger" onClick={cerrarSesion} data-bs-dismiss="modal">
+              <button type="button" className="btn btn-danger" onClick={logout} data-bs-dismiss="modal">
                 Cerrar sesión
               </button>
             </div>

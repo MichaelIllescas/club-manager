@@ -1,57 +1,57 @@
-/* Resumen del pago, con el mismo aire que el comprobante en PDF */
-.resumen-pago {
-  border: 1px solid var(--cm-linea);
-  border-top: 4px solid var(--cm-cancha);
-  border-radius: var(--cm-radio);
+/* Payment summary, styled like the PDF receipt */
+.payment-summary {
+  border: 1px solid var(--cm-line);
+  border-top: 4px solid var(--cm-green);
+  border-radius: var(--cm-radius);
   padding: 1.25rem 1.5rem;
   background: #fbfcfa;
 }
 
-.resumen-pago__titulo {
+.payment-summary__title {
   font-size: 1.4rem;
   margin-bottom: 1rem;
 }
 
-.resumen-pago dl {
+.payment-summary dl {
   display: grid;
   grid-template-columns: 8.5rem 1fr;
   gap: 0.6rem 1rem;
   margin: 0;
 }
 
-.resumen-pago dt {
+.payment-summary dt {
   font-weight: 500;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.resumen-pago dd {
+.payment-summary dd {
   margin: 0;
   font-weight: 600;
 }
 
-.resumen-pago__detalle {
+.payment-summary__detail {
   display: block;
   font-weight: 400;
   font-size: 0.85rem;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
 }
 
-.resumen-pago__total {
+.payment-summary__total {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-top: 1.25rem;
   padding-top: 1rem;
-  border-top: 1px dashed var(--cm-linea);
+  border-top: 1px dashed var(--cm-line);
 }
 
-.resumen-pago__total span {
+.payment-summary__total span {
   font-weight: 600;
-  color: var(--cm-cancha);
+  color: var(--cm-green);
 }
 
-.resumen-pago__total strong {
-  font-family: var(--cm-fuente-titulos);
+.payment-summary__total strong {
+  font-family: var(--cm-font-display);
   font-size: 2rem;
-  color: var(--cm-tinta);
+  color: var(--cm-ink);
 }

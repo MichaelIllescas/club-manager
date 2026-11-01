@@ -1,30 +1,29 @@
-import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
+import FormPage, { RemoteList } from "../Components/FormPage";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
-import "../Usuarios/RegistrarUsuario.css";
+import "../Users/RegisterUser.css";
 
-const RegistrarUsuario = () => {
-  const [recarga, setRecarga] = useState(0);
+const RegisterUser = () => {
+  const [reload, setReload] = useState(0);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     dni: "",
-    telefono: "",
-    direccion: "",
+    phone: "",
+    address: "",
     email: "",
     password: "",
-    role: "USER", // Valor predeterminado como string
+    role: "USER",
   });
 
   const [roles, setRoles] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Obtener roles del backend
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await apiClient.get("auth/roles"); // Ajusta esta URL según tu API
+        const response = await apiClient.get("auth/roles");
         if (Array.isArray(response.data)) {
           setRoles(response.data);
         } else {
@@ -37,7 +36,6 @@ const RegistrarUsuario = () => {
     fetchRoles();
   }, []);
 
-  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -45,27 +43,26 @@ const RegistrarUsuario = () => {
     });
   };
 
-  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    console.log("Datos enviados al backend:", formData); // Verifica los datos enviados
+    console.log("Datos enviados al backend:", formData);
 
     try {
-      await apiClient.post("/auth/registrarUsuario", formData);
+      await apiClient.post("/auth/register", formData);
       setSuccess("Usuario registrado exitosamente.");
-      setRecarga((n) => n + 1);
+      setReload((n) => n + 1);
       setFormData({
         firstName: "",
         lastName: "",
         dni: "",
-        telefono: "",
-        direccion: "",
+        phone: "",
+        address: "",
         email: "",
         password: "",
-        role: "USER", // Restablece al valor predeterminado
+        role: "USER",
       });
     } catch (err) {
       setError("Hubo un error al registrar el usuario. Intenta nuevamente.");
@@ -75,20 +72,20 @@ const RegistrarUsuario = () => {
 
   return (
     <>
-      <PaginaAlta
-        titulo="Registrar usuario"
+      <FormPage
+        title="Registrar usuario"
         intro="Los usuarios son las personas que usan el sistema. El rol administrador puede además gestionar cuotas, categorías, usuarios y ver las recaudaciones."
-        lateral={
-          <ListaRemota
+        side={
+          <RemoteList
             url="/api/users/getAllUsers"
-            titulo="Usuarios del sistema"
-            vacio="Todavía no hay otros usuarios."
-            recarga={recarga}
-            mapear={(usuario) => ({
-              id: usuario.id,
-              nombre: `${usuario.nombre} ${usuario.apellido}`,
-              detalle: usuario.email,
-              valor: usuario.rol === "ADMIN" ? "Administrador" : "Usuario",
+            title="Usuarios del sistema"
+            empty="Todavía no hay otros usuarios."
+            reload={reload}
+            toItem={(user) => ({
+              id: user.id,
+              name: `${user.firstName} ${user.lastName}`,
+              detail: user.email,
+              value: user.role === "ADMIN" ? "Administrador" : "Usuario",
             })}
           />
         }
@@ -97,7 +94,6 @@ const RegistrarUsuario = () => {
           <h1 className="text-center mb-4">Registrar usuario</h1>
 
           <div className="d-flex flex-column gap-4">
-            {/* Nombre y Apellido */}
             <div className="d-flex flex-wrap gap-3">
               <div className="flex-fill">
                 <label htmlFor="firstName" className="form-label">
@@ -130,7 +126,6 @@ const RegistrarUsuario = () => {
               </div>
             </div>
 
-            {/* DNI y Teléfono */}
             <div className="d-flex flex-wrap gap-3">
               <div className="flex-fill">
                 <label htmlFor="dni" className="form-label">
@@ -148,33 +143,32 @@ const RegistrarUsuario = () => {
               </div>
 
               <div className="flex-fill">
-                <label htmlFor="telefono" className="form-label">
+                <label htmlFor="phone" className="form-label">
                   Teléfono
                 </label>
                 <input
                   type="text"
-                  id="telefono"
-                  name="telefono"
+                  id="phone"
+                  name="phone"
                   className="form-control"
-                  value={formData.telefono}
+                  value={formData.phone}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
 
-            {/* Dirección y Correo Electrónico */}
             <div className="d-flex flex-wrap gap-3">
               <div className="flex-fill">
-                <label htmlFor="direccion" className="form-label">
+                <label htmlFor="address" className="form-label">
                   Dirección
                 </label>
                 <input
                   type="text"
-                  id="direccion"
-                  name="direccion"
+                  id="address"
+                  name="address"
                   className="form-control"
-                  value={formData.direccion}
+                  value={formData.address}
                   onChange={handleChange}
                   required
                 />
@@ -196,7 +190,6 @@ const RegistrarUsuario = () => {
               </div>
             </div>
 
-            {/* Contraseña y Rol */}
             <div className="d-flex flex-wrap gap-3 align-items-center">
               <div className="flex-fill">
                 <label htmlFor="password" className="form-label">
@@ -247,9 +240,9 @@ const RegistrarUsuario = () => {
             </button>
           </div>
         </form>
-      </PaginaAlta>
+      </FormPage>
     </>
   );
 };
 
-export default RegistrarUsuario;
+export default RegisterUser;

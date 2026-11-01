@@ -1,23 +1,22 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
-import EditarJugador from "./EditarJugador";
+import EditPlayer from "./EditPlayer";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const VerJugadores = () => {
-  const [jugadores, setJugadores] = useState([]); // Estado para almacenar los jugadores
-  const [loading, setLoading] = useState(true); // Estado para manejar el spinner o carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [selectedPlayerId, setSelectedPlayerId] = useState(null); // Estado para el jugador seleccionado
+const ViewPlayers = () => {
+  const [players, setPlayers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState(null);
 
-  // Función para obtener los jugadores desde el backend
-  const fetchJugadores = async () => {
+  const fetchPlayers = async () => {
     try {
-      const response = await apiClient.get("/api/jugadores");
+      const response = await apiClient.get("/api/players");
 
-      setJugadores(response.data); // Asignar los jugadores al estado
+      setPlayers(response.data);
     } catch (err) {
       console.error("Error al obtener los jugadores:", err);
       setError("No se pudieron cargar los jugadores. Intente nuevamente.");
@@ -27,18 +26,18 @@ const VerJugadores = () => {
   };
 
   useEffect(() => {
-    fetchJugadores(); // Llama a la función al montar el componente
+    fetchPlayers();
   }, []);
 
   const handleEdit = (playerId) => {
-    setSelectedPlayerId(playerId); // Establece el jugador seleccionado para edición
+    setSelectedPlayerId(playerId);
   };
 
   const actions = [
     {
       label: "Editar",
       className: "btn-warning",
-      onClick: (row) => handleEdit(row.id), // Lógica para el botón de edición
+      onClick: (row) => handleEdit(row.id),
     },
   ];
 
@@ -53,32 +52,31 @@ const VerJugadores = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              columnas={[
+              columns={[
                 "id",
-                "nombre",
-                "apellido",
+                "firstName",
+                "lastName",
                 "dni",
-                "telefono",
+                "phone",
                 "email",
-                "fechaRegistro",
-                "categoria",
-                "estado",
+                "registrationDate",
+                "category",
+                "status",
               ]}
-              mensajeVacio="Todavía no hay jugadores registrados."
-              titulo={"Jugadores"}
-              data={jugadores}
+              emptyMessage="Todavía no hay jugadores registrados."
+              title={"Jugadores"}
+              data={players}
               actions={actions}
             />
           )}
         </div>
       </div>
 
-      {/* Modal de edición */}
       {selectedPlayerId && (
-        <EditarJugador
-          playerId={selectedPlayerId} // ID del jugador a editar
-          onClose={() => setSelectedPlayerId(null)} // Cierra el modal
-          onUpdate={fetchJugadores} // Refresca la lista después de actualizar
+        <EditPlayer
+          playerId={selectedPlayerId}
+          onClose={() => setSelectedPlayerId(null)}
+          onUpdate={fetchPlayers}
         />
       )}
 
@@ -87,4 +85,4 @@ const VerJugadores = () => {
   );
 };
 
-export default VerJugadores;
+export default ViewPlayers;

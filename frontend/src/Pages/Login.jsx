@@ -73,12 +73,12 @@ const Login = () => {
 
   return (
     <div className="login">
-      <aside className="login__cancha" aria-hidden="true">
-        <svg className="login__lineas" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid slice">
+      <aside className="login__field" aria-hidden="true">
+        <svg className="login__lines" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid slice">
           <rect x="40" y="40" width="520" height="820" />
           <line x1="40" y1="450" x2="560" y2="450" />
           <circle cx="300" cy="450" r="90" />
-          <circle cx="300" cy="450" r="4" className="login__punto" />
+          <circle cx="300" cy="450" r="4" className="login__dot" />
           <rect x="170" y="40" width="260" height="140" />
           <rect x="235" y="40" width="130" height="55" />
           <rect x="170" y="720" width="260" height="140" />
@@ -86,18 +86,18 @@ const Login = () => {
           <path d="M240 180 A70 70 0 0 0 360 180" />
           <path d="M240 720 A70 70 0 0 1 360 720" />
         </svg>
-        <div className="login__marca">
+        <div className="login__brand">
           <img src={logo} alt="" width="88" height="88" />
           <h1>Club Manager</h1>
           <p>Socios, jugadores, cuotas y pagos del club en un solo lugar.</p>
         </div>
       </aside>
 
-      <main className="login__formulario">
-        <form onSubmit={handleLogin} noValidate className="login__caja">
-          <img src={logo} alt="Club Manager" width="56" height="56" className="login__logo-movil" />
+      <main className="login__form">
+        <form onSubmit={handleLogin} noValidate className="login__box">
+          <img src={logo} alt="Club Manager" width="56" height="56" className="login__mobile-logo" />
           <h2>Ingresar</h2>
-          <p className="login__ayuda">Usá el email y la contraseña que te dio el administrador.</p>
+          <p className="login__help">Usá el email y la contraseña que te dio el administrador.</p>
 
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
@@ -120,7 +120,7 @@ const Login = () => {
             <label htmlFor="password" className="form-label">
               Contraseña
             </label>
-            <div className="login__clave">
+            <div className="login__password">
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
@@ -132,7 +132,7 @@ const Login = () => {
               />
               <button
                 type="button"
-                className="login__ver"
+                className="login__toggle"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >

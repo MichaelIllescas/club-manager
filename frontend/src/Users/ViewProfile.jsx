@@ -2,19 +2,19 @@ import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import { Modal, Button, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import PaginaAlta, { NotaLateral } from "../Components/PaginaAlta";
+import FormPage, { SideNote } from "../Components/FormPage";
 
-const VerPerfil = () => {
+const ViewProfile = () => {
   const [user, setUser] = useState({
     id: null,
-    nombre: "",
-    apellido: "",
+    firstName: "",
+    lastName: "",
     dni: "",
-    telefono: "",
-    direccion: "",
+    phone: "",
+    address: "",
     email: "",
-    estado: "activo",
-    rol: "", // Rol inicial como string vacío
+    status: "activo",
+    role: "",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +23,7 @@ const VerPerfil = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await apiClient.get("/api/users/perfil");
+        const response = await apiClient.get("/api/users/me");
         setUser(response.data);
       } catch (err) {
         console.error("Error al obtener los datos del usuario:", err);
@@ -53,19 +53,19 @@ const VerPerfil = () => {
 
   return (
     <>
-      <PaginaAlta
-        titulo="Mi perfil"
+      <FormPage
+        title="Mi perfil"
         intro="Tus datos en el sistema. El email es el que usás para ingresar."
-        lateral={
-          <NotaLateral titulo="Tu cuenta">
+        side={
+          <SideNote title="Tu cuenta">
             <p className="mb-2">
               Rol:{" "}
               <strong>
-                {user.rol === "ADMIN" ? "Administrador" : "Usuario"}
+                {user.role === "ADMIN" ? "Administrador" : "Usuario"}
               </strong>
             </p>
             <p className="mb-3">
-              {user.rol === "ADMIN"
+              {user.role === "ADMIN"
                 ? "Podés gestionar cuotas, categorías, usuarios y ver las recaudaciones."
                 : "Podés registrar socios, jugadores y pagos, y consultar los listados."}
             </p>
@@ -73,7 +73,7 @@ const VerPerfil = () => {
               <i className="fas fa-key me-2" aria-hidden="true"></i>Cambiar
               contraseña
             </Link>
-          </NotaLateral>
+          </SideNote>
         }
       >
         {loading ? (
@@ -82,21 +82,21 @@ const VerPerfil = () => {
           <div className="alert alert-danger">{error}</div>
         ) : (
           <>
-            <dl className="perfil">
+            <dl className="profile-list">
               <dt>Nombre</dt>
               <dd>
-                {user.nombre} {user.apellido}
+                {user.firstName} {user.lastName}
               </dd>
               <dt>DNI</dt>
               <dd>{user.dni || "Sin cargar"}</dd>
               <dt>Email</dt>
               <dd>{user.email || "Sin cargar"}</dd>
               <dt>Teléfono</dt>
-              <dd>{user.telefono || "Sin cargar"}</dd>
+              <dd>{user.phone || "Sin cargar"}</dd>
               <dt>Dirección</dt>
-              <dd>{user.direccion || "Sin cargar"}</dd>
+              <dd>{user.address || "Sin cargar"}</dd>
             </dl>
-            <div className="alta__acciones">
+            <div className="form-page__actions">
               <Button variant="primary" onClick={() => setShowModal(true)}>
                 <i className="fas fa-user-edit me-2" aria-hidden="true"></i>
                 Editar mis datos
@@ -104,7 +104,7 @@ const VerPerfil = () => {
             </div>
           </>
         )}
-      </PaginaAlta>
+      </FormPage>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
@@ -116,8 +116,8 @@ const VerPerfil = () => {
               <Form.Label>Nombre</Form.Label>
               <Form.Control
                 type="text"
-                name="nombre"
-                value={user.nombre}
+                name="firstName"
+                value={user.firstName}
                 onChange={handleChange}
                 required
               />
@@ -126,8 +126,8 @@ const VerPerfil = () => {
               <Form.Label>Apellido</Form.Label>
               <Form.Control
                 type="text"
-                name="apellido"
-                value={user.apellido}
+                name="lastName"
+                value={user.lastName}
                 onChange={handleChange}
                 required
               />
@@ -146,8 +146,8 @@ const VerPerfil = () => {
               <Form.Label>Teléfono</Form.Label>
               <Form.Control
                 type="text"
-                name="telefono"
-                value={user.telefono}
+                name="phone"
+                value={user.phone}
                 onChange={handleChange}
                 required
               />
@@ -156,8 +156,8 @@ const VerPerfil = () => {
               <Form.Label>Dirección</Form.Label>
               <Form.Control
                 type="text"
-                name="direccion"
-                value={user.direccion}
+                name="address"
+                value={user.address}
                 onChange={handleChange}
                 required
               />
@@ -187,4 +187,4 @@ const VerPerfil = () => {
   );
 };
 
-export default VerPerfil;
+export default ViewProfile;

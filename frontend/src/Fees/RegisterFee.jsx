@@ -1,38 +1,38 @@
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import Header from "../Navbar/Header";
 import { useEffect, useState } from "react";
 import apiClient from "../Config/axiosConfig";
-import { formatearMoneda } from "../Utils/formatearMoneda";
-import "../Components/Alta.css";
+import { formatCurrency } from "../Utils/formatCurrency";
+import "../Components/FormPage.css";
 
-const FORMULARIO_VACIO = { type: "", amount: "" };
+const EMPTY_FORM = { name: "", amount: "" };
 
-const RegistrarCuota = () => {
-  const [formData, setFormData] = useState(FORMULARIO_VACIO);
+const RegisterFee = () => {
+  const [formData, setFormData] = useState(EMPTY_FORM);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [cuotas, setCuotas] = useState([]);
-  const [ultimaId, setUltimaId] = useState(null);
+  const [fees, setFees] = useState([]);
+  const [lastId, setLastId] = useState(null);
 
-  const cargarCuotas = async () => {
+  const loadFees = async () => {
     try {
-      const response = await apiClient.get("/api/cuotas");
-      setCuotas(response.data);
+      const response = await apiClient.get("/api/fees");
+      setFees(response.data);
     } catch (error) {
       console.error("Error al cargar las cuotas:", error);
     }
   };
 
   useEffect(() => {
-    cargarCuotas();
+    loadFees();
   }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const tipoRepetido = cuotas.some(
-    (cuota) => cuota.tipo?.trim().toLowerCase() === formData.type.trim().toLowerCase()
+  const duplicatedName = fees.some(
+    (fee) => fee.name?.trim().toLowerCase() === formData.name.trim().toLowerCase()
   );
 
   const handleSubmit = async (e) => {
@@ -41,16 +41,16 @@ const RegistrarCuota = () => {
     setMessage(null);
 
     try {
-      const response = await apiClient.post("/api/cuotas", {
-        tipo: formData.type.trim(),
-        monto: parseFloat(formData.amount),
-        fechaRegistro: new Date().toISOString(),
+      const response = await apiClient.post("/api/fees", {
+        name: formData.name.trim(),
+        amount: parseFloat(formData.amount),
+        registrationDate: new Date().toISOString(),
       });
 
-      setMessage({ text: `Se registró la cuota "${formData.type.trim()}".`, type: "success" });
-      setUltimaId(response.data?.id ?? null);
-      setFormData(FORMULARIO_VACIO);
-      cargarCuotas();
+      setMessage({ text: `Se registró la cuota "${formData.name.trim()}".`, type: "success" });
+      setLastId(response.data?.id ?? null);
+      setFormData(EMPTY_FORM);
+      loadFees();
     } catch (error) {
       setMessage({
         text:
@@ -66,34 +66,34 @@ const RegistrarCuota = () => {
   return (
     <>
       <Header />
-      <main className="container alta">
-        <section className="panel alta__panel">
-          <h1 className="alta__titulo">Registrar cuota</h1>
-          <p className="alta__intro">
+      <main className="container form-page">
+        <section className="panel form-page__panel">
+          <h1 className="form-page__title">Registrar cuota</h1>
+          <p className="form-page__intro">
             Las cuotas son los conceptos que se cobran en el club. Después se eligen al
             registrar cada pago de un socio o jugador.
           </p>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="type" className="form-label">
+              <label htmlFor="name" className="form-label">
                 Nombre de la cuota
               </label>
               <input
                 type="text"
-                id="type"
-                name="type"
+                id="name"
+                name="name"
                 placeholder="Ej: Cuota mensual jugador"
-                value={formData.type}
+                value={formData.name}
                 onChange={handleChange}
-                className={`form-control ${tipoRepetido ? "is-invalid" : ""}`}
+                className={`form-control ${duplicatedName ? "is-invalid" : ""}`}
                 maxLength={60}
                 required
               />
-              {tipoRepetido ? (
+              {duplicatedName ? (
                 <div className="invalid-feedback">Ya existe una cuota con ese nombre.</div>
               ) : (
-                <div className="alta__ayuda">
+                <div className="form-page__help">
                   Usá un nombre que se entienda en el listado de pagos.
                 </div>
               )}
@@ -118,19 +118,19 @@ const RegistrarCuota = () => {
                   step="0.01"
                 />
               </div>
-              <div className="alta__ayuda">
+              <div className="form-page__help">
                 Si el monto cambia más adelante, se actualiza desde Cuotas &gt; Actualizar montos.
               </div>
             </div>
 
-            <div className="alta__vista" aria-live="polite">
+            <div className="form-page__preview" aria-live="polite">
               <div>
-                <span className="alta__vista-etiqueta">Así se va a ver al cobrar</span>
-                <span className="alta__vista-nombre">
-                  {formData.type.trim() || "Nombre de la cuota"}
+                <span className="form-page__preview-label">Así se va a ver al cobrar</span>
+                <span className="form-page__preview-name">
+                  {formData.name.trim() || "Nombre de la cuota"}
                 </span>
               </div>
-              <span className="alta__vista-monto">{formatearMoneda(formData.amount)}</span>
+              <span className="form-page__preview-amount">{formatCurrency(formData.amount)}</span>
             </div>
 
             {message && (
@@ -142,38 +142,38 @@ const RegistrarCuota = () => {
               </div>
             )}
 
-            <div className="alta__acciones">
+            <div className="form-page__actions">
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => setFormData(FORMULARIO_VACIO)}
+                onClick={() => setFormData(EMPTY_FORM)}
                 disabled={loading}
               >
                 Limpiar
               </button>
-              <button type="submit" className="btn btn-primary" disabled={loading || tipoRepetido}>
+              <button type="submit" className="btn btn-primary" disabled={loading || duplicatedName}>
                 {loading ? "Registrando..." : "Registrar cuota"}
               </button>
             </div>
           </form>
         </section>
 
-        <aside className="panel alta__panel">
-          <h2 className="alta__lista-titulo">Cuotas actuales</h2>
-          <p className="alta__lista-sub">
-            {cuotas.length === 1 ? "1 cuota registrada" : `${cuotas.length} cuotas registradas`}
+        <aside className="panel form-page__panel">
+          <h2 className="form-page__list-title">Cuotas actuales</h2>
+          <p className="form-page__list-subtitle">
+            {fees.length === 1 ? "1 cuota registrada" : `${fees.length} cuotas registradas`}
           </p>
-          {cuotas.length === 0 ? (
-            <p className="alta__vacio">Todavía no hay cuotas. La primera que registres aparece acá.</p>
+          {fees.length === 0 ? (
+            <p className="form-page__empty">Todavía no hay cuotas. La primera que registres aparece acá.</p>
           ) : (
-            <ul className="alta__lista">
-              {cuotas.map((cuota) => (
+            <ul className="form-page__list">
+              {fees.map((fee) => (
                 <li
-                  key={cuota.id}
-                  className={`alta__item ${cuota.id === ultimaId ? "alta__item--nuevo" : ""}`}
+                  key={fee.id}
+                  className={`form-page__item ${fee.id === lastId ? "form-page__item--new" : ""}`}
                 >
-                  <span className="alta__item-nombre">{cuota.tipo}</span>
-                  <span className="alta__item-valor">{formatearMoneda(cuota.monto)}</span>
+                  <span className="form-page__item-name">{fee.name}</span>
+                  <span className="form-page__item-value">{formatCurrency(fee.amount)}</span>
                 </li>
               ))}
             </ul>
@@ -185,4 +185,4 @@ const RegistrarCuota = () => {
   );
 };
 
-export default RegistrarCuota;
+export default RegisterFee;

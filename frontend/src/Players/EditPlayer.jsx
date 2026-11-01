@@ -2,32 +2,31 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const EditarJugador = ({ playerId, onClose, onUpdate }) => {
+const EditPlayer = ({ playerId, onClose, onUpdate }) => {
   const [player, setPlayer] = useState({
-    nombre: "",
-    apellido: "",
+    firstName: "",
+    lastName: "",
     dni: "",
-    telefono: "",
+    phone: "",
     email: "",
-    categoria: "", // Cambiado para manejar el nombre de la categoría
+    category: "",
   });
-  const [categorias, setCategorias] = useState([]); // Almacenar las categorías disponibles
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Cargar datos del jugador y categorías
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [playerResponse, categoriasResponse] = await Promise.all([
-          apiClient.get(`/api/jugadores/${playerId}`),
-          apiClient.get("/api/categorias"),
+        const [playerResponse, categoriesResponse] = await Promise.all([
+          apiClient.get(`/api/players/${playerId}`),
+          apiClient.get("/api/categories"),
         ]);
 
         setPlayer({
           ...playerResponse.data,
-          categoria: playerResponse.data.categoria.nombre, // Almacenar el nombre de la categoría
+          category: playerResponse.data.category.name,
         });
-        setCategorias(categoriasResponse.data || []);
+        setCategories(categoriesResponse.data || []);
       } catch (error) {
         console.error("Error al cargar datos:", error);
       } finally {
@@ -38,20 +37,18 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
     fetchData();
   }, [playerId]);
 
-  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPlayer({ ...player, [name]: value });
   };
 
-  // Enviar los datos al backend
   const handleSubmit = (e) => {
     e.preventDefault();
     apiClient
-      .put(`/api/jugadores/${playerId}`, player)
+      .put(`/api/players/${playerId}`, player)
       .then(() => {
-        onUpdate(); // Refrescar la lista de jugadores
-        onClose(); // Cerrar el modal
+        onUpdate();
+        onClose();
       })
       .catch((error) =>
         console.error("Error al actualizar el jugador:", error)
@@ -64,10 +61,10 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
 
   return (
     <div
-      className="modal fade show d-block" // Clase para mostrar el modal
+      className="modal fade show d-block"
       tabIndex="-1"
       role="dialog"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // Fondo oscuro detrás del modal
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
       <div className="modal-dialog" role="document">
         <div className="modal-content">
@@ -85,9 +82,9 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
                 <label>Nombre:</label>
                 <input
                   type="text"
-                  name="nombre"
+                  name="firstName"
                   className="form-control"
-                  value={player.nombre}
+                  value={player.firstName}
                   onChange={handleChange}
                   required
                 />
@@ -96,9 +93,9 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
                 <label>Apellido:</label>
                 <input
                   type="text"
-                  name="apellido"
+                  name="lastName"
                   className="form-control"
-                  value={player.apellido}
+                  value={player.lastName}
                   onChange={handleChange}
                   required
                 />
@@ -118,9 +115,9 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
                 <label>Teléfono:</label>
                 <input
                   type="text"
-                  name="telefono"
+                  name="phone"
                   className="form-control"
-                  value={player.telefono}
+                  value={player.phone}
                   onChange={handleChange}
                   required
                 />
@@ -139,16 +136,16 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
               <div className="mb-3">
                 <label>Categoría:</label>
                 <select
-                  name="categoria"
+                  name="category"
                   className="form-select"
-                  value={player.categoria}
+                  value={player.category}
                   onChange={handleChange}
                   required
                 >
                   <option value="">Seleccione una categoría</option>
-                  {categorias.map((categoria) => (
-                    <option key={categoria.id} value={categoria.nombre}>
-                      {categoria.nombre}
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
                     </option>
                   ))}
                 </select>
@@ -173,10 +170,10 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
   );
 };
 
-EditarJugador.propTypes = {
+EditPlayer.propTypes = {
   playerId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   onClose: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
 };
 
-export default EditarJugador;
+export default EditPlayer;

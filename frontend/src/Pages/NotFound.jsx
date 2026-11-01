@@ -1,30 +1,30 @@
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "../Auth/useSession";
 import logo from "../assets/img/logo.svg";
-import "./NoEncontrada.css";
+import "./NotFound.css";
 
-// Página para direcciones que no existen o a las que el usuario no tiene acceso
-const NoEncontrada = () => {
-  const { usuario } = useSession();
+// Page for addresses that do not exist or that the user cannot access
+const NotFound = () => {
+  const { user } = useSession();
   const { pathname } = useLocation();
-  const destino = usuario ? "/inicio" : "/";
+  const target = user ? "/inicio" : "/";
 
   return (
-    <main className="no-encontrada">
-      <div className="no-encontrada__caja">
+    <main className="not-found">
+      <div className="not-found__box">
         <img src={logo} alt="" width="72" height="72" />
-        <p className="no-encontrada__codigo">404</p>
+        <p className="not-found__code">404</p>
         <h1>Esta página no existe</h1>
-        <p className="no-encontrada__texto">
+        <p className="not-found__text">
           La dirección <code>{pathname}</code> no corresponde a ninguna sección, o tu usuario no
           tiene acceso a ella.
         </p>
-        <Link to={destino} className="btn btn-primary">
-          {usuario ? "Volver al inicio" : "Ir a ingresar"}
+        <Link to={target} className="btn btn-primary">
+          {user ? "Volver al inicio" : "Ir a ingresar"}
         </Link>
       </div>
     </main>
   );
 };
 
-export default NoEncontrada;
+export default NotFound;

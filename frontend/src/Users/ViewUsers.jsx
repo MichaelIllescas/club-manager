@@ -1,26 +1,25 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
-import EditarUsuario from "./EditarUsuario";
+import EditUser from "./EditUser";
 
-const VerUsuarios = () => {
-  const [usuarios, setUsuarios] = useState([]); // Estado para los usuarios
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [error, setError] = useState(null); // Estado para los errores
-  const [selectedUserId, setSelectedUserId] = useState(null); // Estado para el ID del usuario a editar
-  const [showResetModal, setShowResetModal] = useState(false); // Estado para controlar la visibilidad del modal
-  const [userIdToReset, setUserIdToReset] = useState(null); // Estado para el ID del usuario cuya contraseña se resetea
-  const [resetMessage, setResetMessage] = useState(""); // Estado para el mensaje del modal
-  const [isSuccess, setIsSuccess] = useState(false); // Estado para indicar si fue exitoso
+const ViewUsers = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [userIdToReset, setUserIdToReset] = useState(null);
+  const [resetMessage, setResetMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // Función para obtener los usuarios desde el backend
-  const fetchUsuarios = async () => {
+  const fetchUsers = async () => {
     try {
-      const response = await apiClient.get("/api/users/getAllUsers");
-      setUsuarios(response.data);
+      const response = await apiClient.get("/api/users");
+      setUsers(response.data);
     } catch (err) {
       console.error("Error al obtener los usuarios:", err);
       setError("No se pudieron cargar los usuarios. Intente nuevamente.");
@@ -29,36 +28,33 @@ const VerUsuarios = () => {
     }
   };
 
-  // Función para manejar el reseteo de la contraseña
-  const handleResetClave = async (userId) => {
+  const handleResetPassword = async (userId) => {
     try {
-      await apiClient.post(`/api/users/resetearClave/${userId}`); // Llamada al backend para resetear la contraseña
+      await apiClient.post(`/api/users/${userId}/reset-password`);
       setIsSuccess(true);
-      setResetMessage("Clave reseteada con éxito."); // Actualizar el mensaje
-      fetchUsuarios(); // Actualizar la lista de usuarios
+      setResetMessage("Clave reseteada con éxito.");
+      fetchUsers();
     } catch (err) {
       console.error("Error al resetear la clave:", err);
       setIsSuccess(false);
-      setResetMessage("Error al resetear la clave. Intente nuevamente."); // Actualizar el mensaje de error
+      setResetMessage("Error al resetear la clave. Intente nuevamente.");
     }
   };
 
   useEffect(() => {
-    fetchUsuarios(); // Obtener usuarios cuando el componente se monta
+    fetchUsers();
   }, []);
 
-  // Función para abrir el modal de reseteo de contraseña
   const openResetModal = (userId) => {
-    setUserIdToReset(userId); // Establecer el ID del usuario
-    setResetMessage(""); // Limpiar el mensaje previo
-    setShowResetModal(true); // Mostrar el modal
+    setUserIdToReset(userId);
+    setResetMessage("");
+    setShowResetModal(true);
   };
 
-  // Función para cerrar el modal de reseteo de contraseña
   const closeResetModal = () => {
-    setUserIdToReset(null); // Limpiar el ID del usuario
-    setShowResetModal(false); // Cerrar el modal
-    setResetMessage(""); // Limpiar el mensaje
+    setUserIdToReset(null);
+    setShowResetModal(false);
+    setResetMessage("");
   };
 
   return (
@@ -72,20 +68,20 @@ const VerUsuarios = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              columnas={[
+              columns={[
                 "id",
-                "nombre",
-                "apellido",
+                "firstName",
+                "lastName",
                 "dni",
-                "telefono",
-                "direccion",
+                "phone",
+                "address",
                 "email",
-                "estado",
-                "rol",
+                "status",
+                "role",
               ]}
-              mensajeVacio="Todavía no hay usuarios registrados."
-              titulo={"Usuarios"}
-              data={usuarios}
+              emptyMessage="Todavía no hay usuarios registrados."
+              title={"Usuarios"}
+              data={users}
               actions={[
                 {
                   label: "Editar",
@@ -104,14 +100,13 @@ const VerUsuarios = () => {
       </div>
 
       {selectedUserId && (
-        <EditarUsuario
+        <EditUser
           userId={selectedUserId}
           onClose={() => setSelectedUserId(null)}
-          onUpdate={fetchUsuarios}
+          onUpdate={fetchUsers}
         />
       )}
 
-      {/* Modal de Confirmación con Bootstrap */}
       <div
         className={`modal fade ${showResetModal ? "show" : ""}`}
         tabIndex="-1"
@@ -156,7 +151,7 @@ const VerUsuarios = () => {
                   <button
                     type="button"
                     className="btn btn-danger"
-                    onClick={() => handleResetClave(userIdToReset)}
+                    onClick={() => handleResetPassword(userIdToReset)}
                   >
                     Confirmar
                   </button>
@@ -181,4 +176,4 @@ const VerUsuarios = () => {
   );
 };
 
-export default VerUsuarios;
+export default ViewUsers;

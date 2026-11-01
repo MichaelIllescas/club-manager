@@ -1,21 +1,20 @@
-import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
-import { formatearMoneda } from "../Utils/formatearMoneda";
+import FormPage, { RemoteList } from "../Components/FormPage";
+import { formatCurrency } from "../Utils/formatCurrency";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
-const ActualizarCuotas = () => {
-  const [recarga, setRecarga] = useState(0);
-  const [feeTypes, setFeeTypes] = useState([]); // Tipos de cuotas desde el backend
-  const [selectedFeeType, setSelectedFeeType] = useState(null); // Tipo de cuota seleccionado
-  const [formData, setFormData] = useState({ type: "", amount: "" }); // Datos del formulario
-  const [message, setMessage] = useState(null); // Mensaje de éxito o error
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [error, setError] = useState(null); // Estado de error al cargar los datos
+const UpdateFees = () => {
+  const [reload, setReload] = useState(0);
+  const [feeTypes, setFeeTypes] = useState([]);
+  const [selectedFeeType, setSelectedFeeType] = useState(null);
+  const [formData, setFormData] = useState({ name: "", amount: "" });
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Cargar tipos de cuotas desde el backend
   useEffect(() => {
     const fetchFeeTypes = async () => {
       try {
-        const response = await apiClient.get("/api/cuotas");
+        const response = await apiClient.get("/api/fees");
         setFeeTypes(response.data);
       } catch (err) {
         console.error("Error al cargar los tipos de cuotas:", err);
@@ -30,22 +29,19 @@ const ActualizarCuotas = () => {
     fetchFeeTypes();
   }, []);
 
-  // Manejar cambios en el tipo de cuota seleccionado
   const handleSelectChange = (e) => {
     const feeTypeId = e.target.value;
     const selected = feeTypes.find(
       (feeType) => feeType.id === parseInt(feeTypeId, 10),
     );
     setSelectedFeeType(selected);
-    setFormData({ type: selected.tipo, amount: selected.monto });
+    setFormData({ name: selected.name, amount: selected.amount });
   };
 
-  // Manejar cambios en los campos del formulario
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Enviar los cambios al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedFeeType) {
@@ -58,29 +54,28 @@ const ActualizarCuotas = () => {
 
     try {
       const updatedFee = {
-        tipo: formData.type,
-        monto: parseFloat(formData.amount),
+        name: formData.name,
+        amount: parseFloat(formData.amount),
       };
 
-      await apiClient.put(`/api/cuotas/${selectedFeeType.id}`, updatedFee);
+      await apiClient.put(`/api/fees/${selectedFeeType.id}`, updatedFee);
 
       setMessage({
         text: "Tipo de cuota actualizado con éxito.",
         type: "success",
       });
-      setRecarga((n) => n + 1);
+      setReload((n) => n + 1);
 
-      // Actualizar la lista de cuotas en el estado
       setFeeTypes((prevFeeTypes) =>
         prevFeeTypes.map((fee) =>
           fee.id === selectedFeeType.id
-            ? { ...fee, tipo: formData.type, monto: formData.amount }
+            ? { ...fee, name: formData.name, amount: formData.amount }
             : fee,
         ),
       );
 
-      setSelectedFeeType(null); // Limpiar selección
-      setFormData({ type: "", amount: "" }); // Limpiar formulario
+      setSelectedFeeType(null);
+      setFormData({ name: "", amount: "" });
     } catch (err) {
       console.error("Error al actualizar el tipo de cuota:", err);
       setMessage({
@@ -92,20 +87,20 @@ const ActualizarCuotas = () => {
 
   return (
     <>
-      <PaginaAlta
-        titulo="Actualizar montos"
+      <FormPage
+        title="Actualizar montos"
         intro="Elegí la cuota y cargá el nuevo monto. Los pagos ya registrados conservan el monto con el que se cobraron."
-        lateral={
-          <ListaRemota
+        side={
+          <RemoteList
             url="/api/cuotas"
-            titulo="Montos actuales"
-            vacio="Todavía no hay cuotas registradas."
-            recarga={recarga}
-            mapear={(c) => ({
+            title="Montos actuales"
+            empty="Todavía no hay cuotas registradas."
+            reload={reload}
+            toItem={(c) => ({
               id: c.id,
-              nombre: c.tipo,
-              detalle: null,
-              valor: formatearMoneda(c.monto),
+              name: c.name,
+              detail: null,
+              value: formatCurrency(c.amount),
             })}
           />
         }
@@ -116,7 +111,6 @@ const ActualizarCuotas = () => {
           <p className="text-center text-danger">{error}</p>
         ) : (
           <form onSubmit={handleSubmit}>
-            {/* Selección del tipo de cuota */}
             <div className="mb-3">
               <label htmlFor="feeTypeSelect" className="form-label">
                 Selecciona un tipo de cuota
@@ -133,26 +127,24 @@ const ActualizarCuotas = () => {
                 </option>
                 {feeTypes.map((feeType) => (
                   <option key={feeType.id} value={feeType.id}>
-                    {feeType.tipo}
+                    {feeType.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Mostrar datos actuales */}
             {selectedFeeType && (
               <div className="mb-3">
                 <p>
-                  <strong>Tipo actual:</strong> {selectedFeeType.tipo}
+                  <strong>Tipo actual:</strong> {selectedFeeType.name}
                 </p>
                 <p>
                   <strong>Monto actual:</strong> $
-                  {selectedFeeType.monto.toFixed(2)}
+                  {selectedFeeType.amount.toFixed(2)}
                 </p>
               </div>
             )}
 
-            {/* Formulario para editar */}
             {selectedFeeType && (
               <>
                 <div className="mb-3">
@@ -174,7 +166,6 @@ const ActualizarCuotas = () => {
               </>
             )}
 
-            {/* Mensaje de confirmación o error */}
             {message && (
               <p
                 className={`fw-bold text-center ${
@@ -196,9 +187,9 @@ const ActualizarCuotas = () => {
             </div>
           </form>
         )}
-      </PaginaAlta>
+      </FormPage>
     </>
   );
 };
 
-export default ActualizarCuotas;
+export default UpdateFees;

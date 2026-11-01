@@ -1,24 +1,26 @@
 import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
 
-const CambioEstadoSocio = () => {
-  const [socios, setSocios] = useState([]); // Estado para almacenar los socios
-  const [loading, setLoading] = useState(true); // Estado para manejar el spinner o carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [selectedSocio, setSelectedSocio] = useState(null); // Estado para el socio seleccionado
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [action, setAction] = useState(""); // Acción actual: habilitar o anular
+// Text shown to the user for each action
+const ACTION_LABELS = { deactivate: "anular", activate: "habilitar" };
 
-  // Función para obtener los socios desde el backend
-  const fetchSocios = async () => {
+const ChangeMemberStatus = () => {
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [action, setAction] = useState("");
+
+  const fetchMembers = async () => {
     try {
-      const response = await apiClient.get("/api/socios");
-      setSocios(response.data);
+      const response = await apiClient.get("/api/members");
+      setMembers(response.data);
     } catch (err) {
       console.error("Error al obtener los socios:", err);
       setError("No se pudieron cargar los socios. Intente nuevamente.");
@@ -28,49 +30,46 @@ const CambioEstadoSocio = () => {
   };
 
   useEffect(() => {
-    fetchSocios(); // Llama a la función al montar el componente
+    fetchMembers();
   }, []);
 
-  // Mostrar el modal y establecer la acción (habilitar/anular)
-  const handleActionClick = (socio, actionType) => {
-    setSelectedSocio(socio); // Establece el socio seleccionado
-    setAction(actionType); // Define la acción
-    setShowModal(true); // Muestra el modal
+  const handleActionClick = (member, actionType) => {
+    setSelectedMember(member);
+    setAction(actionType);
+    setShowModal(true);
   };
 
-  // Confirmar la acción (habilitar/anular)
   const handleConfirmAction = async () => {
     try {
       const endpoint =
-        action === "anular"
-          ? `/api/socios/${selectedSocio.id}/anular`
-          : `/api/socios/${selectedSocio.id}/habilitar`;
+        action === "deactivate"
+          ? `/api/members/${selectedMember.id}/deactivate`
+          : `/api/members/${selectedMember.id}/activate`;
 
-      await apiClient.put(endpoint); // Llamada al backend
-      setShowModal(false); // Cierra el modal
-      fetchSocios(); // Refresca la lista de socios
+      await apiClient.put(endpoint);
+      setShowModal(false);
+      fetchMembers();
     } catch (err) {
-      console.error(`Error al ${action} el socio:`, err);
-      setError(`No se pudo ${action} el socio. Intente nuevamente.`);
+      console.error(`Error al ${ACTION_LABELS[action]} el socio:`, err);
+      setError(`No se pudo ${ACTION_LABELS[action]} el socio. Intente nuevamente.`);
     }
   };
 
-  // Generar datos con acciones embebidas
-  const sociosConAcciones = socios.map((socio) => ({
-    ...socio,
-    acciones: (
+  const membersWithActions = members.map((member) => ({
+    ...member,
+    actions: (
       <button
         className={`btn ${
-          socio.estado === "ACTIVO" ? "btn-danger" : "btn-success"
+          member.status === "ACTIVE" ? "btn-danger" : "btn-success"
         } me-2`}
         onClick={() =>
           handleActionClick(
-            socio,
-            socio.estado === "ACTIVO" ? "anular" : "habilitar",
+            member,
+            member.status === "ACTIVE" ? "deactivate" : "activate",
           )
         }
       >
-        {socio.estado === "ACTIVO" ? "Anular" : "Habilitar"}
+        {member.status === "ACTIVE" ? "Anular" : "Habilitar"}
       </button>
     ),
   }));
@@ -87,42 +86,41 @@ const CambioEstadoSocio = () => {
               <p className="text-center text-danger">{error}</p>
             ) : (
               <TableGeneric
-                columnas={[
+                columns={[
                   "id",
-                  "nombre",
-                  "apellido",
+                  "firstName",
+                  "lastName",
                   "dni",
-                  "telefono",
+                  "phone",
                   "email",
-                  "numeroSocio",
-                  "fechaRegistro",
-                  "direccion",
-                  "estado",
-                  "acciones",
+                  "memberNumber",
+                  "registrationDate",
+                  "address",
+                  "status",
+                  "actions",
                 ]}
-                mensajeVacio="Todavía no hay socios registrados."
-                titulo={"Estado de los socios"}
-                data={sociosConAcciones}
+                emptyMessage="Todavía no hay socios registrados."
+                title={"Estado de los socios"}
+                data={membersWithActions}
               />
             )}
           </div>
         </div>
       </div>
 
-      {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar Acción</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro de que quieres {action} a {selectedSocio?.nombre}?
+          ¿Estás seguro de que quieres {ACTION_LABELS[action]} a {selectedMember?.firstName}?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
           <Button
-            variant={action === "anular" ? "danger" : "success"}
+            variant={action === "deactivate" ? "danger" : "success"}
             onClick={handleConfirmAction}
           >
             Confirmar
@@ -135,4 +133,4 @@ const CambioEstadoSocio = () => {
   );
 };
 
-export default CambioEstadoSocio;
+export default ChangeMemberStatus;

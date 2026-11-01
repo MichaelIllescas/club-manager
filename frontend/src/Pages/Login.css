@@ -1,4 +1,4 @@
-/* Login: a la izquierda, una cancha dibujada en tiza; a la derecha, el formulario */
+/* Login: a chalk-drawn field on the left and the form on the right */
 
 .login {
   display: grid;
@@ -6,22 +6,22 @@
   min-height: 100vh;
 }
 
-.login__cancha {
+.login__field {
   position: relative;
   overflow: hidden;
   background:
     repeating-linear-gradient(
       90deg,
-      var(--cm-cancha) 0 64px,
+      var(--cm-green) 0 64px,
       #22663f 64px 128px
     );
-  color: var(--cm-blanco);
+  color: var(--cm-white);
   display: flex;
   align-items: flex-end;
   padding: 3rem;
 }
 
-.login__lineas {
+.login__lines {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -31,90 +31,90 @@
   stroke-width: 3;
 }
 
-.login__punto {
+.login__dot {
   fill: rgba(255, 255, 255, 0.55);
 }
 
-.login__marca {
+.login__brand {
   position: relative;
   background: rgba(22, 74, 46, 0.88);
-  border-left: 4px solid var(--cm-escudo);
+  border-left: 4px solid var(--cm-gold);
   padding: 1.5rem 1.75rem;
   max-width: 26rem;
 }
 
-.login__marca h1 {
-  color: var(--cm-blanco);
+.login__brand h1 {
+  color: var(--cm-white);
   font-size: 3rem;
   line-height: 1;
   margin: 1rem 0 0.5rem;
 }
 
-.login__marca p {
+.login__brand p {
   margin: 0;
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.85);
 }
 
-.login__formulario {
+.login__form {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 2rem 1rem 0;
-  background: var(--cm-tiza);
+  background: var(--cm-chalk);
 }
 
-.login__caja {
+.login__box {
   width: 100%;
   max-width: 380px;
   margin: auto 0;
 }
 
-.login__caja h2 {
+.login__box h2 {
   font-size: 2.5rem;
   margin-bottom: 0.25rem;
 }
 
-.login__ayuda {
-  color: var(--cm-tinta-suave);
+.login__help {
+  color: var(--cm-ink-soft);
   margin-bottom: 1.75rem;
 }
 
-.login__clave {
+.login__password {
   position: relative;
 }
 
-.login__clave .form-control {
+.login__password .form-control {
   padding-right: 2.75rem;
 }
 
-.login__ver {
+.login__toggle {
   position: absolute;
   top: 50%;
   right: 0.35rem;
   transform: translateY(-50%);
   border: 0;
   background: transparent;
-  color: var(--cm-tinta-suave);
+  color: var(--cm-ink-soft);
   padding: 0.35rem 0.5rem;
   border-radius: 6px;
 }
 
-.login__ver:hover {
-  color: var(--cm-cancha);
+.login__toggle:hover {
+  color: var(--cm-green);
 }
 
-.login__logo-movil {
+.login__mobile-logo {
   display: none;
   margin-bottom: 1rem;
 }
 
-.login__formulario .sitio-footer {
+.login__form .site-footer {
   width: 100%;
   margin-top: 2rem;
   background: transparent;
-  border-top: 1px solid var(--cm-linea);
+  border-top: 1px solid var(--cm-line);
 }
 
 @media (max-width: 860px) {
@@ -122,11 +122,11 @@
     grid-template-columns: 1fr;
   }
 
-  .login__cancha {
+  .login__field {
     display: none;
   }
 
-  .login__logo-movil {
+  .login__mobile-logo {
     display: block;
   }
 }

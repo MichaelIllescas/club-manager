@@ -1,61 +1,61 @@
 import { useEffect, useState } from "react";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import apiClient from "../Config/axiosConfig";
-import "../Components/Alta.css";
+import "../Components/FormPage.css";
 
-const MAX_DESCRIPCION = 255;
+const MAX_DESCRIPTION = 255;
 
-const RegistrarCategoria = () => {
-  const [categoria, setCategoria] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [mensaje, setMensaje] = useState(null);
+const RegisterCategory = () => {
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [categorias, setCategorias] = useState([]);
-  const [ultimaId, setUltimaId] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [lastId, setLastId] = useState(null);
 
-  const cargarCategorias = async () => {
+  const loadCategories = async () => {
     try {
-      const response = await apiClient.get("/api/categorias");
-      setCategorias(response.data);
+      const response = await apiClient.get("/api/categories");
+      setCategories(response.data);
     } catch (error) {
       console.error("Error al cargar las categorías:", error);
     }
   };
 
   useEffect(() => {
-    cargarCategorias();
+    loadCategories();
   }, []);
 
-  const nombreRepetido = categorias.some(
-    (c) => c.nombre?.trim().toLowerCase() === categoria.trim().toLowerCase()
+  const duplicatedName = categories.some(
+    (c) => c.name?.trim().toLowerCase() === category.trim().toLowerCase()
   );
 
-  const limpiar = () => {
-    setCategoria("");
-    setDescripcion("");
+  const clear = () => {
+    setCategory("");
+    setDescription("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMensaje(null);
+    setMessage(null);
 
     try {
-      const response = await apiClient.post("/api/categorias", {
-        nombre: categoria.trim(),
-        descripcion: descripcion.trim(),
+      const response = await apiClient.post("/api/categories", {
+        name: category.trim(),
+        description: description.trim(),
       });
-      setMensaje({ texto: `Se registró la categoría "${categoria.trim()}".`, tipo: "success" });
-      setUltimaId(response.data?.id ?? null);
-      limpiar();
-      cargarCategorias();
+      setMessage({ text: `Se registró la categoría "${category.trim()}".`, type: "success" });
+      setLastId(response.data?.id ?? null);
+      clear();
+      loadCategories();
     } catch (error) {
-      setMensaje({
-        texto:
+      setMessage({
+        text:
           error.response?.data?.error ||
           "No se pudo registrar la categoría. Revisá el nombre.",
-        tipo: "error",
+        type: "error",
       });
     } finally {
       setLoading(false);
@@ -65,80 +65,80 @@ const RegistrarCategoria = () => {
   return (
     <>
       <Header />
-      <main className="container alta">
-        <section className="panel alta__panel">
-          <h1 className="alta__titulo">Registrar categoría</h1>
-          <p className="alta__intro">
+      <main className="container form-page">
+        <section className="panel form-page__panel">
+          <h1 className="form-page__title">Registrar categoría</h1>
+          <p className="form-page__intro">
             Las categorías agrupan a los jugadores, por ejemplo por edad o por división. Cada
             jugador se asigna a una y los pagos se pueden consultar por categoría.
           </p>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="categoria" className="form-label">
+              <label htmlFor="category" className="form-label">
                 Nombre
               </label>
               <input
                 type="text"
-                id="categoria"
-                className={`form-control ${nombreRepetido ? "is-invalid" : ""}`}
+                id="category"
+                className={`form-control ${duplicatedName ? "is-invalid" : ""}`}
                 placeholder="Ej: Sub 15"
-                value={categoria}
-                onChange={(e) => setCategoria(e.target.value)}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 maxLength={100}
                 required
               />
-              {nombreRepetido ? (
+              {duplicatedName ? (
                 <div className="invalid-feedback">Ya existe una categoría con ese nombre.</div>
               ) : (
-                <div className="alta__ayuda">Es el nombre que se ve en los listados y filtros.</div>
+                <div className="form-page__help">Es el nombre que se ve en los listados y filtros.</div>
               )}
             </div>
 
             <div className="mb-3">
-              <label htmlFor="descripcion" className="form-label">
+              <label htmlFor="description" className="form-label">
                 Descripción
-                <span className="alta__contador">
-                  {descripcion.length}/{MAX_DESCRIPCION}
+                <span className="form-page__counter">
+                  {description.length}/{MAX_DESCRIPTION}
                 </span>
               </label>
               <textarea
-                id="descripcion"
+                id="description"
                 className="form-control"
                 placeholder="Ej: Jugadores nacidos en 2011 y 2012"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                maxLength={MAX_DESCRIPCION}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                maxLength={MAX_DESCRIPTION}
                 rows="4"
               />
-              <div className="alta__ayuda">Opcional. Sirve para aclarar quiénes entran en la categoría.</div>
+              <div className="form-page__help">Opcional. Sirve para aclarar quiénes entran en la categoría.</div>
             </div>
 
-            <div className="alta__vista" aria-live="polite">
+            <div className="form-page__preview" aria-live="polite">
               <div>
-                <span className="alta__vista-etiqueta">Así se va a ver en los listados</span>
-                <span className="alta__vista-nombre">{categoria.trim() || "Nombre de la categoría"}</span>
-                <span className="alta__item-detalle">{descripcion.trim() || "Sin descripción"}</span>
+                <span className="form-page__preview-label">Así se va a ver en los listados</span>
+                <span className="form-page__preview-name">{category.trim() || "Nombre de la categoría"}</span>
+                <span className="form-page__item-detail">{description.trim() || "Sin descripción"}</span>
               </div>
             </div>
 
-            {mensaje && (
+            {message && (
               <div
-                className={`alert ${mensaje.tipo === "success" ? "alert-success" : "alert-danger"}`}
+                className={`alert ${message.type === "success" ? "alert-success" : "alert-danger"}`}
                 role="status"
               >
-                {mensaje.texto}
+                {message.text}
               </div>
             )}
 
-            <div className="alta__acciones">
-              <button type="button" className="btn btn-secondary" onClick={limpiar} disabled={loading}>
+            <div className="form-page__actions">
+              <button type="button" className="btn btn-secondary" onClick={clear} disabled={loading}>
                 Limpiar
               </button>
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={loading || nombreRepetido}
+                disabled={loading || duplicatedName}
               >
                 {loading ? "Registrando..." : "Registrar categoría"}
               </button>
@@ -146,27 +146,27 @@ const RegistrarCategoria = () => {
           </form>
         </section>
 
-        <aside className="panel alta__panel">
-          <h2 className="alta__lista-titulo">Categorías actuales</h2>
-          <p className="alta__lista-sub">
-            {categorias.length === 1
+        <aside className="panel form-page__panel">
+          <h2 className="form-page__list-title">Categorías actuales</h2>
+          <p className="form-page__list-subtitle">
+            {categories.length === 1
               ? "1 categoría registrada"
-              : `${categorias.length} categorías registradas`}
+              : `${categories.length} categorías registradas`}
           </p>
-          {categorias.length === 0 ? (
-            <p className="alta__vacio">
+          {categories.length === 0 ? (
+            <p className="form-page__empty">
               Todavía no hay categorías. La primera que registres aparece acá.
             </p>
           ) : (
-            <ul className="alta__lista">
-              {categorias.map((c) => (
+            <ul className="form-page__list">
+              {categories.map((c) => (
                 <li
                   key={c.id}
-                  className={`alta__item ${c.id === ultimaId ? "alta__item--nuevo" : ""}`}
+                  className={`form-page__item ${c.id === lastId ? "form-page__item--new" : ""}`}
                 >
                   <span>
-                    <span className="alta__item-nombre">{c.nombre}</span>
-                    {c.descripcion && <span className="alta__item-detalle">{c.descripcion}</span>}
+                    <span className="form-page__item-name">{c.name}</span>
+                    {c.description && <span className="form-page__item-detail">{c.description}</span>}
                   </span>
                 </li>
               ))}
@@ -179,4 +179,4 @@ const RegistrarCategoria = () => {
   );
 };
 
-export default RegistrarCategoria;
+export default RegisterCategory;

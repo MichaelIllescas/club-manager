@@ -1,11 +1,11 @@
-/* La página es una columna: el contenido crece y el pie queda abajo */
+/* The page is a column: content grows and the footer stays at the bottom */
 #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-.sitio-footer {
+.site-footer {
   margin-top: auto;
   display: flex;
   flex-wrap: wrap;
@@ -13,17 +13,17 @@
   gap: 0.5rem 1.5rem;
   padding: 1rem 1.5rem;
   font-size: 0.875rem;
-  color: var(--cm-tinta-suave);
-  border-top: 1px solid var(--cm-linea);
-  background: var(--cm-blanco);
+  color: var(--cm-ink-soft);
+  border-top: 1px solid var(--cm-line);
+  background: var(--cm-white);
 }
 
-.sitio-footer a {
-  color: var(--cm-cancha);
+.site-footer a {
+  color: var(--cm-green);
   font-weight: 600;
   text-decoration: none;
 }
 
-.sitio-footer a:hover {
+.site-footer a:hover {
   text-decoration: underline;
 }

@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 
-// Datos del usuario logueado; los carga SessionProvider
-export const SessionContext = createContext({ usuario: null, rol: null, cargando: true });
+// Logged-in user data, loaded by SessionProvider
+export const SessionContext = createContext({ user: null, role: null, loading: true });
 
 export function useSession() {
   return useContext(SessionContext);

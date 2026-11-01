@@ -2,59 +2,59 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import apiClient from "../Config/axiosConfig";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
-import "./Alta.css";
+import Footer from "../Pages/Footer";
+import "./FormPage.css";
 
-// Estructura común de las pantallas de alta y edición:
-// el formulario a la izquierda y, si hay, información de contexto a la derecha.
-const PaginaAlta = ({ titulo, intro, lateral, ancha = false, children }) => (
+// Shared layout for create and edit screens:
+// the form on the left and, when there is one, context on the right.
+const FormPage = ({ title, intro, side, wide = false, children }) => (
   <>
     <Header />
-    <main className={`container alta ${lateral ? "" : ancha ? "alta--ancha" : "alta--sola"}`}>
-      <section className="panel alta__panel">
-        <h1 className="alta__titulo">{titulo}</h1>
-        {intro && <p className="alta__intro">{intro}</p>}
+    <main className={`container form-page ${side ? "" : wide ? "form-page--wide" : "form-page--single"}`}>
+      <section className="panel form-page__panel">
+        <h1 className="form-page__title">{title}</h1>
+        {intro && <p className="form-page__intro">{intro}</p>}
         {children}
       </section>
-      {lateral}
+      {side}
     </main>
     <Footer />
   </>
 );
 
-PaginaAlta.propTypes = {
-  titulo: PropTypes.string.isRequired,
+FormPage.propTypes = {
+  title: PropTypes.string.isRequired,
   intro: PropTypes.node,
-  lateral: PropTypes.node,
-  ancha: PropTypes.bool,
+  side: PropTypes.node,
+  wide: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
 
-// Lista lateral con lo ya registrado (los últimos primero)
-export const ListaLateral = ({ titulo, items, vacio, resaltarId, limite = 8 }) => {
-  const visibles = [...items].reverse().slice(0, limite);
+// Side list with the existing records (newest first)
+export const SideList = ({ title, items, empty, highlightId, limit = 8 }) => {
+  const visibleItems = [...items].reverse().slice(0, limit);
 
   return (
-    <aside className="panel alta__panel">
-      <h2 className="alta__lista-titulo">{titulo}</h2>
-      <p className="alta__lista-sub">
+    <aside className="panel form-page__panel">
+      <h2 className="form-page__list-title">{title}</h2>
+      <p className="form-page__list-subtitle">
         {items.length === 1 ? "1 registro" : `${items.length} registros`}
-        {items.length > limite ? ` · se muestran los últimos ${limite}` : ""}
+        {items.length > limit ? ` · se muestran los últimos ${limit}` : ""}
       </p>
       {items.length === 0 ? (
-        <p className="alta__vacio">{vacio}</p>
+        <p className="form-page__empty">{empty}</p>
       ) : (
-        <ul className="alta__lista">
-          {visibles.map((item) => (
+        <ul className="form-page__list">
+          {visibleItems.map((item) => (
             <li
               key={item.id}
-              className={`alta__item ${item.id === resaltarId ? "alta__item--nuevo" : ""}`}
+              className={`form-page__item ${item.id === highlightId ? "form-page__item--new" : ""}`}
             >
               <span>
-                <span className="alta__item-nombre">{item.nombre}</span>
-                {item.detalle && <span className="alta__item-detalle">{item.detalle}</span>}
+                <span className="form-page__item-name">{item.name}</span>
+                {item.detail && <span className="form-page__item-detail">{item.detail}</span>}
               </span>
-              {item.valor && <span className="alta__item-valor">{item.valor}</span>}
+              {item.value && <span className="form-page__item-value">{item.value}</span>}
             </li>
           ))}
         </ul>
@@ -63,56 +63,56 @@ export const ListaLateral = ({ titulo, items, vacio, resaltarId, limite = 8 }) =
   );
 };
 
-ListaLateral.propTypes = {
-  titulo: PropTypes.string.isRequired,
+SideList.propTypes = {
+  title: PropTypes.string.isRequired,
   items: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-      nombre: PropTypes.node.isRequired,
-      detalle: PropTypes.node,
-      valor: PropTypes.node,
+      name: PropTypes.node.isRequired,
+      detail: PropTypes.node,
+      value: PropTypes.node,
     })
   ).isRequired,
-  vacio: PropTypes.string.isRequired,
-  resaltarId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  limite: PropTypes.number,
+  empty: PropTypes.string.isRequired,
+  highlightId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  limit: PropTypes.number,
 };
 
-// Lista lateral que pide sus datos al backend; vuelve a cargar cuando cambia "recarga"
-export const ListaRemota = ({ url, mapear, recarga = 0, ...props }) => {
+// Side list that loads its own data and reloads when "reload" changes
+export const RemoteList = ({ url, toItem, reload = 0, ...props }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     apiClient
       .get(url)
-      .then((response) => setItems(response.data.map(mapear)))
+      .then((response) => setItems(response.data.map(toItem)))
       .catch(() => setItems([]));
-    // mapear es una función de la pantalla; sólo se recarga por url o recarga
+    // toItem comes from the screen; only url and reload trigger a reload
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, recarga]);
+  }, [url, reload]);
 
-  return <ListaLateral items={items} {...props} />;
+  return <SideList items={items} {...props} />;
 };
 
-ListaRemota.propTypes = {
+RemoteList.propTypes = {
   url: PropTypes.string.isRequired,
-  mapear: PropTypes.func.isRequired,
-  recarga: PropTypes.number,
-  titulo: PropTypes.string.isRequired,
-  vacio: PropTypes.string.isRequired,
+  toItem: PropTypes.func.isRequired,
+  reload: PropTypes.number,
+  title: PropTypes.string.isRequired,
+  empty: PropTypes.string.isRequired,
 };
 
-// Panel lateral de texto, para pantallas sin una lista que mostrar
-export const NotaLateral = ({ titulo, children }) => (
-  <aside className="panel alta__panel">
-    <h2 className="alta__lista-titulo">{titulo}</h2>
-    <div className="alta__nota">{children}</div>
+// Side text panel, for screens without a list to show
+export const SideNote = ({ title, children }) => (
+  <aside className="panel form-page__panel">
+    <h2 className="form-page__list-title">{title}</h2>
+    <div className="form-page__note">{children}</div>
   </aside>
 );
 
-NotaLateral.propTypes = {
-  titulo: PropTypes.string.isRequired,
+SideNote.propTypes = {
+  title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };
 
-export default PaginaAlta;
+export default FormPage;

@@ -7,27 +7,27 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
-import { formatearMoneda } from "../Utils/formatearMoneda";
+import { formatCurrency } from "../Utils/formatCurrency";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip);
 
-const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-const CANCHA = "#1f5e3b";
-const ESCUDO = "#e0a731";
-const LINEA = "#e3e8e1";
-const TINTA_SUAVE = "#4e5d55";
+const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+const FIELD_GREEN = "#1f5e3b";
+const CREST_GOLD = "#e0a731";
+const LINE = "#e3e8e1";
+const INK_SOFT = "#4e5d55";
 
-// Recaudación de cada mes del año; el mes actual se resalta en dorado
-const GraficoIndex = ({ data }) => {
-  const mesActual = new Date().getMonth();
+// Revenue for each month of the year; the current month is highlighted in gold
+const RevenueChart = ({ data }) => {
+  const currentMonth = new Date().getMonth();
 
   const chartData = {
-    labels: MESES,
+    labels: MONTHS,
     datasets: [
       {
         label: "Recaudación",
         data: data || [],
-        backgroundColor: MESES.map((_, i) => (i === mesActual ? ESCUDO : CANCHA)),
+        backgroundColor: MONTHS.map((_, i) => (i === currentMonth ? CREST_GOLD : FIELD_GREEN)),
         borderRadius: 4,
         maxBarThickness: 42,
       },
@@ -41,24 +41,24 @@ const GraficoIndex = ({ data }) => {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (contexto) => formatearMoneda(contexto.parsed.y),
+          label: (context) => formatCurrency(context.parsed.y),
         },
       },
     },
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: TINTA_SUAVE, font: { family: "Barlow", size: 13 } },
+        ticks: { color: INK_SOFT, font: { family: "Barlow", size: 13 } },
       },
       y: {
         beginAtZero: true,
         suggestedMax: 1000,
-        grid: { color: LINEA },
+        grid: { color: LINE },
         border: { display: false },
         ticks: {
-          color: TINTA_SUAVE,
+          color: INK_SOFT,
           font: { family: "Barlow", size: 12 },
-          callback: (valor) => formatearMoneda(valor).replace(",00", ""),
+          callback: (value) => formatCurrency(value).replace(",00", ""),
         },
       },
     },
@@ -71,8 +71,8 @@ const GraficoIndex = ({ data }) => {
   );
 };
 
-GraficoIndex.propTypes = {
+RevenueChart.propTypes = {
   data: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string])).isRequired,
 };
 
-export default GraficoIndex;
+export default RevenueChart;

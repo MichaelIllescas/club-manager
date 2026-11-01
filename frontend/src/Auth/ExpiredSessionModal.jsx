@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { SESION_EXPIRADA } from "../Config/axiosConfig";
+import { SESSION_EXPIRED } from "../Config/axiosConfig";
 
-// Muestra un aviso cuando el backend responde 401 (sesión vencida o inexistente)
-function SesionExpirada() {
+// Shows a notice when the backend responds 401 (expired or missing session)
+function ExpiredSessionModal() {
   const navigate = useNavigate();
   const location = useLocation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const mostrar = () => setVisible(true);
-    window.addEventListener(SESION_EXPIRADA, mostrar);
-    return () => window.removeEventListener(SESION_EXPIRADA, mostrar);
+    const show = () => setVisible(true);
+    window.addEventListener(SESSION_EXPIRED, show);
+    return () => window.removeEventListener(SESSION_EXPIRED, show);
   }, []);
 
   if (!visible || location.pathname === "/") {
     return null;
   }
 
-  const volverAlLogin = () => {
+  const backToLogin = () => {
     setVisible(false);
     navigate("/");
   };
@@ -34,7 +34,7 @@ function SesionExpirada() {
             <p>Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.</p>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-primary" onClick={volverAlLogin}>
+            <button type="button" className="btn btn-primary" onClick={backToLogin}>
               Aceptar
             </button>
           </div>
@@ -44,4 +44,4 @@ function SesionExpirada() {
   );
 }
 
-export default SesionExpirada;
+export default ExpiredSessionModal;

@@ -1,25 +1,25 @@
 import PropTypes from "prop-types";
-import "./ResumenLista.css";
+import "./SummaryStrip.css";
 
-// Franja de totales arriba de un listado
-const ResumenLista = ({ datos }) => (
-  <section className="resumen-lista" aria-label="Resumen">
-    {datos.map((dato) => (
-      <div key={dato.nombre} className="resumen-lista__dato">
-        <span className="resumen-lista__valor">{dato.valor}</span>
-        <span className="resumen-lista__nombre">{dato.nombre}</span>
+// Totals strip shown above a list
+const SummaryStrip = ({ data }) => (
+  <section className="summary-strip" aria-label="Resumen">
+    {data.map((item) => (
+      <div key={item.label} className="summary-strip__item">
+        <span className="summary-strip__value">{item.value}</span>
+        <span className="summary-strip__label">{item.label}</span>
       </div>
     ))}
   </section>
 );
 
-ResumenLista.propTypes = {
-  datos: PropTypes.arrayOf(
+SummaryStrip.propTypes = {
+  data: PropTypes.arrayOf(
     PropTypes.shape({
-      nombre: PropTypes.string.isRequired,
-      valor: PropTypes.node.isRequired,
+      label: PropTypes.string.isRequired,
+      value: PropTypes.node.isRequired,
     })
   ).isRequired,
 };
 
-export default ResumenLista;
+export default SummaryStrip;

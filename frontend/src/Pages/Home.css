@@ -1,104 +1,104 @@
-.inicio {
+.home {
   padding-bottom: 3rem;
 }
 
-.inicio__encabezado {
+.home__header {
   margin: 1.5rem 0;
 }
 
-.inicio__encabezado h1 {
+.home__header h1 {
   font-size: 2.75rem;
   margin: 0;
 }
 
-.inicio__encabezado p {
-  color: var(--cm-tinta-suave);
+.home__header p {
+  color: var(--cm-ink-soft);
   margin: 0;
 }
 
-.inicio__titulo {
+.home__title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
-/* Marcador: los totales del club en una sola franja, como un tablero */
-.marcador {
+/* Scoreboard: the club totals in a single strip */
+.scoreboard {
   display: grid;
   grid-template-columns: repeat(3, 1fr) 1.6fr;
-  background: var(--cm-tinta);
-  color: var(--cm-blanco);
-  border-radius: var(--cm-radio);
-  border-bottom: 4px solid var(--cm-escudo);
+  background: var(--cm-ink);
+  color: var(--cm-white);
+  border-radius: var(--cm-radius);
+  border-bottom: 4px solid var(--cm-gold);
   margin-bottom: 1.5rem;
   overflow: hidden;
 }
 
-.marcador__dato {
+.scoreboard__item {
   display: flex;
   flex-direction: column;
   padding: 1.1rem 1.5rem;
 }
 
-.marcador__dato + .marcador__dato {
+.scoreboard__item + .scoreboard__item {
   border-left: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.marcador__valor {
-  font-family: var(--cm-fuente-titulos);
+.scoreboard__value {
+  font-family: var(--cm-font-display);
   font-weight: 700;
   font-size: 2.75rem;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
-.marcador__dato--total .marcador__valor {
-  color: var(--cm-escudo);
+.scoreboard__item--total .scoreboard__value {
+  color: var(--cm-gold);
 }
 
-.marcador__nombre {
+.scoreboard__label {
   margin-top: 0.35rem;
   color: rgba(255, 255, 255, 0.72);
   font-size: 0.95rem;
 }
 
-.accesos {
+.shortcuts {
   display: grid;
   gap: 0.5rem;
 }
 
-.accesos__item {
+.shortcuts__item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--cm-linea);
+  border: 1px solid var(--cm-line);
   border-radius: 6px;
-  color: var(--cm-tinta);
+  color: var(--cm-ink);
   font-weight: 600;
   text-decoration: none;
 }
 
-.accesos__item i {
+.shortcuts__item i {
   width: 1.25rem;
-  color: var(--cm-cancha);
+  color: var(--cm-green);
 }
 
-.accesos__item:hover {
-  background: var(--cm-cancha-claro);
-  border-color: var(--cm-cancha);
-  color: var(--cm-tinta);
+.shortcuts__item:hover {
+  background: var(--cm-green-light);
+  border-color: var(--cm-green);
+  color: var(--cm-ink);
 }
 
 @media (max-width: 768px) {
-  .marcador {
+  .scoreboard {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .marcador__dato:nth-child(3) {
+  .scoreboard__item:nth-child(3) {
     border-left: 0;
   }
 
-  .marcador__dato:nth-child(n + 3) {
+  .scoreboard__item:nth-child(n + 3) {
     border-top: 1px solid rgba(255, 255, 255, 0.14);
   }
 }

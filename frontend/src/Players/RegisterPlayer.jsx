@@ -1,33 +1,33 @@
-import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
+import FormPage, { RemoteList } from "../Components/FormPage";
 import { useState } from "react";
-import FormularioJugador from "./FormularioJugador";
+import PlayerForm from "./PlayerForm";
 
-function RegistrarJugador() {
-  const [recarga, setRecarga] = useState(0);
+function RegisterPlayer() {
+  const [reload, setReload] = useState(0);
   return (
     <>
-      <PaginaAlta
-        titulo="Registrar jugador"
+      <FormPage
+        title="Registrar jugador"
         intro="Cargá los datos del jugador y elegí la categoría en la que juega."
-        lateral={
-          <ListaRemota
+        side={
+          <RemoteList
             url="/api/jugadores"
-            titulo="Últimos jugadores"
-            vacio="Todavía no hay jugadores. El primero que registres aparece acá."
-            recarga={recarga}
-            mapear={(jugador) => ({
-              id: jugador.id,
-              nombre: `${jugador.nombre} ${jugador.apellido}`,
-              detalle: `DNI ${jugador.dni}`,
-              valor: jugador.categoria,
+            title="Últimos jugadores"
+            empty="Todavía no hay jugadores. El primero que registres aparece acá."
+            reload={reload}
+            toItem={(player) => ({
+              id: player.id,
+              name: `${player.firstName} ${player.lastName}`,
+              detail: `DNI ${player.dni}`,
+              value: player.category,
             })}
           />
         }
       >
-        <FormularioJugador onRegistrado={() => setRecarga((n) => n + 1)} />
-      </PaginaAlta>
+        <PlayerForm onRegistered={() => setReload((n) => n + 1)} />
+      </FormPage>
     </>
   );
 }
 
-export default RegistrarJugador;
+export default RegisterPlayer;

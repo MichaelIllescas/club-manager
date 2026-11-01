@@ -1,22 +1,21 @@
-import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
+import FormPage, { RemoteList } from "../Components/FormPage";
 import { useState } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const RegistrarSocio = () => {
-  const [recarga, setRecarga] = useState(0);
+const RegisterMember = () => {
+  const [reload, setReload] = useState(0);
   const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
+    firstName: "",
+    lastName: "",
     dni: "",
-    direccion: "",
-    telefono: "",
+    address: "",
+    phone: "",
     email: "",
-    numeroSocio: "",
+    memberNumber: "",
   });
 
-  const [message, setMessage] = useState(null); // Mensaje de éxito o error
+  const [message, setMessage] = useState(null);
 
-  // Manejar cambios en los campos del formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -28,21 +27,19 @@ const RegistrarSocio = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Limpia los valores antes de enviar
     const cleanedFormData = {
-      nombre: formData.nombre.trim(),
-      apellido: formData.apellido.trim(),
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
       dni: formData.dni.trim(),
-      direccion: formData.direccion.trim(),
-      telefono: formData.telefono.trim(),
+      address: formData.address.trim(),
+      phone: formData.phone.trim(),
       email: formData.email.trim() || null,
-      numeroSocio: formData.numeroSocio.trim() || null,
-      estado: "ACTIVO",
+      memberNumber: formData.memberNumber.trim() || null,
+      status: "ACTIVE",
     };
 
-    // Validación básica
-    const { nombre, apellido, dni, direccion, telefono } = cleanedFormData;
-    if (!nombre || !apellido || !dni || !direccion || !telefono) {
+    const { firstName, lastName, dni, address, phone } = cleanedFormData;
+    if (!firstName || !lastName || !dni || !address || !phone) {
       setMessage({
         text: "Por favor, completa todos los campos obligatorios.",
         type: "error",
@@ -51,7 +48,7 @@ const RegistrarSocio = () => {
     }
 
     try {
-      await apiClient.post("/api/socios", cleanedFormData, {
+      await apiClient.post("/api/members", cleanedFormData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -61,16 +58,16 @@ const RegistrarSocio = () => {
         text: "Socio registrado con éxito.",
         type: "success",
       });
-      setRecarga((n) => n + 1);
+      setReload((n) => n + 1);
 
       setFormData({
-        nombre: "",
-        apellido: "",
+        firstName: "",
+        lastName: "",
         dni: "",
-        direccion: "",
-        telefono: "",
+        address: "",
+        phone: "",
         email: "",
-        numeroSocio: "",
+        memberNumber: "",
       });
     } catch (error) {
       if (error.response) {
@@ -91,20 +88,20 @@ const RegistrarSocio = () => {
 
   return (
     <>
-      <PaginaAlta
-        titulo="Registrar socio"
+      <FormPage
+        title="Registrar socio"
         intro="Cargá los datos de la persona que se asocia al club. El DNI y el número de socio no se pueden repetir."
-        lateral={
-          <ListaRemota
+        side={
+          <RemoteList
             url="/api/socios"
-            titulo="Últimos socios"
-            vacio="Todavía no hay socios. El primero que registres aparece acá."
-            recarga={recarga}
-            mapear={(socio) => ({
-              id: socio.id,
-              nombre: `${socio.nombre} ${socio.apellido}`,
-              detalle: `DNI ${socio.dni}`,
-              valor: socio.numeroSocio ? `N° ${socio.numeroSocio}` : null,
+            title="Últimos socios"
+            empty="Todavía no hay socios. El primero que registres aparece acá."
+            reload={reload}
+            toItem={(member) => ({
+              id: member.id,
+              name: `${member.firstName} ${member.lastName}`,
+              detail: `DNI ${member.dni}`,
+              value: member.memberNumber ? `N° ${member.memberNumber}` : null,
             })}
           />
         }
@@ -112,28 +109,28 @@ const RegistrarSocio = () => {
         <form onSubmit={handleSubmit}>
           <div className="row g-3">
             <div className="col-md-6">
-              <label htmlFor="nombre" className="form-label">
+              <label htmlFor="firstName" className="form-label">
                 Nombre
               </label>
               <input
                 type="text"
-                id="nombre"
-                name="nombre"
-                value={formData.nombre}
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleInputChange}
                 className="form-control"
                 required
               />
             </div>
             <div className="col-md-6">
-              <label htmlFor="apellido" className="form-label">
+              <label htmlFor="lastName" className="form-label">
                 Apellido
               </label>
               <input
                 type="text"
-                id="apellido"
-                name="apellido"
-                value={formData.apellido}
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
                 onChange={handleInputChange}
                 className="form-control"
                 required
@@ -154,28 +151,28 @@ const RegistrarSocio = () => {
               />
             </div>
             <div className="col-md-6">
-              <label htmlFor="direccion" className="form-label">
+              <label htmlFor="address" className="form-label">
                 Dirección
               </label>
               <input
                 type="text"
-                id="direccion"
-                name="direccion"
-                value={formData.direccion}
+                id="address"
+                name="address"
+                value={formData.address}
                 onChange={handleInputChange}
                 className="form-control"
                 required
               />
             </div>
             <div className="col-md-6">
-              <label htmlFor="telefono" className="form-label">
+              <label htmlFor="phone" className="form-label">
                 Teléfono
               </label>
               <input
                 type="text"
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
+                id="phone"
+                name="phone"
+                value={formData.phone}
                 onChange={handleInputChange}
                 className="form-control"
                 required
@@ -195,14 +192,14 @@ const RegistrarSocio = () => {
               />
             </div>
             <div className="col-md-6">
-              <label htmlFor="numeroSocio" className="form-label">
+              <label htmlFor="memberNumber" className="form-label">
                 Número de socio (Optional)
               </label>
               <input
                 type="text"
-                id="numeroSocio"
-                name="numeroSocio"
-                value={formData.numeroSocio}
+                id="memberNumber"
+                name="memberNumber"
+                value={formData.memberNumber}
                 onChange={handleInputChange}
                 className="form-control"
               />
@@ -224,9 +221,9 @@ const RegistrarSocio = () => {
             </div>
           </div>
         </form>
-      </PaginaAlta>
+      </FormPage>
     </>
   );
 };
 
-export default RegistrarSocio;
+export default RegisterMember;

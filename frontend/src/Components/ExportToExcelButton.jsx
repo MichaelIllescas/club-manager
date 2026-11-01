@@ -8,12 +8,10 @@ const ExportToExcelButton = ({ data, fileName = "data.xlsx" }) => {
       return;
     }
 
-    // Crear un libro de trabajo (workbook) y una hoja de trabajo (worksheet)
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
 
-    // Exportar el archivo Excel
     XLSX.writeFile(workbook, fileName);
   };
 

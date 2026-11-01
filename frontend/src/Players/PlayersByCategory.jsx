@@ -1,41 +1,38 @@
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
+import Footer from "../Pages/Footer";
 import TableGeneric from "../Components/TableGeneric";
 
-const FiltrarJugadoresPorCategoria = () => {
-  const [categorias, setCategorias] = useState([]); // Lista de categorías
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(""); // ID de la categoría seleccionada
-  const [jugadores, setJugadores] = useState([]); // Lista de jugadores filtrados
-  const [loading, setLoading] = useState(false); // Indicador de carga
+const PlayersByCategory = () => {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Obtener categorías al cargar el componente
   useEffect(() => {
-    const fetchCategorias = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await apiClient.get("/api/categorias");
-        setCategorias(response.data);
+        const response = await apiClient.get("/api/categories");
+        setCategories(response.data);
       } catch (error) {
         console.error("Error al obtener categorías:", error);
       }
     };
-    fetchCategorias();
+    fetchCategories();
   }, []);
 
-  // Filtrar jugadores por categoría seleccionada
-  // Actualizar la lista de jugadores cuando cambia la categoría seleccionada
   useEffect(() => {
-    if (!categoriaSeleccionada) {
-      setJugadores([]);
+    if (!selectedCategory) {
+      setPlayers([]);
       return;
     }
 
-    const fetchJugadores = async () => {
+    const fetchPlayers = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get(`/api/jugadores/categoria/${categoriaSeleccionada}`);
-        setJugadores(response.data);
+        const response = await apiClient.get(`/api/players/category/${selectedCategory}`);
+        setPlayers(response.data);
       } catch (error) {
         console.error("Error al filtrar jugadores:", error);
       } finally {
@@ -43,8 +40,8 @@ const FiltrarJugadoresPorCategoria = () => {
       }
     };
 
-    fetchJugadores();
-  }, [categoriaSeleccionada]);
+    fetchPlayers();
+  }, [selectedCategory]);
 
   return (
     <>
@@ -57,13 +54,13 @@ const FiltrarJugadoresPorCategoria = () => {
               <label className="form-label">Seleccionar categoría:</label>
               <select
                 className="form-select w-100"
-                value={categoriaSeleccionada}
-                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="">Todas las categorías</option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.id} value={categoria.id}>
-                    {categoria.nombre}
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
                 ))}
               </select>
@@ -73,20 +70,20 @@ const FiltrarJugadoresPorCategoria = () => {
               <p>Cargando jugadores...</p>
             ) : (
               <TableGeneric
-                columnas={[
+                columns={[
                   "id",
-                  "nombre",
-                  "apellido",
+                  "firstName",
+                  "lastName",
                   "dni",
-                  "telefono",
+                  "phone",
                   "email",
-                  "fechaRegistro",
-                  "categoria",
-                  "estado",
+                  "registrationDate",
+                  "category",
+                  "status",
                 ]}
-                mensajeVacio="No hay jugadores en esta categoría."
-                titulo="Jugadores"
-                data={jugadores}
+                emptyMessage="No hay jugadores en esta categoría."
+                title="Jugadores"
+                data={players}
               />
             )}
           </div>
@@ -97,4 +94,4 @@ const FiltrarJugadoresPorCategoria = () => {
   );
 };
 
-export default FiltrarJugadoresPorCategoria;
+export default PlayersByCategory;

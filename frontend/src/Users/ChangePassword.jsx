@@ -1,8 +1,8 @@
-import PaginaAlta, { NotaLateral } from "../Components/PaginaAlta";
+import FormPage, { SideNote } from "../Components/FormPage";
 import { useState } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const CambiarClave = () => {
+const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -12,59 +12,52 @@ const CambiarClave = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Validar que las contraseñas coincidan
     if (newPassword !== confirmPassword) {
       setErrorMessage("Las contraseñas no coinciden.");
-      setSuccessMessage(""); // Limpiar mensaje de éxito
+      setSuccessMessage("");
       return;
     }
 
     try {
-      // Preparar el cuerpo de la solicitud (sin el username)
       const payload = {
         currentPassword: currentPassword,
         newPassword: newPassword,
       };
 
-      // Enviar la solicitud al backend con Axios
       const response = await apiClient.put(
-        "/api/users/update-password",
+        "/api/users/me/password",
         payload,
       );
 
-      // Manejo de la respuesta
       if (response.status === 200) {
         setSuccessMessage(
           response.data.message || "Contraseña actualizada correctamente.",
         );
-        setErrorMessage(""); // Limpiar mensaje de error
-        // Reiniciar los campos
+        setErrorMessage("");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       }
     } catch (error) {
-      // Manejar errores del backend
       if (error.response) {
-        // Capturar el mensaje del backend
         setErrorMessage(
           error.response.data.error || "Error al actualizar la contraseña.",
         );
-        setSuccessMessage(""); // Limpiar mensaje de éxito
+        setSuccessMessage("");
       } else {
         setErrorMessage("Error de conexión con el servidor.");
-        setSuccessMessage(""); // Limpiar mensaje de éxito
+        setSuccessMessage("");
       }
     }
   };
 
   return (
     <>
-      <PaginaAlta
-        titulo="Cambiar contraseña"
+      <FormPage
+        title="Cambiar contraseña"
         intro="Ingresá tu contraseña actual y elegí una nueva."
-        lateral={
-          <NotaLateral titulo="Para una contraseña segura">
+        side={
+          <SideNote title="Para una contraseña segura">
             <ul>
               <li>Usá al menos 8 caracteres.</li>
               <li>Combiná letras, números y algún símbolo.</li>
@@ -76,7 +69,7 @@ const CambiarClave = () => {
                 usuario.
               </li>
             </ul>
-          </NotaLateral>
+          </SideNote>
         }
       >
         <form onSubmit={handleSubmit}>
@@ -136,9 +129,9 @@ const CambiarClave = () => {
             </button>
           </div>
         </form>
-      </PaginaAlta>
+      </FormPage>
     </>
   );
 };
 
-export default CambiarClave;
+export default ChangePassword;

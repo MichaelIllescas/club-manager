@@ -1,22 +1,21 @@
-import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
+import FormPage, { RemoteList } from "../Components/FormPage";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const ActualizarCategoria = () => {
-  const [recarga, setRecarga] = useState(0);
-  const [categorias, setCategorias] = useState([]); // Estado para almacenar las categorías
-  const [selectedCategoria, setSelectedCategoria] = useState(null); // Categoría seleccionada
-  const [formData, setFormData] = useState({ type: "", descripcion: "" }); // Datos del formulario
-  const [message, setMessage] = useState(null); // Mensaje de éxito o error
-  const [loading, setLoading] = useState(true); // Estado para manejar el spinner o carga
-  const [error, setError] = useState(null); // Estado para manejar errores
+const UpdateCategory = () => {
+  const [reload, setReload] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [formData, setFormData] = useState({ name: "", description: "" });
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Cargar categorías desde el backend
   useEffect(() => {
-    const fetchCategorias = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await apiClient.get("/api/categorias"); // Llamada con apiClient
-        setCategorias(response.data); // Asignar categorías al estado
+        const response = await apiClient.get("/api/categories");
+        setCategories(response.data);
       } catch (err) {
         console.error("Error al cargar las categorías:", err);
         setError("No se pudieron cargar las categorías. Intente nuevamente.");
@@ -25,28 +24,25 @@ const ActualizarCategoria = () => {
       }
     };
 
-    fetchCategorias();
+    fetchCategories();
   }, []);
 
-  // Manejar cambios en la categoría seleccionada
   const handleSelectChange = (e) => {
-    const categoriaId = e.target.value;
-    const selected = categorias.find(
-      (categoria) => categoria.id === parseInt(categoriaId, 10),
+    const categoryId = e.target.value;
+    const selected = categories.find(
+      (category) => category.id === parseInt(categoryId, 10),
     );
-    setSelectedCategoria(selected);
-    setFormData({ type: selected.nombre, descripcion: selected.descripcion });
+    setSelectedCategory(selected);
+    setFormData({ name: selected.name, description: selected.description });
   };
 
-  // Manejar cambios en los campos del formulario
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Enviar los cambios al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedCategoria) {
+    if (!selectedCategory) {
       setMessage({
         text: "Por favor, selecciona una categoría.",
         type: "error",
@@ -55,34 +51,33 @@ const ActualizarCategoria = () => {
     }
 
     try {
-      const updatedCategoria = {
-        nombre: formData.type,
-        descripcion: formData.descripcion,
+      const updatedCategory = {
+        name: formData.name,
+        description: formData.description,
       };
 
       await apiClient.put(
-        `/api/categorias/${selectedCategoria.id}`,
-        updatedCategoria,
-      ); // Llamada con apiClient
+        `/api/categories/${selectedCategory.id}`,
+        updatedCategory,
+      );
 
       setMessage({ text: "Categoría actualizada con éxito.", type: "success" });
-      setRecarga((n) => n + 1);
+      setReload((n) => n + 1);
 
-      // Actualizar la lista de categorías en el estado
-      setCategorias((prevCategorias) =>
-        prevCategorias.map((cat) =>
-          cat.id === selectedCategoria.id
+      setCategories((prevCategories) =>
+        prevCategories.map((cat) =>
+          cat.id === selectedCategory.id
             ? {
                 ...cat,
-                nombre: formData.type,
-                descripcion: formData.descripcion,
+                name: formData.name,
+                description: formData.description,
               }
             : cat,
         ),
       );
 
-      setSelectedCategoria(null); // Limpiar selección
-      setFormData({ type: "", descripcion: "" }); // Limpiar formulario
+      setSelectedCategory(null);
+      setFormData({ name: "", description: "" });
     } catch (err) {
       console.error("Error al actualizar la categoría:", err);
       setMessage({
@@ -96,20 +91,20 @@ const ActualizarCategoria = () => {
 
   return (
     <>
-      <PaginaAlta
-        titulo="Actualizar categoría"
+      <FormPage
+        title="Actualizar categoría"
         intro="Elegí la categoría y corregí su nombre o descripción. Los jugadores asignados la mantienen."
-        lateral={
-          <ListaRemota
+        side={
+          <RemoteList
             url="/api/categorias"
-            titulo="Categorías actuales"
-            vacio="Todavía no hay categorías registradas."
-            recarga={recarga}
-            mapear={(c) => ({
+            title="Categorías actuales"
+            empty="Todavía no hay categorías registradas."
+            reload={reload}
+            toItem={(c) => ({
               id: c.id,
-              nombre: c.nombre,
-              detalle: c.descripcion,
-              valor: null,
+              name: c.name,
+              detail: c.description,
+              value: null,
             })}
           />
         }
@@ -120,13 +115,12 @@ const ActualizarCategoria = () => {
           <p className="text-center text-danger">{error}</p>
         ) : (
           <form onSubmit={handleSubmit}>
-            {/* Selección de la categoría */}
             <div className="mb-3">
-              <label htmlFor="categoriaSelect" className="form-label">
+              <label htmlFor="categorySelect" className="form-label">
                 Selecciona una categoría
               </label>
               <select
-                id="categoriaSelect"
+                id="categorySelect"
                 className="form-select"
                 onChange={handleSelectChange}
                 defaultValue=""
@@ -135,53 +129,51 @@ const ActualizarCategoria = () => {
                 <option value="" disabled>
                   -- Selecciona --
                 </option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.id} value={categoria.id}>
-                    {categoria.nombre}
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Mostrar datos actuales */}
-            {selectedCategoria && (
+            {selectedCategory && (
               <div className="mb-3">
                 <p>
-                  <strong>Categoría actual:</strong> {selectedCategoria.nombre}
+                  <strong>Categoría actual:</strong> {selectedCategory.name}
                 </p>
                 <p>
                   <strong>Descripción actual:</strong>{" "}
-                  {selectedCategoria.descripcion}
+                  {selectedCategory.description}
                 </p>
               </div>
             )}
 
-            {/* Formulario para editar */}
-            {selectedCategoria && (
+            {selectedCategory && (
               <>
                 <div className="mb-3">
-                  <label htmlFor="type" className="form-label">
+                  <label htmlFor="name" className="form-label">
                     Nuevo nombre:
                   </label>
                   <input
                     type="text"
-                    id="type"
-                    name="type"
-                    value={formData.type}
+                    id="name"
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
                     className="form-control"
                     required
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="descripcion" className="form-label">
+                  <label htmlFor="description" className="form-label">
                     Nueva descripción:
                   </label>
                   <input
                     type="text"
-                    id="descripcion"
-                    name="descripcion"
-                    value={formData.descripcion}
+                    id="description"
+                    name="description"
+                    value={formData.description}
                     onChange={handleInputChange}
                     className="form-control"
                     required
@@ -190,7 +182,6 @@ const ActualizarCategoria = () => {
               </>
             )}
 
-            {/* Mensaje de confirmación o error */}
             {message && (
               <p
                 className={`fw-bold text-center ${
@@ -205,16 +196,16 @@ const ActualizarCategoria = () => {
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={!selectedCategoria}
+                disabled={!selectedCategory}
               >
                 Guardar Cambios
               </button>
             </div>
           </form>
         )}
-      </PaginaAlta>
+      </FormPage>
     </>
   );
 };
 
-export default ActualizarCategoria;
+export default UpdateCategory;

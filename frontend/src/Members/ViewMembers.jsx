@@ -2,21 +2,21 @@ import { useEffect, useState } from "react";
 import Header from "../Navbar/Header";
 import TableGeneric from "../Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
-import ActualizarSocio from "./ActualizarSocio";
-import Footer from "../Index/Footer";
+import UpdateMember from "./UpdateMember";
+import Footer from "../Pages/Footer";
 
-function VerSocios() {
-  const [socios, setSocios] = useState([]);
+function ViewMembers() {
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [socioId, setSocioId] = useState(null); // Estado para manejar el ID del socio seleccionado
-  const [showModal, setShowModal] = useState(false); // Controla la visibilidad del modal
+  const [memberId, setMemberId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const fetchSocios = async () => {
+    const fetchMembers = async () => {
       try {
-        const response = await apiClient.get("/api/socios");
-        setSocios(response.data);
+        const response = await apiClient.get("/api/members");
+        setMembers(response.data);
       } catch (err) {
         setError("Error al obtener los datos.");
         console.error("Error al obtener los socios:", err);
@@ -25,24 +25,23 @@ function VerSocios() {
       }
     };
 
-    fetchSocios();
+    fetchMembers();
   }, []);
 
   const handleEditClick = (row) => {
-    setSocioId(row.id); // Establece el ID del socio seleccionado
-    setShowModal(true); // Muestra el modal
+    setMemberId(row.id);
+    setShowModal(true);
   };
 
   const handleModalClose = () => {
-    setShowModal(false); // Oculta el modal
-    setSocioId(null); // Limpia el ID seleccionado
+    setShowModal(false);
+    setMemberId(null);
   };
 
   const handleUpdate = async () => {
-    // Refresca la lista de socios después de la actualización
     try {
-      const response = await apiClient.get("/api/socios");
-      setSocios(response.data);
+      const response = await apiClient.get("/api/members");
+      setMembers(response.data);
     } catch (err) {
       console.error("Error al actualizar la lista de socios:", err);
     }
@@ -63,10 +62,9 @@ function VerSocios() {
         <div
           className="d-flex flex-column align-items-center justify-content-start pb-5"
           style={{
-            marginTop: "20px", // Baja el contenedor del nav
+            marginTop: "20px",
           }}
         >
-          {/* Contenedor de la tabla */}
           <div className="w-100">
             {loading ? (
               <p>Cargando datos...</p>
@@ -74,21 +72,21 @@ function VerSocios() {
               <p className="text-danger">{error}</p>
             ) : (
               <TableGeneric
-                columnas={[
+                columns={[
                   "id",
-                  "nombre",
-                  "apellido",
+                  "firstName",
+                  "lastName",
                   "dni",
-                  "telefono",
+                  "phone",
                   "email",
-                  "numeroSocio",
-                  "fechaRegistro",
-                  "direccion",
-                  "estado",
+                  "memberNumber",
+                  "registrationDate",
+                  "address",
+                  "status",
                 ]}
-                mensajeVacio="Todavía no hay socios registrados."
-                titulo={"Socios"} // Título dinámico corregido
-                data={socios}
+                emptyMessage="Todavía no hay socios registrados."
+                title={"Socios"}
+                data={members}
                 actions={actions}
               />
             )}
@@ -97,16 +95,15 @@ function VerSocios() {
       </div>
       <Footer />
 
-      {/* Modal ActualizarSocio */}
-      {showModal && socioId && (
-        <ActualizarSocio
-          socioId={socioId} // Pasa el ID del socio seleccionado
-          onClose={handleModalClose} // Cierra el modal
-          onUpdate={handleUpdate} // Refresca la lista de socios
+      {showModal && memberId && (
+        <UpdateMember
+          memberId={memberId}
+          onClose={handleModalClose}
+          onUpdate={handleUpdate}
         />
       )}
     </>
   );
 }
 
-export default VerSocios;
+export default ViewMembers;

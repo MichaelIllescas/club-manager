@@ -1,8 +1,8 @@
-// Formato argentino: 13.531.750,00 (punto para miles, coma para decimales)
-export const formatearNumero = (valor) =>
+// Argentine format: 13.531.750,00 (dot for thousands, comma for decimals)
+export const formatNumber = (value) =>
   new Intl.NumberFormat("es-AR", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(Number(valor) || 0);
+  }).format(Number(value) || 0);
 
-export const formatearMoneda = (valor) => `$${formatearNumero(valor)}`;
+export const formatCurrency = (value) => `$${formatNumber(value)}`;
