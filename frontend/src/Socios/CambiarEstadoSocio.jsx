@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
 import TableGeneric from "/src/Components/TableGeneric";
@@ -17,9 +17,7 @@ const CambioEstadoSocio = () => {
   // Función para obtener los socios desde el backend
   const fetchSocios = async () => {
     try {
-      const response = await apiClient.get(
-        "/api/socios"
-      );
+      const response = await apiClient.get("/api/socios");
       setSocios(response.data);
     } catch (err) {
       console.error("Error al obtener los socios:", err);
@@ -68,7 +66,7 @@ const CambioEstadoSocio = () => {
         onClick={() =>
           handleActionClick(
             socio,
-            socio.estado === "ACTIVO" ? "anular" : "habilitar"
+            socio.estado === "ACTIVO" ? "anular" : "habilitar",
           )
         }
       >
@@ -81,20 +79,34 @@ const CambioEstadoSocio = () => {
     <>
       <Header />
       <div className="pt-2 mt-2 vh-50 pb-5">
-      <div className="d-flex justify-content-center align-content-center pb-5 mb-2">
-        <div className="mt-5 col-lg-12 text-center">
-          {loading ? (
-            <p className="text-center">Cargando socios...</p>
-          ) : error ? (
-            <p className="text-center text-danger">{error}</p>
-          ) : (
-            <TableGeneric 
-              titulo={"Estado de los Socios"}
-              data={sociosConAcciones}
-            />
-          )}
+        <div className="d-flex justify-content-center align-content-center pb-5 mb-2">
+          <div className="mt-5 col-lg-12 text-center">
+            {loading ? (
+              <p className="text-center">Cargando socios...</p>
+            ) : error ? (
+              <p className="text-center text-danger">{error}</p>
+            ) : (
+              <TableGeneric
+                columnas={[
+                  "id",
+                  "nombre",
+                  "apellido",
+                  "dni",
+                  "telefono",
+                  "email",
+                  "numeroSocio",
+                  "fechaRegistro",
+                  "direccion",
+                  "estado",
+                  "acciones",
+                ]}
+                mensajeVacio="Todavía no hay socios registrados."
+                titulo={"Estado de los socios"}
+                data={sociosConAcciones}
+              />
+            )}
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Modal de confirmación */}

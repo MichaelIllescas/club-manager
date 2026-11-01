@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
 const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
@@ -58,7 +59,7 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
       <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Actualizar Socio</h5>
+            <h5 className="modal-title">Actualizar socio</h5>
             <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
@@ -130,7 +131,7 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
                 />
               </div>
               <div className="mb-3">
-                <label>Número de Socio:</label>
+                <label>Número de socio:</label>
                 <input
                   type="text"
                   name="numeroSocio"
@@ -158,6 +159,12 @@ const ActualizarSocio = ({ socioId, onClose, onUpdate }) => {
       </div>
     </div>
   );
+};
+
+ActualizarSocio.propTypes = {
+  socioId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  onClose: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default ActualizarSocio;

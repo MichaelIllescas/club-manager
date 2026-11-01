@@ -1,18 +1,31 @@
-import Header from "/src/Navbar/Header";
-import Footer from "/src/index/Footer";
+import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
+import { useState } from "react";
 import RegistroJugadorForm from "./RegistroForm";
 
 function REgistroJugadores() {
+  const [recarga, setRecarga] = useState(0);
   return (
     <>
-      <Header />
-      <div  className="px-1 mt-5 pt-2 mb-5 pb-5 col-lg-8 col-sm-4 m-auto">
-        <div className="mt-5 p-3 pb-3 mb-5  rounded pt-3 bg-dark text-light m-auto">
-          
-            <RegistroJugadorForm />
-         </div>
-      </div>
-      <Footer />
+      <PaginaAlta
+        titulo="Registrar jugador"
+        intro="Cargá los datos del jugador y elegí la categoría en la que juega."
+        lateral={
+          <ListaRemota
+            url="/api/jugadores"
+            titulo="Últimos jugadores"
+            vacio="Todavía no hay jugadores. El primero que registres aparece acá."
+            recarga={recarga}
+            mapear={(jugador) => ({
+              id: jugador.id,
+              nombre: `${jugador.nombre} ${jugador.apellido}`,
+              detalle: `DNI ${jugador.dni}`,
+              valor: jugador.categoria,
+            })}
+          />
+        }
+      >
+        <RegistroJugadorForm onRegistrado={() => setRecarga((n) => n + 1)} />
+      </PaginaAlta>
     </>
   );
 }

@@ -17,10 +17,8 @@ const CambioEstadoJugador = () => {
   // Función para obtener los jugadores desde el backend
   const fetchJugadores = async () => {
     try {
-      const response = await apiClient.get(
-        "/api/jugadores/estados"
-      );
-      setJugadores(response.data);
+      const response = await apiClient.get("/api/jugadores/estados");
+      setJugadores(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Error al obtener los jugadores:", err);
       setError("No se pudieron cargar los jugadores. Intente nuevamente.");
@@ -68,7 +66,7 @@ const CambioEstadoJugador = () => {
         onClick={() =>
           handleActionClick(
             jugador,
-            jugador.estado == "ACTIVO" ? "deshabilitar" : "habilitar"
+            jugador.estado == "ACTIVO" ? "deshabilitar" : "habilitar",
           )
         }
       >
@@ -88,7 +86,16 @@ const CambioEstadoJugador = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              titulo={"Estado de los Jugadores"}
+              columnas={[
+                "id",
+                "nombre",
+                "apellido",
+                "dni",
+                "estado",
+                "acciones",
+              ]}
+              mensajeVacio="Todavía no hay jugadores registrados."
+              titulo={"Estado de los jugadores"}
               data={jugadoresConAcciones}
             />
           )}

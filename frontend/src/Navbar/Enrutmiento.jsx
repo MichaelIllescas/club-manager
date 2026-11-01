@@ -1,7 +1,5 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
-import {jwtDecode} from "jwt-decode"; 
-import { getCookie } from "../Auth/cookieUtils";
+import { useSession } from "../Auth/useSession";
 import Login from "../Index/Login"
 import Index from "../index/Index";
 import VerCuotas from "../Cuotas/VerCuotas";
@@ -14,7 +12,6 @@ import VerSocios from "../Socios/VerSocios";
 import RegistrarSocio from "../Socios/RegistrarSocio";
 import RegistroJugadores from "../Jugadores/RegistroJugadores";
 import VerJugadores from "../Jugadores/VerJugadores";
-import EditarJugador from "../Jugadores/EditarJugador";
 import CambioEstadoJugador from "../Jugadores/CambiarEstadoJugador";
 import RegistrarPago from "../Pagos/RegistrarPago ";
 import VerListadoGeneralPagos from "../Pagos/VerPagosGeneral";
@@ -32,16 +29,7 @@ import VerPerfil from "../Usuarios/VerPerfil";
 import UpdatePasswordForm from "../Usuarios/CambiarClave";
 
 const Enrrutado = () => {
-
-   // Obtener el valor de la cookie "authToken"
-    const token = getCookie("authToken");
-
-    // Decodificar el token para obtener el rol del usuario
-    let role = null;
-    if (token) {
-      const decoded = jwtDecode(token); // Uso correcto de jwtDecode
-      role = decoded.role; // Ajusta según tu JWT
-    }
+  const { rol: role } = useSession();
 
   return (
     <Routes>
@@ -68,7 +56,6 @@ const Enrrutado = () => {
 
       <Route path="/registrarJugador" element={<RegistroJugadores />} />
       <Route path="/verJugadores" element={<VerJugadores />} />
-      <Route path="/editarJugador" element={<EditarJugador />} />
       <Route path="/cambioEstado" element={<CambioEstadoJugador />} />
       <Route path="/listadoDeJugadoresPorCategoria" element={<FiltrarJugadoresPorCategoria/>}></Route>
       <Route path="/verPagosPorPeriodo" element={<VerPagosPorPeriodo/>}></Route>

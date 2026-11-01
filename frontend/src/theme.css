@@ -1,0 +1,294 @@
+/*
+ * Tema visual de Club Manager.
+ * Se carga después de Bootstrap y redefine sus variables y componentes.
+ *
+ * Paleta "club de barrio":
+ *   cancha  #1F5E3B  verde principal (botones, encabezados de tabla, foco)
+ *   tiza    #F4F6F1  fondo de la aplicación
+ *   tinta   #172A22  texto
+ *   escudo  #E0A731  acento puntual (sección activa, logo)
+ *   deuda   #B8432E  errores y montos adeudados
+ */
+
+:root {
+  --cm-cancha: #1f5e3b;
+  --cm-cancha-oscuro: #164a2e;
+  --cm-cancha-claro: #e6efe8;
+  --cm-tiza: #f4f6f1;
+  --cm-tinta: #172a22;
+  --cm-tinta-suave: #4e5d55;
+  --cm-escudo: #e0a731;
+  --cm-deuda: #b8432e;
+  --cm-linea: #d9e0d6;
+  --cm-blanco: #ffffff;
+  --cm-radio: 8px;
+  --cm-fuente: "Barlow", system-ui, sans-serif;
+  --cm-fuente-titulos: "Barlow Condensed", "Barlow", sans-serif;
+
+  --bs-body-font-family: var(--cm-fuente);
+  --bs-body-color: var(--cm-tinta);
+  --bs-body-bg: var(--cm-tiza);
+  --bs-primary: var(--cm-cancha);
+  --bs-primary-rgb: 31, 94, 59;
+  --bs-danger: var(--cm-deuda);
+  --bs-danger-rgb: 184, 67, 46;
+  --bs-link-color: var(--cm-cancha);
+  --bs-link-color-rgb: 31, 94, 59;
+  --bs-link-hover-color: var(--cm-cancha-oscuro);
+  --bs-border-color: var(--cm-linea);
+  --bs-border-radius: var(--cm-radio);
+  --bs-focus-ring-color: rgba(31, 94, 59, 0.25);
+}
+
+html,
+body.body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--cm-tiza);
+  color: var(--cm-tinta);
+  font-family: var(--cm-fuente);
+  font-size: 16px;
+}
+
+h1, h2, h3, h4, h5,
+.h1, .h2, .h3, .h4, .h5 {
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--cm-tinta);
+}
+
+/* Los títulos de página quedan alineados a la izquierda */
+.panel > h3:first-child,
+.panel > h2:first-child,
+.panel h3.text-center:first-child {
+  text-align: left !important;
+  font-size: 2rem;
+  margin-bottom: 1.25rem !important;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--cm-cancha-claro);
+}
+
+/* ---------- Paneles (antes cajas negras) ---------- */
+
+.panel {
+  background: var(--cm-blanco) !important;
+  color: var(--cm-tinta) !important;
+  border: 1px solid var(--cm-linea);
+  border-radius: var(--cm-radio);
+  box-shadow: 0 1px 2px rgba(23, 42, 34, 0.06);
+}
+
+.panel .text-white,
+.panel .text-light {
+  color: var(--cm-tinta) !important;
+}
+
+/* ---------- Formularios ---------- */
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--cm-tinta-suave);
+  margin-bottom: 0.3rem;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid var(--cm-linea);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  background-color: var(--cm-blanco);
+  color: var(--cm-tinta);
+}
+
+/* El selector reserva lugar a la derecha para la flecha */
+.form-select {
+  padding-right: 2.5rem !important;
+  background-position: right 0.75rem center;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--cm-cancha);
+  box-shadow: 0 0 0 3px rgba(31, 94, 59, 0.18);
+}
+
+.form-check-input:checked {
+  background-color: var(--cm-cancha);
+  border-color: var(--cm-cancha);
+}
+
+/* ---------- Botones ---------- */
+
+.btn {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.6rem;
+}
+
+.btn-primary,
+.btn-success {
+  --bs-btn-bg: var(--cm-cancha);
+  --bs-btn-border-color: var(--cm-cancha);
+  --bs-btn-hover-bg: var(--cm-cancha-oscuro);
+  --bs-btn-hover-border-color: var(--cm-cancha-oscuro);
+  --bs-btn-active-bg: var(--cm-cancha-oscuro);
+  --bs-btn-active-border-color: var(--cm-cancha-oscuro);
+  --bs-btn-disabled-bg: var(--cm-cancha);
+  --bs-btn-disabled-border-color: var(--cm-cancha);
+}
+
+.btn-danger {
+  --bs-btn-bg: var(--cm-deuda);
+  --bs-btn-border-color: var(--cm-deuda);
+  --bs-btn-hover-bg: #9a3725;
+  --bs-btn-hover-border-color: #9a3725;
+}
+
+.btn-warning {
+  --bs-btn-bg: var(--cm-escudo);
+  --bs-btn-border-color: var(--cm-escudo);
+  --bs-btn-color: var(--cm-tinta);
+  --bs-btn-hover-bg: #c99223;
+  --bs-btn-hover-border-color: #c99223;
+}
+
+.btn-secondary {
+  --bs-btn-bg: var(--cm-blanco);
+  --bs-btn-color: var(--cm-tinta);
+  --bs-btn-border-color: var(--cm-linea);
+  --bs-btn-hover-bg: var(--cm-cancha-claro);
+  --bs-btn-hover-color: var(--cm-tinta);
+  --bs-btn-hover-border-color: var(--cm-linea);
+}
+
+.btn:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--cm-escudo);
+  outline-offset: 2px;
+}
+
+/* ---------- Tablas ---------- */
+
+.table {
+  --bs-table-bg: var(--cm-blanco);
+  --bs-table-color: var(--cm-tinta);
+  --bs-table-striped-bg: #f7f9f6;
+  --bs-table-striped-color: var(--cm-tinta);
+  --bs-table-hover-bg: var(--cm-cancha-claro);
+  --bs-table-border-color: var(--cm-linea);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.table > thead th {
+  background: var(--cm-cancha);
+  color: var(--cm-blanco);
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  border-color: var(--cm-cancha-oscuro);
+  vertical-align: middle;
+}
+
+.table > tbody td {
+  vertical-align: middle;
+}
+
+.table-responsive {
+  border: 1px solid var(--cm-linea);
+  border-radius: var(--cm-radio);
+}
+
+/* ---------- Paginación y menús ---------- */
+
+.dropdown-menu {
+  border: 1px solid var(--cm-linea);
+  border-radius: var(--cm-radio);
+  box-shadow: 0 8px 24px rgba(23, 42, 34, 0.12);
+  padding: 0.35rem;
+}
+
+.dropdown-item {
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+  color: var(--cm-tinta);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--cm-cancha-claro);
+  color: var(--cm-tinta);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background: var(--cm-cancha);
+  color: var(--cm-blanco);
+}
+
+/* ---------- Modales ---------- */
+
+.modal-content {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 20px 50px rgba(23, 42, 34, 0.25);
+}
+
+.modal-header {
+  border-bottom: 2px solid var(--cm-cancha-claro);
+}
+
+.modal-title {
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--cm-linea);
+}
+
+/* ---------- Tarjetas ---------- */
+
+.card {
+  border: 1px solid var(--cm-linea);
+  border-radius: var(--cm-radio);
+  box-shadow: none;
+}
+
+.card-header {
+  background: var(--cm-blanco);
+  border-bottom: 1px solid var(--cm-linea);
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.text-danger {
+  color: var(--cm-deuda) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.btn-info {
+  --bs-btn-bg: var(--cm-blanco);
+  --bs-btn-color: var(--cm-cancha);
+  --bs-btn-border-color: var(--cm-cancha);
+  --bs-btn-hover-bg: var(--cm-cancha);
+  --bs-btn-hover-color: var(--cm-blanco);
+  --bs-btn-hover-border-color: var(--cm-cancha);
+}

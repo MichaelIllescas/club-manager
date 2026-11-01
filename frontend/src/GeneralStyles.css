@@ -1,21 +1,4 @@
-.body {
-  background-image: linear-gradient(135deg, #1f3b57 0%, #10202f 100%);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo negro con 50% de opacidad */
-  background-blend-mode: overlay;
-   height: 100%; /* Asegura que el cuerpo ocupe el 100% de la altura */
-  margin: 0;
-  padding: 0;
-}
 
-html{
-  height: 100%;
-  background: #000;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
 
 
 

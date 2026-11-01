@@ -1,0 +1,47 @@
+.resumen-lista {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 1.5rem;
+  background: var(--cm-blanco);
+  border: 1px solid var(--cm-linea);
+  border-top: 4px solid var(--cm-cancha);
+  border-radius: var(--cm-radio);
+}
+
+.resumen-lista__dato {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.5rem;
+  min-width: 0;
+}
+
+.resumen-lista__dato + .resumen-lista__dato {
+  border-left: 1px solid var(--cm-linea);
+}
+
+.resumen-lista__valor {
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--cm-tinta);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resumen-lista__nombre {
+  color: var(--cm-tinta-suave);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .resumen-lista {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen-lista__dato + .resumen-lista__dato {
+    border-left: 0;
+    border-top: 1px solid var(--cm-linea);
+  }
+}

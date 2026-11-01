@@ -1,36 +1,29 @@
-/* Reserva el espacio del footer fijo para que no tape tablas ni contenido */
+/* La página es una columna: el contenido crece y el pie queda abajo */
 #root {
-    --footer-space: 30px;
-    padding-bottom: var(--footer-space);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-@media (max-width: 576px) {
-    #root {
-        --footer-space: 40px;
-    }
+.sitio-footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: var(--cm-tinta-suave);
+  border-top: 1px solid var(--cm-linea);
+  background: var(--cm-blanco);
 }
 
-.sticky-footer {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    padding: 10px;
-    background-color: #f8f9fa;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+.sitio-footer a {
+  color: var(--cm-cancha);
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.author-link {
-    color: #4fc3f7;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+.sitio-footer a:hover {
+  text-decoration: underline;
 }
-
-.author-link:hover {
-    color: #81d4fa;
-    text-decoration: none;
-    text-shadow: 0 0 8px rgba(79, 195, 247, 0.6);
-}
-

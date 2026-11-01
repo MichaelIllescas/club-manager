@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import * as XLSX from "xlsx";
 
 const ExportToExcelButton = ({ data, fileName = "data.xlsx" }) => {
@@ -18,10 +18,16 @@ const ExportToExcelButton = ({ data, fileName = "data.xlsx" }) => {
   };
 
   return (
-    <button className="btn btn-success" onClick={handleExport}>
+    <button type="button" className="btn btn-secondary" onClick={handleExport}>
+      <i className="fas fa-file-excel me-2" aria-hidden="true"></i>
       Exportar a Excel
     </button>
   );
+};
+
+ExportToExcelButton.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  fileName: PropTypes.string,
 };
 
 export default ExportToExcelButton;

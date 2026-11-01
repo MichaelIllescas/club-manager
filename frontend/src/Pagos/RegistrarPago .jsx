@@ -1,7 +1,9 @@
+import PaginaAlta from "../Components/PaginaAlta";
+import { formatearFecha } from "../Utils/formatearFecha";
+import { formatearMoneda } from "../Utils/formatearMoneda";
+import "./RegistrarPago.css";
 import { useState, useEffect, useRef } from "react";
 import apiClient from "../Config/axiosConfig";
-import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
 import DescargarComprobante from "../Components/ComprobantePagoPDF";
 
 const RegistrarPago = () => {
@@ -25,7 +27,6 @@ const RegistrarPago = () => {
   const [mensaje, setMensaje] = useState("");
   const [mostrarModal, setMostrarModal] = useState(false);
   const [pagoRegistrado, setPagoRegistrado] = useState(null); // Guardar el pago confirmado
-
 
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +67,7 @@ const RegistrarPago = () => {
         persona.tipo === filtroTipo &&
         `${persona.nombre} ${persona.apellido}`
           .toLowerCase()
-          .includes(filtroNombre.toLowerCase())
+          .includes(filtroNombre.toLowerCase()),
     );
     setPersonasFiltradas(filtrados);
   }, [filtroNombre, filtroTipo, personas]);
@@ -109,12 +110,12 @@ const RegistrarPago = () => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
-  
+
     if (requestAbortController.current) {
       requestAbortController.current.abort();
     }
     requestAbortController.current = new AbortController();
-  
+
     const pagoRequest = {
       fechaPago: pago.fechaPago,
       monto: pago.monto,
@@ -122,14 +123,13 @@ const RegistrarPago = () => {
       cuota: { id: parseInt(pago.cuotaId) },
       jugador: pago.jugadorId ? { id: pago.jugadorId } : null,
       socio: pago.socioId ? { id: pago.socioId } : null,
-      
     };
-  
+
     try {
       const response = await apiClient.post("/api/pagos", pagoRequest, {
         signal: requestAbortController.current.signal,
       });
-  
+
       // Actualizar pagoRegistrado con la respuesta completa del backend
       setPagoRegistrado({
         id: response.data.id,
@@ -143,7 +143,7 @@ const RegistrarPago = () => {
         tipo: response.data.tipo,
         usuario_registro: response.data.usuario_registro,
       });
-  
+
       setMensaje("Pago registrado exitosamente.");
     } catch (error) {
       setMensaje("Error al registrar el pago.");
@@ -154,11 +154,11 @@ const RegistrarPago = () => {
       requestAbortController.current = null;
     }
   };
-  
+
   const handleCerrarModal = () => {
     setMostrarModal(false);
     setPagoRegistrado(null); // Limpiar comprobante al cerrar modal
-  
+
     // Restablecer los campos del formulario a sus valores iniciales
     setPago({
       fechaPago: "",
@@ -180,195 +180,211 @@ const RegistrarPago = () => {
     setFiltroNombre("");
   };
 
-
   return (
     <>
-      <Header />
-      <div className="mb-4 pb-5">
-        <div className="my-5 py-3">
-          <div className="container mt-5 bg-black text-light py-4 rounded">
-            <h2 className="text-center">Registrar Pago</h2>
-            <form onSubmit={handleAbrirModal}>
-              <div className="row">
-                <div className="col-lg-6 col-12 px-5">
-                  <div className="mb-3">
-                    <label className="form-label">Tipo de Persona</label>
-                    <select
-                      className="form-select w-100"
-                      value={filtroTipo}
-                      onChange={(e) => {
-                        setFiltroTipo(e.target.value);
-                        setPersonaSeleccionada(null);
-                        setFiltroNombre("");
-                      }}
-                    >
-                      <option value="jugador">Jugador</option>
-                      <option value="socio">Socio</option>
-                    </select>
-                  </div>
+      <PaginaAlta
+        titulo="Registrar pago"
+        intro="Buscá al socio o jugador, elegí la cuota y la fecha. Antes de guardar vas a poder revisar el pago y después descargar el comprobante."
+        ancha
+      >
+        <form onSubmit={handleAbrirModal}>
+          <div className="row">
+            <div className="col-lg-7 col-12">
+              <div className="mb-3">
+                <label className="form-label">Tipo de persona</label>
+                <select
+                  className="form-select w-100"
+                  value={filtroTipo}
+                  onChange={(e) => {
+                    setFiltroTipo(e.target.value);
+                    setPersonaSeleccionada(null);
+                    setFiltroNombre("");
+                  }}
+                >
+                  <option value="jugador">Jugador</option>
+                  <option value="socio">Socio</option>
+                </select>
+              </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Buscar {filtroTipo}</label>
-                    <div className="d-flex align-items-center">
-                      <input
-                        type="text"
-                        className="form-control w-100"
-                        placeholder={`Buscar ${filtroTipo}...`}
-                        value={filtroNombre}
-                        onChange={(e) => {
-                          if (!personaSeleccionada) {
-                            setFiltroNombre(e.target.value);
-                            setMenuVisible(true);
-                          }
-                        }}
-                        onFocus={() => setMenuVisible(true)}
-                        onBlur={() =>
-                          setTimeout(() => setMenuVisible(false), 200)
-                        }
-                        disabled={!!personaSeleccionada}
-                      />
+              <div className="mb-3">
+                <label className="form-label">Buscar {filtroTipo}</label>
+                <div className="d-flex align-items-center">
+                  <input
+                    type="text"
+                    className="form-control w-100"
+                    placeholder={`Buscar ${filtroTipo}...`}
+                    value={filtroNombre}
+                    onChange={(e) => {
+                      if (!personaSeleccionada) {
+                        setFiltroNombre(e.target.value);
+                        setMenuVisible(true);
+                      }
+                    }}
+                    onFocus={() => setMenuVisible(true)}
+                    onBlur={() => setTimeout(() => setMenuVisible(false), 200)}
+                    disabled={!!personaSeleccionada}
+                  />
 
-                      {personaSeleccionada && (
-                        <button
-                          className="btn btn-danger ms-2"
-                          onClick={handleResetSeleccion}
-                        >
-                          X
-                        </button>
-                      )}
-                    </div>
-
-                    {menuVisible && personasFiltradas.length > 0 && (
-                      <ul className="dropdown-menu show">
-                        {personasFiltradas.map((persona) => (
-                          <li
-                            key={persona.id}
-                            className="dropdown-item"
-                            onClick={() => handleSeleccionarPersona(persona)}
-                          >
-                            {persona.nombre} {persona.apellido} DNI N°{" "}
-                            {persona.dni}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Fecha de Pago</label>
-                    <input
-                      type="date"
-                      name="fechaPago"
-                      className="form-control w-100"
-                      value={pago.fechaPago}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Observaciones</label>
-                    <input
-                      type="text"
-                      name="descripcion"
-                      className="form-control w-100"
-                      value={pago.descripcion}
-                      onChange={handleChange}
-                      placeholder="Ingrese las observaciones del pago..."
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Cuota</label>
-                    <select
-                      name="cuotaId"
-                      className="form-select w-100"
-                      value={pago.cuotaId}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Seleccione una cuota</option>
-                      {cuotas.map((cuota) => (
-                        <option key={cuota.id} value={cuota.id}>
-                          {cuota.tipo} - ${cuota.monto}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="col-lg-6 col-12 px-5">
                   {personaSeleccionada && (
-                    <div className="mt-3 text-start">
-                      <h5>Datos del {filtroTipo} Seleccionado:</h5>
-                      <p>
-                        <strong>Nombre:</strong> {personaSeleccionada.nombre}
-                      </p>
-                      <p>
-                        <strong>Apellido:</strong>{" "}
-                        {personaSeleccionada.apellido}
-                      </p>
-                      <p>
-                        <strong>DNI:</strong> {personaSeleccionada.dni}
-                      </p>
-                    </div>
+                    <button
+                      className="btn btn-danger ms-2"
+                      onClick={handleResetSeleccion}
+                    >
+                      X
+                    </button>
                   )}
-
-                  {cuotaSeleccionada && (
-                    <div className="mt-3 text-start">
-                      <h5>Datos de la Cuota Seleccionada:</h5>
-                      <p>
-                        <strong>Tipo:</strong> {cuotaSeleccionada.tipo}
-                      </p>
-                      <p>
-                        <strong>Monto:</strong> ${cuotaSeleccionada.monto}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="mt-3 text-start">
-                    <h5>Detalles del Pago:</h5>
-                    <p>
-                      <strong>Fecha de Pago:</strong>{" "}
-                      {pago.fechaPago || "No seleccionada"}
-                    </p>
-                    <p>
-                      <strong>Descripción:</strong>{" "}
-                      {pago.descripcion || "No ingresada"}
-                    </p>
-                    
-                  </div>
                 </div>
+
+                {menuVisible && personasFiltradas.length > 0 && (
+                  <ul className="dropdown-menu show">
+                    {personasFiltradas.map((persona) => (
+                      <li
+                        key={persona.id}
+                        className="dropdown-item"
+                        onClick={() => handleSeleccionarPersona(persona)}
+                      >
+                        {persona.nombre} {persona.apellido} DNI N° {persona.dni}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
-              <div className="text-center">
-                <button type="submit" className="btn btn-primary mt-1">
-                  Registrar Pago
-                </button>
+              <div className="mb-3">
+                <label className="form-label">Fecha de pago</label>
+                <input
+                  type="date"
+                  name="fechaPago"
+                  className="form-control w-100"
+                  value={pago.fechaPago}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-            </form>
+
+              <div className="mb-3">
+                <label className="form-label">Observaciones</label>
+                <input
+                  type="text"
+                  name="descripcion"
+                  className="form-control w-100"
+                  value={pago.descripcion}
+                  onChange={handleChange}
+                  placeholder="Ingrese las observaciones del pago..."
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Cuota</label>
+                <select
+                  name="cuotaId"
+                  className="form-select w-100"
+                  value={pago.cuotaId}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccione una cuota</option>
+                  {cuotas.map((cuota) => (
+                    <option key={cuota.id} value={cuota.id}>
+                      {cuota.tipo} - {formatearMoneda(cuota.monto)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="col-lg-5 col-12">
+              <aside className="resumen-pago" aria-live="polite">
+                <h2 className="resumen-pago__titulo">Resumen del pago</h2>
+                <dl>
+                  <dt>Paga</dt>
+                  <dd>
+                    {personaSeleccionada
+                      ? `${personaSeleccionada.nombre} ${personaSeleccionada.apellido}`
+                      : "Elegí un socio o jugador"}
+                    {personaSeleccionada && (
+                      <span className="resumen-pago__detalle">
+                        DNI {personaSeleccionada.dni}
+                      </span>
+                    )}
+                  </dd>
+                  <dt>Cuota</dt>
+                  <dd>
+                    {cuotaSeleccionada
+                      ? cuotaSeleccionada.tipo
+                      : "Elegí una cuota"}
+                  </dd>
+                  <dt>Fecha de pago</dt>
+                  <dd>
+                    {pago.fechaPago
+                      ? formatearFecha(pago.fechaPago)
+                      : "Elegí la fecha"}
+                  </dd>
+                  {pago.descripcion && (
+                    <>
+                      <dt>Observaciones</dt>
+                      <dd>{pago.descripcion}</dd>
+                    </>
+                  )}
+                </dl>
+                <div className="resumen-pago__total">
+                  <span>Total</span>
+                  <strong>
+                    {formatearMoneda(
+                      cuotaSeleccionada ? cuotaSeleccionada.monto : 0,
+                    )}
+                  </strong>
+                </div>
+              </aside>
+            </div>
           </div>
-        </div>
-      </div>
 
-     {/* Modal */}
-     {mostrarModal && (
+          <div className="alta__acciones mt-3">
+            <button type="submit" className="btn btn-primary">
+              Revisar y registrar
+            </button>
+          </div>
+        </form>
+      </PaginaAlta>
+
+      {/* Modal */}
+      {mostrarModal && (
         <div className="modal d-block" tabIndex="-1">
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Confirmar Pago</h5>
-                <button type="button" className="btn-close" onClick={handleCerrarModal}></button>
+                <h5 className="modal-title">Confirmar pago</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handleCerrarModal}
+                ></button>
               </div>
               <div className="modal-body">
-                <p><strong>Fecha de Pago:</strong> {pago.fechaPago || "No seleccionada"}</p>
-                <p><strong>Monto:</strong> ${pago.monto}</p>
-                <p><strong>Cuota:</strong> {cuotaSeleccionada?.tipo || "No seleccionada"}</p>
+                <p>
+                  <strong>Fecha de pago:</strong>{" "}
+                  {pago.fechaPago
+                    ? formatearFecha(pago.fechaPago)
+                    : "No seleccionada"}
+                </p>
+                <p>
+                  <strong>Monto:</strong> {formatearMoneda(pago.monto)}
+                </p>
+                <p>
+                  <strong>Cuota:</strong>{" "}
+                  {cuotaSeleccionada?.tipo || "No seleccionada"}
+                </p>
                 {personaSeleccionada && (
                   <>
-                    <p><strong>Nombre:</strong> {personaSeleccionada.nombre}</p>
-                    <p><strong>Apellido:</strong> {personaSeleccionada.apellido}</p>
-                    <p><strong>DNI:</strong> {personaSeleccionada.dni}</p>
+                    <p>
+                      <strong>Nombre:</strong> {personaSeleccionada.nombre}
+                    </p>
+                    <p>
+                      <strong>Apellido:</strong> {personaSeleccionada.apellido}
+                    </p>
+                    <p>
+                      <strong>DNI:</strong> {personaSeleccionada.dni}
+                    </p>
                   </>
                 )}
               </div>
@@ -378,31 +394,35 @@ const RegistrarPago = () => {
                 </p>
               )}
               <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={handleCerrarModal}>Cerrar</button>
-                
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleCerrarModal}
+                >
+                  Cerrar
+                </button>
+
                 {pagoRegistrado ? (
                   <div className="text-center">
                     <button className="btn">
                       <DescargarComprobante pago={pagoRegistrado} />
                     </button>
-                    
                   </div>
                 ) : (
-                  <button className="btn btn-primary" onClick={handleConfirmarPago} disabled={isSubmitting}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleConfirmarPago}
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Registrando..." : "Confirmar"}
                   </button>
                 )}
-                       
               </div>
             </div>
           </div>
         </div>
       )}
-
-      <Footer />
-      </>
+    </>
   );
 };
-
 
 export default RegistrarPago;

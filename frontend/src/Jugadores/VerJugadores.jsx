@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
 import TableGeneric from "/src/Components/TableGeneric";
@@ -17,7 +17,6 @@ const VerJugadores = () => {
     try {
       const response = await apiClient.get("/api/jugadores");
 
-      
       setJugadores(response.data); // Asignar los jugadores al estado
     } catch (err) {
       console.error("Error al obtener los jugadores:", err);
@@ -54,7 +53,19 @@ const VerJugadores = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              titulo={"Ver Jugadores"}
+              columnas={[
+                "id",
+                "nombre",
+                "apellido",
+                "dni",
+                "telefono",
+                "email",
+                "fechaRegistro",
+                "categoria",
+                "estado",
+              ]}
+              mensajeVacio="Todavía no hay jugadores registrados."
+              titulo={"Jugadores"}
               data={jugadores}
               actions={actions}
             />

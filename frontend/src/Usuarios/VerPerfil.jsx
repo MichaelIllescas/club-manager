@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import { Modal, Button, Form } from "react-bootstrap";
-import Footer from "../Index/Footer";
-import Header from "../Navbar/Header";
+import { Link } from "react-router-dom";
+import PaginaAlta, { NotaLateral } from "../Components/PaginaAlta";
 
 const VerPerfil = () => {
- const [user, setUser] = useState({
-     id: null,
-     nombre: "",
-     apellido: "",
-     dni: "",
-     telefono: "",
-     direccion: "",
-     email: "",
-     estado: "activo",
-     rol: "", // Rol inicial como string vacío
-   });
+  const [user, setUser] = useState({
+    id: null,
+    nombre: "",
+    apellido: "",
+    dni: "",
+    telefono: "",
+    direccion: "",
+    email: "",
+    estado: "activo",
+    rol: "", // Rol inicial como string vacío
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -53,35 +53,58 @@ const VerPerfil = () => {
 
   return (
     <>
-      <Header />
-      <div className="container mt-5 pt-5">
+      <PaginaAlta
+        titulo="Mi perfil"
+        intro="Tus datos en el sistema. El email es el que usás para ingresar."
+        lateral={
+          <NotaLateral titulo="Tu cuenta">
+            <p className="mb-2">
+              Rol:{" "}
+              <strong>
+                {user.rol === "ADMIN" ? "Administrador" : "Usuario"}
+              </strong>
+            </p>
+            <p className="mb-3">
+              {user.rol === "ADMIN"
+                ? "Podés gestionar cuotas, categorías, usuarios y ver las recaudaciones."
+                : "Podés registrar socios, jugadores y pagos, y consultar los listados."}
+            </p>
+            <Link to="/actualziar-clave" className="btn btn-secondary">
+              <i className="fas fa-key me-2" aria-hidden="true"></i>Cambiar
+              contraseña
+            </Link>
+          </NotaLateral>
+        }
+      >
         {loading ? (
           <p>Cargando datos...</p>
         ) : error ? (
-          <p className="text-danger">{error}</p>
+          <div className="alert alert-danger">{error}</div>
         ) : (
           <>
-            
-            <div className="py-3 card bg-black text-light text-center col-lg-6 mx-auto">
-            <h1>Mi Perfil</h1>
-            <hr className="shadow"/>
-              <div className="card-body">
-                <p><strong>Nombre:</strong> {user.nombre}</p>
-                <p><strong>Apellido:</strong> {user.apellido}</p>
-                <p><strong>DNI:</strong> {user.dni}</p>
-                <p><strong>Email:</strong> {user.email}</p>
-                <p><strong>Teléfono:</strong> {user.telefono}</p>
-                <p><strong>Dirección:</strong> {user.direccion}</p>
-                <p><strong>Rol:</strong> {user.rol}</p>
-                <Button variant="primary" onClick={() => setShowModal(true)}>
-                  Actualizar datos
-                </Button>
-              </div>
+            <dl className="perfil">
+              <dt>Nombre</dt>
+              <dd>
+                {user.nombre} {user.apellido}
+              </dd>
+              <dt>DNI</dt>
+              <dd>{user.dni || "Sin cargar"}</dd>
+              <dt>Email</dt>
+              <dd>{user.email || "Sin cargar"}</dd>
+              <dt>Teléfono</dt>
+              <dd>{user.telefono || "Sin cargar"}</dd>
+              <dt>Dirección</dt>
+              <dd>{user.direccion || "Sin cargar"}</dd>
+            </dl>
+            <div className="alta__acciones">
+              <Button variant="primary" onClick={() => setShowModal(true)}>
+                <i className="fas fa-user-edit me-2" aria-hidden="true"></i>
+                Editar mis datos
+              </Button>
             </div>
           </>
         )}
-      </div>
-      <Footer />
+      </PaginaAlta>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>

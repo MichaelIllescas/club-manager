@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
 const EditarJugador = ({ playerId, onClose, onUpdate }) => {
@@ -71,7 +72,7 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
       <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Editar Jugador</h5>
+            <h5 className="modal-title">Editar jugador</h5>
             <button
               type="button"
               className="btn-close"
@@ -170,6 +171,12 @@ const EditarJugador = ({ playerId, onClose, onUpdate }) => {
       </div>
     </div>
   );
+};
+
+EditarJugador.propTypes = {
+  playerId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  onClose: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default EditarJugador;

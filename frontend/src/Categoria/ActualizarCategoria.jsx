@@ -1,9 +1,9 @@
+import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
 import { useState, useEffect } from "react";
-import Header from "../Navbar/Header";
-import Footer from "/src/Index/Footer";
-import apiClient from "../Config/axiosConfig"; 
+import apiClient from "../Config/axiosConfig";
 
 const ActualizarCategoria = () => {
+  const [recarga, setRecarga] = useState(0);
   const [categorias, setCategorias] = useState([]); // Estado para almacenar las categorías
   const [selectedCategoria, setSelectedCategoria] = useState(null); // Categoría seleccionada
   const [formData, setFormData] = useState({ type: "", descripcion: "" }); // Datos del formulario
@@ -32,7 +32,7 @@ const ActualizarCategoria = () => {
   const handleSelectChange = (e) => {
     const categoriaId = e.target.value;
     const selected = categorias.find(
-      (categoria) => categoria.id === parseInt(categoriaId, 10)
+      (categoria) => categoria.id === parseInt(categoriaId, 10),
     );
     setSelectedCategoria(selected);
     setFormData({ type: selected.nombre, descripcion: selected.descripcion });
@@ -62,10 +62,11 @@ const ActualizarCategoria = () => {
 
       await apiClient.put(
         `/api/categorias/${selectedCategoria.id}`,
-        updatedCategoria
+        updatedCategoria,
       ); // Llamada con apiClient
 
       setMessage({ text: "Categoría actualizada con éxito.", type: "success" });
+      setRecarga((n) => n + 1);
 
       // Actualizar la lista de categorías en el estado
       setCategorias((prevCategorias) =>
@@ -76,8 +77,8 @@ const ActualizarCategoria = () => {
                 nombre: formData.type,
                 descripcion: formData.descripcion,
               }
-            : cat
-        )
+            : cat,
+        ),
       );
 
       setSelectedCategoria(null); // Limpiar selección
@@ -95,112 +96,123 @@ const ActualizarCategoria = () => {
 
   return (
     <>
-      <Header />
-      <div className="mt-5 pt-3 pb-5 mb-5">
-        <div className="container mt-5 colg-sm-12 p-3 rounded col-lg-4 bg-dark text-light mb-5">
-          <h3 className="text-center mb-4">Actualizar Categoría</h3>
-          {loading ? (
-            <p className="text-center">Cargando categorías...</p>
-          ) : error ? (
-            <p className="text-center text-danger">{error}</p>
-          ) : (
-            <form onSubmit={handleSubmit} className="p-4 shadow">
-              {/* Selección de la categoría */}
-              <div className="mb-3">
-                <label htmlFor="categoriaSelect" className="form-label">
-                  Selecciona una categoría
-                </label>
-                <select
-                  id="categoriaSelect"
-                  className="form-select"
-                  onChange={handleSelectChange}
-                  defaultValue=""
-                  required
-                >
-                  <option value="" disabled>
-                    -- Selecciona --
+      <PaginaAlta
+        titulo="Actualizar categoría"
+        intro="Elegí la categoría y corregí su nombre o descripción. Los jugadores asignados la mantienen."
+        lateral={
+          <ListaRemota
+            url="/api/categorias"
+            titulo="Categorías actuales"
+            vacio="Todavía no hay categorías registradas."
+            recarga={recarga}
+            mapear={(c) => ({
+              id: c.id,
+              nombre: c.nombre,
+              detalle: c.descripcion,
+              valor: null,
+            })}
+          />
+        }
+      >
+        {loading ? (
+          <p className="text-center">Cargando categorías...</p>
+        ) : error ? (
+          <p className="text-center text-danger">{error}</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {/* Selección de la categoría */}
+            <div className="mb-3">
+              <label htmlFor="categoriaSelect" className="form-label">
+                Selecciona una categoría
+              </label>
+              <select
+                id="categoriaSelect"
+                className="form-select"
+                onChange={handleSelectChange}
+                defaultValue=""
+                required
+              >
+                <option value="" disabled>
+                  -- Selecciona --
+                </option>
+                {categorias.map((categoria) => (
+                  <option key={categoria.id} value={categoria.id}>
+                    {categoria.nombre}
                   </option>
-                  {categorias.map((categoria) => (
-                    <option key={categoria.id} value={categoria.id}>
-                      {categoria.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                ))}
+              </select>
+            </div>
 
-              {/* Mostrar datos actuales */}
-              {selectedCategoria && (
-                <div className="mb-3">
-                  <p>
-                    <strong>Categoría actual:</strong>{" "}
-                    {selectedCategoria.nombre}
-                  </p>
-                  <p>
-                    <strong>Descripción actual:</strong>{" "}
-                    {selectedCategoria.descripcion}
-                  </p>
-                </div>
-              )}
-
-              {/* Formulario para editar */}
-              {selectedCategoria && (
-                <>
-                  <div className="mb-3">
-                    <label htmlFor="type" className="form-label">
-                      Nuevo Nombre:
-                    </label>
-                    <input
-                      type="text"
-                      id="type"
-                      name="type"
-                      value={formData.type}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="descripcion" className="form-label">
-                      Nueva Descripción:
-                    </label>
-                    <input
-                      type="text"
-                      id="descripcion"
-                      name="descripcion"
-                      value={formData.descripcion}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Mensaje de confirmación o error */}
-              {message && (
-                <p
-                  className={`fw-bold text-center ${
-                    message.type === "success" ? "text-success" : "text-danger"
-                  }`}
-                >
-                  {message.text}
+            {/* Mostrar datos actuales */}
+            {selectedCategoria && (
+              <div className="mb-3">
+                <p>
+                  <strong>Categoría actual:</strong> {selectedCategoria.nombre}
                 </p>
-              )}
-
-              <div className="text-center">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={!selectedCategoria}
-                >
-                  Guardar Cambios
-                </button>
+                <p>
+                  <strong>Descripción actual:</strong>{" "}
+                  {selectedCategoria.descripcion}
+                </p>
               </div>
-            </form>
-          )}
-        </div>
-      </div>
-      <Footer />
+            )}
+
+            {/* Formulario para editar */}
+            {selectedCategoria && (
+              <>
+                <div className="mb-3">
+                  <label htmlFor="type" className="form-label">
+                    Nuevo nombre:
+                  </label>
+                  <input
+                    type="text"
+                    id="type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="descripcion" className="form-label">
+                    Nueva descripción:
+                  </label>
+                  <input
+                    type="text"
+                    id="descripcion"
+                    name="descripcion"
+                    value={formData.descripcion}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Mensaje de confirmación o error */}
+            {message && (
+              <p
+                className={`fw-bold text-center ${
+                  message.type === "success" ? "text-success" : "text-danger"
+                }`}
+              >
+                {message.text}
+              </p>
+            )}
+
+            <div className="text-center">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={!selectedCategoria}
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        )}
+      </PaginaAlta>
     </>
   );
 };

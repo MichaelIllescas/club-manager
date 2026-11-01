@@ -2,6 +2,7 @@ import  { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import logo from '../assets/img/logo.svg';
 import Footer from "./Footer";
+import "./Login.css";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -71,24 +72,33 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center shadow-lg pb-5 px-1"
-      style={{ minHeight: "calc(100vh - var(--footer-space))" }}
-    >
-      <div
-        className="card p-4 shadow"
-        style={{ maxWidth: "400px", width: "100%" }}
-      >
-        <div className="text-center mb-3">
-          <img
-            src={logo}
-            alt="Logo"
-            width="100"
-            className="rounded-circle"
-          />
-          <h4 className="mt-2">Iniciar Sesión</h4>
+    <div className="login">
+      <aside className="login__cancha" aria-hidden="true">
+        <svg className="login__lineas" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid slice">
+          <rect x="40" y="40" width="520" height="820" />
+          <line x1="40" y1="450" x2="560" y2="450" />
+          <circle cx="300" cy="450" r="90" />
+          <circle cx="300" cy="450" r="4" className="login__punto" />
+          <rect x="170" y="40" width="260" height="140" />
+          <rect x="235" y="40" width="130" height="55" />
+          <rect x="170" y="720" width="260" height="140" />
+          <rect x="235" y="805" width="130" height="55" />
+          <path d="M240 180 A70 70 0 0 0 360 180" />
+          <path d="M240 720 A70 70 0 0 1 360 720" />
+        </svg>
+        <div className="login__marca">
+          <img src={logo} alt="" width="88" height="88" />
+          <h1>Club Manager</h1>
+          <p>Socios, jugadores, cuotas y pagos del club en un solo lugar.</p>
         </div>
-        <form onSubmit={handleLogin}>
+      </aside>
+
+      <main className="login__formulario">
+        <form onSubmit={handleLogin} noValidate className="login__caja">
+          <img src={logo} alt="Club Manager" width="56" height="56" className="login__logo-movil" />
+          <h2>Ingresar</h2>
+          <p className="login__ayuda">Usá el email y la contraseña que te dio el administrador.</p>
+
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
               Email
@@ -97,43 +107,48 @@ const Login = () => {
               type="email"
               id="email"
               className="form-control"
-              placeholder="Ingrese su email"
+              placeholder="nombre@club.com"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <p id="errorEmail" className="text-danger"></p>
+            <p id="errorEmail" className="text-danger small mb-0"></p>
           </div>
-          <div className="mb-3 position-relative">
+
+          <div className="mb-3">
             <label htmlFor="password" className="form-label">
-              Password
+              Contraseña
             </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              className="form-control"
-              placeholder="Ingrese su contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <i
-              className={`bi ${
-                showPassword ? "bi-eye-slash" : "bi-eye"
-              } position-absolute`}
-              style={{
-                top: "38px",
-                right: "10px",
-                cursor: "pointer",
-              }}
-              onClick={togglePasswordVisibility}
-            ></i>
-            <p id="errorPassword" className="text-danger"></p>
+            <div className="login__clave">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                className="form-control"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="login__ver"
+                onClick={togglePasswordVisibility}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+              </button>
+            </div>
+            <p id="errorPassword" className="text-danger small mb-0"></p>
           </div>
+
           {errorMessage && (
-            <p className="text-danger text-center">{errorMessage}</p>
+            <div className="alert alert-danger py-2" role="alert">
+              {errorMessage}
+            </div>
           )}
-          <div className="form-check mb-3">
+
+          <div className="form-check mb-4">
             <input
               type="checkbox"
               className="form-check-input"
@@ -142,27 +157,26 @@ const Login = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
             />
             <label htmlFor="rememberMe" className="form-check-label">
-              Recordar email en este dispositivo
+              Recordar mi email en este equipo
             </label>
           </div>
-          <button type="submit" className="btn btn-primary w-100">
-            Iniciar Sesión
+
+          <button type="submit" className="btn btn-primary w-100 py-2">
+            Ingresar
           </button>
-        </form>
-        <div className="text-center mt-3">
-          <a
-            href="#"
-            className="text-primary text-decoration-none"
+
+          <button
+            type="button"
+            className="btn btn-link w-100 mt-2 text-decoration-none"
             data-bs-toggle="modal"
             data-bs-target="#forgotPasswordModal"
           >
-            ¿Olvidó su contraseña?
-          </a>
-        </div>
-      </div>
-      <Footer/>
+            Olvidé mi contraseña
+          </button>
+        </form>
+        <Footer />
+      </main>
 
-      {/* Modal */}
       <div
         className="modal fade"
         id="forgotPasswordModal"
@@ -170,29 +184,26 @@ const Login = () => {
         aria-labelledby="forgotPasswordModalLabel"
         aria-hidden="true"
       >
-        <div className="modal-dialog">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="forgotPasswordModalLabel">
-                Recuperar Contraseña
+                Recuperar contraseña
               </h5>
               <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
-                aria-label="Close"
+                aria-label="Cerrar"
               ></button>
             </div>
             <div className="modal-body">
-              Debe contactarse con el administrador del club para restablecer su contraseña.
+              Pedile al administrador del club que restablezca tu contraseña desde
+              Usuarios. Después vas a poder cambiarla desde tu perfil.
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cerrar
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                Entendido
               </button>
             </div>
           </div>

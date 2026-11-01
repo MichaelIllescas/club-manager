@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
 import TableGeneric from "/src/Components/TableGeneric";
@@ -65,14 +65,26 @@ const VerUsuarios = () => {
     <>
       <Header />
       <div className="d-flex justify-content-center align-content-center pt-1 pb-5 mb-3">
-        <div className="mt-5 col-lg-10 pb-5 ">
+        <div className="mt-5 col-lg-10 pb-5">
           {loading ? (
             <p className="text-center">Cargando usuarios...</p>
           ) : error ? (
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
-              titulo={"Ver Usuarios"}
+              columnas={[
+                "id",
+                "nombre",
+                "apellido",
+                "dni",
+                "telefono",
+                "direccion",
+                "email",
+                "estado",
+                "rol",
+              ]}
+              mensajeVacio="Todavía no hay usuarios registrados."
+              titulo={"Usuarios"}
               data={usuarios}
               actions={[
                 {
@@ -81,7 +93,7 @@ const VerUsuarios = () => {
                   onClick: (row) => setSelectedUserId(row.id),
                 },
                 {
-                  label: "Resetear Clave",
+                  label: "Restablecer contraseña",
                   className: "btn-info",
                   onClick: (row) => openResetModal(row.id),
                 },
@@ -112,7 +124,7 @@ const VerUsuarios = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="resetModalLabel">
-                Confirmar Reseteo de Clave
+                Confirmar reseteo de clave
               </h5>
               <button
                 type="button"
@@ -123,11 +135,7 @@ const VerUsuarios = () => {
             </div>
             <div className="modal-body">
               {resetMessage && (
-                <p
-                  className={`text-${
-                    isSuccess ? "success" : "danger"
-                  }`}
-                >
+                <p className={`text-${isSuccess ? "success" : "danger"}`}>
                   {resetMessage}
                 </p>
               )}

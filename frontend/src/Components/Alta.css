@@ -1,0 +1,190 @@
+/* Pantallas de alta: formulario a la izquierda y lo ya registrado a la derecha */
+
+.alta {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+.alta__panel {
+  padding: 1.75rem;
+}
+
+.alta__titulo {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.alta__intro {
+  color: var(--cm-tinta-suave);
+  margin: 0.25rem 0 1.5rem;
+  max-width: 34rem;
+}
+
+.alta__ayuda {
+  font-size: 0.85rem;
+  color: var(--cm-tinta-suave);
+  margin-top: 0.35rem;
+}
+
+.alta__contador {
+  float: right;
+  font-size: 0.8rem;
+  color: var(--cm-tinta-suave);
+}
+
+/* Vista previa de cómo va a quedar el registro */
+.alta__vista {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--cm-cancha-claro);
+  border-left: 4px solid var(--cm-cancha);
+  border-radius: 6px;
+}
+
+.alta__vista-etiqueta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--cm-tinta-suave);
+}
+
+.alta__vista-nombre {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.alta__vista-monto {
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 700;
+  font-size: 1.75rem;
+  color: var(--cm-cancha-oscuro);
+  white-space: nowrap;
+}
+
+.alta__acciones {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* Lista de lo ya registrado */
+.alta__lista-titulo {
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.alta__lista-sub {
+  color: var(--cm-tinta-suave);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.alta__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 26rem;
+  overflow-y: auto;
+}
+
+.alta__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--cm-linea);
+}
+
+.alta__item:last-child {
+  border-bottom: 0;
+}
+
+.alta__item-nombre {
+  font-weight: 600;
+}
+
+.alta__item-detalle {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--cm-tinta-suave);
+}
+
+.alta__item-valor {
+  font-weight: 700;
+  color: var(--cm-cancha-oscuro);
+  white-space: nowrap;
+}
+
+.alta__item--nuevo {
+  background: #fdf6e3;
+  margin: 0 -0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 6px;
+}
+
+.alta__vacio {
+  color: var(--cm-tinta-suave);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+@media (max-width: 992px) {
+  .alta {
+    grid-template-columns: 1fr;
+  }
+}
+
+.alta--sola {
+  grid-template-columns: minmax(0, 46rem);
+  justify-content: center;
+}
+
+.alta__nota {
+  color: var(--cm-tinta-suave);
+}
+
+.alta__nota ul {
+  padding-left: 1.1rem;
+  margin: 0.75rem 0 0;
+}
+
+.alta__nota li + li {
+  margin-top: 0.4rem;
+}
+
+.alta--ancha {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Datos de solo lectura, como en el perfil */
+.perfil {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0;
+  margin: 0 0 1.5rem;
+  border-top: 1px solid var(--cm-linea);
+}
+
+.perfil dt,
+.perfil dd {
+  margin: 0;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--cm-linea);
+}
+
+.perfil dt {
+  font-weight: 500;
+  color: var(--cm-tinta-suave);
+}
+
+.perfil dd {
+  font-weight: 600;
+}

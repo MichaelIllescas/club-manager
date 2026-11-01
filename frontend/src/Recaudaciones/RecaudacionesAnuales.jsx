@@ -1,5 +1,6 @@
 import Footer from "../index/Footer";
 import { formatearMoneda } from "../Utils/formatearMoneda";
+import { COLOR_ANIO, COLOR_ANIO_RELLENO, COLOR_ANTERIOR, opcionesGrafico } from "../Utils/estiloGraficos";
 import Header from "../Navbar/Header";
 import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
@@ -12,10 +13,11 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 
 // Registrar los componentes de Chart.js
-ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend, Filler);
 
 const VerRecaudacionesAnuales = () => {
   const [anioSeleccionado, setAnioSeleccionado] = useState(new Date().getFullYear());
@@ -58,46 +60,29 @@ const VerRecaudacionesAnuales = () => {
     labels: meses,
     datasets: [
       {
-        label: `Recaudaciones ${anioSeleccionado}`,
+        label: `${anioSeleccionado}`,
         data: datosAnuales,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderWidth: 2,
-        tension: 0.4,
+        borderColor: COLOR_ANIO,
+        backgroundColor: COLOR_ANIO_RELLENO,
+        pointBackgroundColor: COLOR_ANIO,
+        borderWidth: 3,
+        fill: true,
+        tension: 0.25,
       },
       {
-        label: `Recaudaciones ${anioSeleccionado - 1}`,
+        label: `${anioSeleccionado - 1} (año anterior)`,
         data: datosAnioAnterior,
-        borderColor: "rgba(192, 75, 75, 1)",
-        backgroundColor: "rgba(192, 75, 75, 0.2)",
+        borderColor: COLOR_ANTERIOR,
+        backgroundColor: COLOR_ANTERIOR,
+        pointBackgroundColor: COLOR_ANTERIOR,
         borderWidth: 2,
-        tension: 0.4,
+        borderDash: [6, 4],
+        tension: 0.25,
       },
     ],
   };
 
-  const options = {
-    locale: "es-AR",
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        labels: { color: "white" },
-      },
-      tooltip: { enabled: true },
-    },
-    scales: {
-      x: {
-        ticks: { color: "white" },
-        grid: { color: "rgba(255, 255, 255, 0.2)" },
-      },
-      y: {
-        ticks: { color: "white" },
-        grid: { color: "rgba(255, 255, 255, 0.2)" },
-      },
-    },
-  };
+  const options = opcionesGrafico();
 
   const totalRecaudaciones = datosAnuales.reduce((total, valor) => total + (valor || 0), 0);
   const totalRecaudacionesAnterior = datosAnioAnterior.reduce((total, valor) => total + (valor || 0), 0);
@@ -110,15 +95,15 @@ const VerRecaudacionesAnuales = () => {
     <>
       <Header />
       <div className="pt-5 pb-5">
-        <div className="container my-5 pt-5 pb-5 mb-5 bg-dark rounded">
+        <div className="container my-5 pt-5 pb-5 mb-5 panel rounded">
         <div className="text-center mb-4">
-          <h1>Recaudación Anual</h1>
-          <label htmlFor="anio" className="text-white">Seleccione el año: </label>
+          <h1>Recaudación anual</h1>
+          <label htmlFor="anio" className="">Seleccione el año: </label>
           <select
             id="anio"
             value={anioSeleccionado}
             onChange={(e) => setAnioSeleccionado(parseInt(e.target.value))}
-            className="form-select px-4 w-auto d-inline-block ms-5"
+            className="form-select w-auto d-inline-block ms-3"
           >
             {[...Array(10)].map((_, i) => (
               <option key={i} value={2025 + i}>{2025 + i}</option>
@@ -137,8 +122,8 @@ const VerRecaudacionesAnuales = () => {
                 <Line data={data} options={options} />
               </div>
               <div className="col-lg-4">
-                <div className="bg-dark text-light p-4 rounded">
-                  <h3 className="mb-3">Resumen Anual</h3>
+                <div className="panel p-4 rounded">
+                  <h3 className="mb-3">Resumen anual</h3>
                   <p><strong>Año seleccionado:</strong> {anioSeleccionado}</p>
                   <p><strong>Total recaudado en {anioSeleccionado}:</strong> {formatearMoneda(totalRecaudaciones)}</p>
                   <p><strong>Total recaudado en {anioSeleccionado - 1}:</strong> {formatearMoneda(totalRecaudacionesAnterior)}</p>
@@ -157,7 +142,7 @@ const VerRecaudacionesAnuales = () => {
 
             {/* Tabla de recaudaciones debajo de la gráfica */}
             <div className="mt-4">
-              <table className="table table-striped table-dark">
+              <table className="table table-striped">
                 <thead>
                   <tr>
                     <th>Mes</th>
@@ -180,8 +165,8 @@ const VerRecaudacionesAnuales = () => {
             </div>
 
             {/* Información al final en dispositivos pequeños */}
-            <div className="d-lg-none bg-dark text-light p-4 rounded mt-4">
-              <h3 className="mb-3">Resumen Anual</h3>
+            <div className="d-lg-none panel p-4 rounded mt-4">
+              <h3 className="mb-3">Resumen anual</h3>
               <p><strong>Año seleccionado:</strong> {anioSeleccionado}</p>
               <p><strong>Total recaudado en {anioSeleccionado}:</strong> {formatearMoneda(totalRecaudaciones)}</p>
               <p><strong>Total recaudado en {anioSeleccionado - 1}:</strong> {formatearMoneda(totalRecaudacionesAnterior)}</p>

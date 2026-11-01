@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import apiClient from "../Config/axiosConfig"; 
+import apiClient from "../Config/axiosConfig";
 import TableGeneric from "/src/components/TableGeneric";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
@@ -36,7 +36,7 @@ const VerPagosPorPeriodo = () => {
   // Actualiza la lista de pagos automáticamente cuando cambian los filtros
   useEffect(() => {
     fetchPagos();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diaSeleccionado, mesSeleccionado, añoSeleccionado]);
 
   // Agregar la columna de "Descargar Comprobante" después de recibir los datos
@@ -55,12 +55,12 @@ const VerPagosPorPeriodo = () => {
       <Header />
       <div className="pt-3 pb-3">
         <div className="container my-5 py-5">
-          <div className="bg-black text-light p-4 rounded">
-            <h2>Historial de pagos por Fecha</h2>
+          <div className="panel p-4 rounded">
+            <h2>Historial de pagos por fecha</h2>
 
             {/* Selector de Año */}
             <div className="mb-3">
-              <label className="form-label">Seleccionar Año:</label>
+              <label className="form-label">Seleccionar año:</label>
               <select
                 className="form-select w-100"
                 value={añoSeleccionado}
@@ -77,7 +77,7 @@ const VerPagosPorPeriodo = () => {
 
             {/* Selector de Mes */}
             <div className="mb-3">
-              <label className="form-label">Seleccionar Mes:</label>
+              <label className="form-label">Seleccionar mes:</label>
               <select
                 className="form-select w-100"
                 value={mesSeleccionado}
@@ -94,7 +94,7 @@ const VerPagosPorPeriodo = () => {
 
             {/* Selector de Día */}
             <div className="mb-3">
-              <label className="form-label">Seleccionar Día:</label>
+              <label className="form-label">Seleccionar día:</label>
               <select
                 className="form-select w-100"
                 value={diaSeleccionado}
@@ -112,13 +112,25 @@ const VerPagosPorPeriodo = () => {
             {/* Tabla de Pagos */}
             {loading ? (
               <p>Cargando pagos...</p>
-            ) : pagosConBoton.length > 0 ? (
+            ) : (
               <TableGeneric
-                titulo="Pagos Filtrados"
+                columnas={[
+                  "id",
+                  "nombre",
+                  "apellido",
+                  "dni",
+                  "categoria",
+                  "fechaPago",
+                  "monto",
+                  "descripcion",
+                  "tipo",
+                  "usuario_registro",
+                  "Comprobante",
+                ]}
+                mensajeVacio="No hay pagos en el período elegido."
+                titulo="Pagos encontrados"
                 data={pagosConBoton} // 🔥 Ahora los datos incluyen el botón de descarga
               />
-            ) : (
-              <p>No hay pagos disponibles para el período seleccionado.</p>
             )}
           </div>
         </div>

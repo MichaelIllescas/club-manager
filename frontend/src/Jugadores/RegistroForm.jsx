@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 
-const RegistroJugadorForm = () => {
+const RegistroJugadorForm = ({ onRegistrado }) => {
   const [jugador, setJugador] = useState({
     nombre: "",
     apellido: "",
@@ -18,9 +19,7 @@ const RegistroJugadorForm = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const response = await apiClient.get(
-          "/api/categorias"
-        );
+        const response = await apiClient.get("/api/categorias");
         setCategorias(response.data); // Guardamos las categorías en el estado
       } catch (error) {
         console.error("Error al cargar las categorías:", error);
@@ -38,7 +37,7 @@ const RegistroJugadorForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await apiClient.post("/api/jugadores", {
+      await apiClient.post("/api/jugadores", {
         nombre: jugador.nombre,
         apellido: jugador.apellido,
         dni: jugador.dni,
@@ -47,6 +46,7 @@ const RegistroJugadorForm = () => {
         categoria: { id: jugador.categoriaId },
       });
       setMensaje("Jugador registrado con éxito");
+      onRegistrado?.();
       setJugador({
         nombre: "",
         apellido: "",
@@ -58,19 +58,17 @@ const RegistroJugadorForm = () => {
     } catch (error) {
       setMensaje(
         error.response?.data?.message ||
-          "Ocurrió un error al registrar el jugador"
+          "Ocurrió un error al registrar el jugador",
       );
     }
   };
 
   return (
-    <div className="mt-1 ">
-      <h2 className="text-center mb-4">Registrar Jugador</h2>
-
-      <form onSubmit={handleSubmit} className=" p-1 rounded">
+    <div className="mt-1">
+      <form onSubmit={handleSubmit} className="p-1 rounded">
         <div className="row g-3">
           {/* Nombre */}
-          <div className="col-md-6 ">
+          <div className="col-md-6">
             <label htmlFor="nombre" className="form-label">
               Nombre
             </label>
@@ -183,6 +181,10 @@ const RegistroJugadorForm = () => {
       </form>
     </div>
   );
+};
+
+RegistroJugadorForm.propTypes = {
+  onRegistrado: PropTypes.func,
 };
 
 export default RegistroJugadorForm;

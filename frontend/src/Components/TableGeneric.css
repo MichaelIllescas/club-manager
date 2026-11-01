@@ -1,0 +1,119 @@
+.tabla {
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.tabla__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.tabla__titulo {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.tabla__total {
+  color: var(--cm-tinta-suave);
+}
+
+.tabla__herramientas {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tabla__buscar {
+  position: relative;
+  flex: 1;
+}
+
+.tabla__buscar i {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cm-tinta-suave);
+}
+
+.tabla__buscar .form-control {
+  padding-left: 2.4rem;
+}
+
+.tabla__columnas {
+  min-width: 14rem;
+  padding: 0.75rem 1rem;
+}
+
+.tabla__columnas .form-check + .form-check {
+  margin-top: 0.35rem;
+}
+
+.tabla .table td {
+  white-space: nowrap;
+}
+
+.tabla__orden {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.tabla__orden i {
+  opacity: 0.6;
+  font-size: 0.8em;
+}
+
+.tabla__acciones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tabla__paginas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  color: var(--cm-tinta-suave);
+}
+
+.estado {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.estado--activo {
+  background: var(--cm-cancha-claro);
+  color: var(--cm-cancha-oscuro);
+}
+
+.estado--anulado {
+  background: #f6e3df;
+  color: var(--cm-deuda);
+}
+
+.tabla .table td.tabla__vacia {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--cm-tinta-suave);
+  white-space: normal;
+}
+
+.tabla__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

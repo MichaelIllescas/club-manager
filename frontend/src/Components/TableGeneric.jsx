@@ -1,44 +1,79 @@
 import React, { useState, useMemo } from "react";
+import PropTypes from "prop-types";
 import "bootstrap/dist/css/bootstrap.min.css";
-import ExportToExcelButton from "./ExportToExcelButton"; 
+import ExportToExcelButton from "./ExportToExcelButton";
+import "./TableGeneric.css";
+
+// Nombres legibles para las columnas que vienen del backend
+const NOMBRES = {
+  id: "ID",
+  dni: "DNI",
+  telefono: "Teléfono",
+  direccion: "Dirección",
+  email: "Email",
+  rol: "Rol",
+  numeroSocio: "N° de socio",
+  fechaRegistro: "Fecha de registro",
+  fechaPago: "Fecha de pago",
+  usuario_registro: "Registró",
+  descripcion: "Descripción",
+  categoria: "Categoría",
+  actualizada: "Última actualización",
+  recaudado: "Recaudado",
+};
+
+// Los estados se muestran como etiquetas para distinguirlos de un vistazo
+const ESTADOS = { ACTIVO: "activo", HABILITADO: "activo", ANULADO: "anulado", INACTIVO: "anulado", DESHABILITADO: "anulado" };
+
+const celda = (valor) =>
+  typeof valor === "string" && ESTADOS[valor] ? (
+    <span className={`estado estado--${ESTADOS[valor]}`}>{valor.charAt(0) + valor.slice(1).toLowerCase()}</span>
+  ) : (
+    valor
+  );
+
+const nombreColumna = (clave) =>
+  NOMBRES[clave] ??
+  clave
+    .replace(/_/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .replace(/^./, (letra) => letra.toUpperCase());
 
 // `filtros`: controles extra opcionales que se muestran debajo de "Mostrar columnas"
-const TableGeneric = ({ titulo = "Título de la tabla", data, actions = [], filtros = null }) => {
+const TableGeneric = ({
+  titulo = "Título de la tabla",
+  data,
+  columnas = [],
+  actions = [],
+  filtros = null,
+  mensajeVacio = "Todavía no hay registros.",
+  accionPrincipal = null,
+}) => {
   const [filterInput, setFilterInput] = useState(""); // Estado del filtro
   const [currentPage, setCurrentPage] = useState(1); // Estado de la página actual
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" }); // Estado de ordenamiento
-  const [visibleColumns, setVisibleColumns] = useState({}); // Columnas visibles
+  const [hiddenColumns, setHiddenColumns] = useState({}); // Columnas ocultas por el usuario
   const itemsPerPage = 10; // Elementos por página
 
-  if (!data || data.length === 0) {
-    return (
-      <>
-        {filtros && <div className="mb-3">{filtros}</div>}
-        <p className="text-center mt-3 text-warning">No se encontraron datos disponibles.</p>
-      </>
-    );
-  }
-
-  const columns = useMemo(() => Object.keys(data[0]), [data]);
-
-  // Inicializar las columnas visibles la primera vez
-  useMemo(() => {
-    if (Object.keys(visibleColumns).length === 0) {
-      const initialColumns = {};
-      columns.forEach((col) => (initialColumns[col] = true));
-      setVisibleColumns(initialColumns);
-    }
-  }, [columns, visibleColumns]);
+  // Los hooks van antes de cualquier return: si la tabla pasa de vacía a tener datos,
+  // React necesita que se llamen siempre en el mismo orden.
+  const rows = useMemo(() => data ?? [], [data]);
+  // Sin datos, la tabla igual se muestra con las columnas que indica la pantalla
+  const columns = useMemo(
+    () => (rows.length > 0 ? Object.keys(rows[0]) : columnas),
+    [rows, columnas]
+  );
 
   // Filtrar datos por búsqueda
   const filteredData = useMemo(() => {
-    return data.filter((item) =>
+    return rows.filter((item) =>
       Object.values(item)
         .join(" ")
         .toLowerCase()
         .includes(filterInput.toLowerCase())
     );
-  }, [filterInput, data]);
+  }, [filterInput, rows]);
 
   // Ordenar datos
   const sortedData = useMemo(() => {
@@ -87,107 +122,146 @@ const TableGeneric = ({ titulo = "Título de la tabla", data, actions = [], filt
   };
 
   const handleColumnToggle = (column) => {
-    setVisibleColumns((prev) => ({
+    setHiddenColumns((prev) => ({
       ...prev,
       [column]: !prev[column],
     }));
   };
 
+  const isVisible = (column) => !hiddenColumns[column];
+
+  const columnasVisibles = columns.filter(isVisible).length + (actions.length > 0 ? 1 : 0);
+
   return (
-    <div className="container mt-5 p-3 bg-black text-white rounded">
-     
-      <div className="d-flex justify-content-between align-items-center mb-3">
-    <h3 className="h1">{titulo}</h3>
-    <ExportToExcelButton data={filteredData} fileName="tabla_datos.xlsx" />
-</div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <span>Total de elementos: {filteredData.length}</span>
-      </div>
-      <div className="mb-3">
-        <input
-          type="text"
-          value={filterInput}
-          onChange={(e) => setFilterInput(e.target.value)}
-          placeholder="Buscar en la tabla..."
-          className="form-control w-100"
-        />
-      </div>
-      {/* Configuración de columnas */}
-      <div className="mb-3">
-        <h5>Mostrar columnas:</h5>
-        {columns.map((column, index) => (
-          <div key={index} className="form-check form-check-inline">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id={`column-${column}`}
-              checked={visibleColumns[column]}
-              onChange={() => handleColumnToggle(column)}
-            />
-            <label className="form-check-label" htmlFor={`column-${column}`}>
-              {column}
-            </label>
+    <section className="tabla panel">
+      <header className="tabla__encabezado">
+        <div>
+          <h3 className="tabla__titulo">{titulo}</h3>
+          <span className="tabla__total">
+            {filteredData.length} {filteredData.length === 1 ? "registro" : "registros"}
+          </span>
+        </div>
+        <div className="tabla__botones">
+          <ExportToExcelButton data={filteredData} fileName="tabla_datos.xlsx" />
+          {accionPrincipal}
+        </div>
+      </header>
+
+      <div className="tabla__herramientas">
+        <div className="tabla__buscar">
+          <i className="fas fa-search" aria-hidden="true"></i>
+          <input
+            type="search"
+            value={filterInput}
+            onChange={(e) => {
+              setFilterInput(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Buscar en la tabla..."
+            aria-label="Buscar en la tabla"
+            className="form-control"
+          />
+        </div>
+        <div className="dropdown">
+          <button
+            type="button"
+            className="btn btn-secondary dropdown-toggle"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="outside"
+            aria-expanded="false"
+          >
+            <i className="fas fa-columns me-2" aria-hidden="true"></i>Columnas
+          </button>
+          <div className="dropdown-menu dropdown-menu-end tabla__columnas">
+            {columns.map((column) => (
+              <div key={column} className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`column-${column}`}
+                  checked={isVisible(column)}
+                  onChange={() => handleColumnToggle(column)}
+                />
+                <label className="form-check-label" htmlFor={`column-${column}`}>
+                  {nombreColumna(column)}
+                </label>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
+
       {filtros && <div className="mb-3">{filtros}</div>}
-      <div
-        className="table-responsive"
-        style={{ overflowX: "auto", maxWidth: "100%" }}
-      >
-        <table className="table table-bordered table-striped table-dark table-sm text-center">
+
+      <div className="table-responsive">
+        <table className="table table-striped table-hover align-middle">
           <thead>
             <tr>
               {columns.map(
-                (column, index) =>
-                  visibleColumns[column] && (
+                (column) =>
+                  isVisible(column) && (
                     <th
-                      key={index}
-                      style={{ whiteSpace: "nowrap", cursor: "pointer" }}
-                      onClick={() => handleSort(column)}
-                      title={`Ordenar por ${column}`}
+                      key={column}
+                      scope="col"
+                      aria-sort={
+                        sortConfig.key === column
+                          ? sortConfig.direction === "asc"
+                            ? "ascending"
+                            : "descending"
+                          : "none"
+                      }
                     >
-                      {column}{" "}
-                      {sortConfig.key === column ? (
-                        sortConfig.direction === "asc" ? (
-                          <span>&uarr;</span>
-                        ) : (
-                          <span>&darr;</span>
-                        )
-                      ) : (
-                        <span>&#x21c5;</span>
-                      )}
+                      <button
+                        type="button"
+                        className="tabla__orden"
+                        onClick={() => handleSort(column)}
+                        title={`Ordenar por ${nombreColumna(column)}`}
+                      >
+                        {nombreColumna(column)}
+                        <i
+                          className={`fas ${
+                            sortConfig.key !== column
+                              ? "fa-sort"
+                              : sortConfig.direction === "asc"
+                              ? "fa-sort-up"
+                              : "fa-sort-down"
+                          }`}
+                          aria-hidden="true"
+                        ></i>
+                      </button>
                     </th>
                   )
               )}
-              {actions.length > 0 && <th>Acciones</th>}
+              {actions.length > 0 && <th scope="col">Acciones</th>}
             </tr>
           </thead>
           <tbody>
+            {paginatedData.length === 0 && (
+              <tr>
+                <td colSpan={Math.max(columnasVisibles, 1)} className="tabla__vacia">
+                  {rows.length === 0 ? mensajeVacio : "Ningún registro coincide con la búsqueda."}
+                </td>
+              </tr>
+            )}
             {paginatedData.map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {columns.map(
-                  (column, colIndex) =>
-                    visibleColumns[column] && (
-                      <td key={colIndex} style={{ whiteSpace: "nowrap" }}>
-                        {row[column]}
-                      </td>
-                    )
+                  (column) => isVisible(column) && <td key={column}>{celda(row[column])}</td>
                 )}
                 {actions.length > 0 && (
                   <td>
-                    {actions.map((action, actionIndex) => (
-                      <button
-                        key={actionIndex}
-                        className={`btn btn-sm ${
-                          action.className || "btn-primary"
-                        } me-2`}
-                        onClick={() => action.onClick(row)}
-                      >
-                        {action.icon && React.createElement(action.icon)}{" "}
-                        {action.label}
-                      </button>
-                    ))}
+                    <div className="tabla__acciones">
+                      {actions.map((action, actionIndex) => (
+                        <button
+                          key={actionIndex}
+                          type="button"
+                          className={`btn btn-sm ${action.className || "btn-primary"}`}
+                          onClick={() => action.onClick(row)}
+                        >
+                          {action.icon && React.createElement(action.icon)} {action.label}
+                        </button>
+                      ))}
+                    </div>
                   </td>
                 )}
               </tr>
@@ -195,27 +269,49 @@ const TableGeneric = ({ titulo = "Título de la tabla", data, actions = [], filt
           </tbody>
         </table>
       </div>
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <button
-          className="btn btn-outline-light"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          {"< Anterior"}
-        </button>
-        <span>
-          Página {currentPage} de {totalPages}
-        </span>
-        <button
-          className="btn btn-outline-light"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          {"Siguiente >"}
-        </button>
-      </div>
-    </div>
+
+      {totalPages > 1 && (
+        <nav className="tabla__paginas" aria-label="Paginación">
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <i className="fas fa-chevron-left me-1" aria-hidden="true"></i>Anterior
+          </button>
+          <span>
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente<i className="fas fa-chevron-right ms-1" aria-hidden="true"></i>
+          </button>
+        </nav>
+      )}
+    </section>
   );
+};
+
+TableGeneric.propTypes = {
+  titulo: PropTypes.string,
+  data: PropTypes.arrayOf(PropTypes.object),
+  actions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      onClick: PropTypes.func.isRequired,
+      className: PropTypes.string,
+      icon: PropTypes.elementType,
+    })
+  ),
+  columnas: PropTypes.arrayOf(PropTypes.string),
+  filtros: PropTypes.node,
+  mensajeVacio: PropTypes.string,
+  accionPrincipal: PropTypes.node,
 };
 
 export default TableGeneric;

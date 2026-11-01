@@ -1,0 +1,104 @@
+.inicio {
+  padding-bottom: 3rem;
+}
+
+.inicio__encabezado {
+  margin: 1.5rem 0;
+}
+
+.inicio__encabezado h1 {
+  font-size: 2.75rem;
+  margin: 0;
+}
+
+.inicio__encabezado p {
+  color: var(--cm-tinta-suave);
+  margin: 0;
+}
+
+.inicio__titulo {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Marcador: los totales del club en una sola franja, como un tablero */
+.marcador {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 1.6fr;
+  background: var(--cm-tinta);
+  color: var(--cm-blanco);
+  border-radius: var(--cm-radio);
+  border-bottom: 4px solid var(--cm-escudo);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.marcador__dato {
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 1.5rem;
+}
+
+.marcador__dato + .marcador__dato {
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.marcador__valor {
+  font-family: var(--cm-fuente-titulos);
+  font-weight: 700;
+  font-size: 2.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.marcador__dato--total .marcador__valor {
+  color: var(--cm-escudo);
+}
+
+.marcador__nombre {
+  margin-top: 0.35rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+}
+
+.accesos {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.accesos__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--cm-linea);
+  border-radius: 6px;
+  color: var(--cm-tinta);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.accesos__item i {
+  width: 1.25rem;
+  color: var(--cm-cancha);
+}
+
+.accesos__item:hover {
+  background: var(--cm-cancha-claro);
+  border-color: var(--cm-cancha);
+  color: var(--cm-tinta);
+}
+
+@media (max-width: 768px) {
+  .marcador {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .marcador__dato:nth-child(3) {
+    border-left: 0;
+  }
+
+  .marcador__dato:nth-child(n + 3) {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+}

@@ -33,7 +33,7 @@ const FiltrarJugadoresPorCategoria = () => {
     setLoading(true); // Mostrar indicador de carga
     try {
       const response = await apiClient.get(
-        `/api/jugadores/categoria/${categoriaSeleccionada}`
+        `/api/jugadores/categoria/${categoriaSeleccionada}`,
       );
       setJugadores(response.data);
     } catch (error) {
@@ -53,10 +53,10 @@ const FiltrarJugadoresPorCategoria = () => {
       <Header />
       <div className="pt-3 pb-5">
         <div className="container my-5 py-5">
-          <div className="bg-black text-light p-3 rounded">
-            <h2>Filtrar Jugadores</h2>
+          <div className="panel p-3 rounded">
+            <h2>Filtrar jugadores</h2>
             <div className="mb-3">
-              <label className="form-label">Seleccionar Categoría:</label>
+              <label className="form-label">Seleccionar categoría:</label>
               <select
                 className="form-select w-100"
                 value={categoriaSeleccionada}
@@ -73,20 +73,23 @@ const FiltrarJugadoresPorCategoria = () => {
 
             {loading ? (
               <p>Cargando jugadores...</p>
-            ) : jugadores.length > 0 ? (
+            ) : (
               <TableGeneric
+                columnas={[
+                  "id",
+                  "nombre",
+                  "apellido",
+                  "dni",
+                  "telefono",
+                  "email",
+                  "fechaRegistro",
+                  "categoria",
+                  "estado",
+                ]}
+                mensajeVacio="No hay jugadores en esta categoría."
                 titulo="Jugadores"
                 data={jugadores}
-                columns={[
-                  { key: "nombre", label: "Nombre" },
-                  { key: "apellido", label: "Apellido" },
-                  { key: "dni", label: "DNI" },
-                  { key: "email", label: "Email" },
-                  { key: "telefono", label: "Teléfono" },
-                ]}
               />
-            ) : (
-              <p className="mt-5">No hay jugadores disponibles para esta categoría.</p>
             )}
           </div>
         </div>

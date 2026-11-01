@@ -1,0 +1,57 @@
+/* Resumen del pago, con el mismo aire que el comprobante en PDF */
+.resumen-pago {
+  border: 1px solid var(--cm-linea);
+  border-top: 4px solid var(--cm-cancha);
+  border-radius: var(--cm-radio);
+  padding: 1.25rem 1.5rem;
+  background: #fbfcfa;
+}
+
+.resumen-pago__titulo {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.resumen-pago dl {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 0.6rem 1rem;
+  margin: 0;
+}
+
+.resumen-pago dt {
+  font-weight: 500;
+  color: var(--cm-tinta-suave);
+}
+
+.resumen-pago dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.resumen-pago__detalle {
+  display: block;
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--cm-tinta-suave);
+}
+
+.resumen-pago__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--cm-linea);
+}
+
+.resumen-pago__total span {
+  font-weight: 600;
+  color: var(--cm-cancha);
+}
+
+.resumen-pago__total strong {
+  font-family: var(--cm-fuente-titulos);
+  font-size: 2rem;
+  color: var(--cm-tinta);
+}

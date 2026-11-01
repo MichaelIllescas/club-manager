@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import Header from "../Navbar/Header";
-import Footer from "../Index/Footer";
-import apiClient from "../Config/axiosConfig"; 
+import PaginaAlta, { ListaRemota } from "../Components/PaginaAlta";
+import { formatearMoneda } from "../Utils/formatearMoneda";
+import { useState, useEffect } from "react";
+import apiClient from "../Config/axiosConfig";
 const ActualizarCuotas = () => {
+  const [recarga, setRecarga] = useState(0);
   const [feeTypes, setFeeTypes] = useState([]); // Tipos de cuotas desde el backend
   const [selectedFeeType, setSelectedFeeType] = useState(null); // Tipo de cuota seleccionado
   const [formData, setFormData] = useState({ type: "", amount: "" }); // Datos del formulario
@@ -19,7 +20,7 @@ const ActualizarCuotas = () => {
       } catch (err) {
         console.error("Error al cargar los tipos de cuotas:", err);
         setError(
-          "No se pudieron cargar los tipos de cuotas. Intente nuevamente."
+          "No se pudieron cargar los tipos de cuotas. Intente nuevamente.",
         );
       } finally {
         setLoading(false);
@@ -33,7 +34,7 @@ const ActualizarCuotas = () => {
   const handleSelectChange = (e) => {
     const feeTypeId = e.target.value;
     const selected = feeTypes.find(
-      (feeType) => feeType.id === parseInt(feeTypeId, 10)
+      (feeType) => feeType.id === parseInt(feeTypeId, 10),
     );
     setSelectedFeeType(selected);
     setFormData({ type: selected.tipo, amount: selected.monto });
@@ -61,23 +62,21 @@ const ActualizarCuotas = () => {
         monto: parseFloat(formData.amount),
       };
 
-      await apiClient.put(
-        `/api/cuotas/${selectedFeeType.id}`,
-        updatedFee
-      );
+      await apiClient.put(`/api/cuotas/${selectedFeeType.id}`, updatedFee);
 
       setMessage({
         text: "Tipo de cuota actualizado con éxito.",
         type: "success",
       });
+      setRecarga((n) => n + 1);
 
       // Actualizar la lista de cuotas en el estado
       setFeeTypes((prevFeeTypes) =>
         prevFeeTypes.map((fee) =>
           fee.id === selectedFeeType.id
             ? { ...fee, tipo: formData.type, monto: formData.amount }
-            : fee
-        )
+            : fee,
+        ),
       );
 
       setSelectedFeeType(null); // Limpiar selección
@@ -93,99 +92,111 @@ const ActualizarCuotas = () => {
 
   return (
     <>
-      <Header />
-      <div className="mt-5 pt-3">
-        <div className="container mt-5 colg-sm-12 p-3 rounded col-lg-4 bg-dark text-light">
-          <h3 className="text-center mb-4">Actualizar Monto de Cuotas</h3>
-          {loading ? (
-            <p className="text-center">Cargando tipos de cuotas...</p>
-          ) : error ? (
-            <p className="text-center text-danger">{error}</p>
-          ) : (
-            <form onSubmit={handleSubmit} className="p-4 shadow">
-              {/* Selección del tipo de cuota */}
-              <div className="mb-3">
-                <label htmlFor="feeTypeSelect" className="form-label">
-                  Selecciona un tipo de cuota
-                </label>
-                <select
-                  id="feeTypeSelect"
-                  className="form-select"
-                  onChange={handleSelectChange}
-                  defaultValue=""
-                  required
-                >
-                  <option value="" disabled>
-                    -- Selecciona --
+      <PaginaAlta
+        titulo="Actualizar montos"
+        intro="Elegí la cuota y cargá el nuevo monto. Los pagos ya registrados conservan el monto con el que se cobraron."
+        lateral={
+          <ListaRemota
+            url="/api/cuotas"
+            titulo="Montos actuales"
+            vacio="Todavía no hay cuotas registradas."
+            recarga={recarga}
+            mapear={(c) => ({
+              id: c.id,
+              nombre: c.tipo,
+              detalle: null,
+              valor: formatearMoneda(c.monto),
+            })}
+          />
+        }
+      >
+        {loading ? (
+          <p className="text-center">Cargando tipos de cuotas...</p>
+        ) : error ? (
+          <p className="text-center text-danger">{error}</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {/* Selección del tipo de cuota */}
+            <div className="mb-3">
+              <label htmlFor="feeTypeSelect" className="form-label">
+                Selecciona un tipo de cuota
+              </label>
+              <select
+                id="feeTypeSelect"
+                className="form-select"
+                onChange={handleSelectChange}
+                defaultValue=""
+                required
+              >
+                <option value="" disabled>
+                  -- Selecciona --
+                </option>
+                {feeTypes.map((feeType) => (
+                  <option key={feeType.id} value={feeType.id}>
+                    {feeType.tipo}
                   </option>
-                  {feeTypes.map((feeType) => (
-                    <option key={feeType.id} value={feeType.id}>
-                      {feeType.tipo}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                ))}
+              </select>
+            </div>
 
-              {/* Mostrar datos actuales */}
-              {selectedFeeType && (
-                <div className="mb-3">
-                  <p>
-                    <strong>Tipo actual:</strong> {selectedFeeType.tipo}
-                  </p>
-                  <p>
-                    <strong>Monto actual:</strong> $
-                    {selectedFeeType.monto.toFixed(2)}
-                  </p>
-                </div>
-              )}
-
-              {/* Formulario para editar */}
-              {selectedFeeType && (
-                <>
-                  <div className="mb-3">
-                    <label htmlFor="amount" className="form-label">
-                      Nuevo Monto
-                    </label>
-                    <input
-                      type="number"
-                      id="amount"
-                      name="amount"
-                      value={formData.amount}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Mensaje de confirmación o error */}
-              {message && (
-                <p
-                  className={`fw-bold text-center ${
-                    message.type === "success" ? "text-success" : "text-danger"
-                  }`}
-                >
-                  {message.text}
+            {/* Mostrar datos actuales */}
+            {selectedFeeType && (
+              <div className="mb-3">
+                <p>
+                  <strong>Tipo actual:</strong> {selectedFeeType.tipo}
                 </p>
-              )}
-
-              <div className="text-center">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={!selectedFeeType}
-                >
-                  Guardar Cambios
-                </button>
+                <p>
+                  <strong>Monto actual:</strong> $
+                  {selectedFeeType.monto.toFixed(2)}
+                </p>
               </div>
-            </form>
-          )}
-        </div>
-      </div>
-      <Footer />
+            )}
+
+            {/* Formulario para editar */}
+            {selectedFeeType && (
+              <>
+                <div className="mb-3">
+                  <label htmlFor="amount" className="form-label">
+                    Nuevo monto
+                  </label>
+                  <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Mensaje de confirmación o error */}
+            {message && (
+              <p
+                className={`fw-bold text-center ${
+                  message.type === "success" ? "text-success" : "text-danger"
+                }`}
+              >
+                {message.text}
+              </p>
+            )}
+
+            <div className="text-center">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={!selectedFeeType}
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        )}
+      </PaginaAlta>
     </>
   );
 };

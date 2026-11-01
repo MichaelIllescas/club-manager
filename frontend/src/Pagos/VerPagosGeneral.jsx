@@ -17,7 +17,9 @@ const VerListadoGeneralPagos = () => {
   const pagosFiltrados =
     tipoFiltro === "todos"
       ? pagos
-      : pagos.filter((pago) => esPagoDeJugador(pago) === (tipoFiltro === "jugador"));
+      : pagos.filter(
+          (pago) => esPagoDeJugador(pago) === (tipoFiltro === "jugador"),
+        );
 
   useEffect(() => {
     const fetchPagos = async () => {
@@ -27,7 +29,9 @@ const VerListadoGeneralPagos = () => {
         // Formatear fechas y agregar la columna con el botón de descarga
         // Del más nuevo al más viejo (se ordena antes de formatear la fecha)
         const ordenados = [...response.data].sort(
-          (a, b) => new Date(b.fechaPago) - new Date(a.fechaPago) || (b.id ?? 0) - (a.id ?? 0)
+          (a, b) =>
+            new Date(b.fechaPago) - new Date(a.fechaPago) ||
+            (b.id ?? 0) - (a.id ?? 0),
         );
 
         const formattedPagos = ordenados.map((cuota) => ({
@@ -68,8 +72,22 @@ const VerListadoGeneralPagos = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <TableGeneric
+              columnas={[
+                "id",
+                "nombre",
+                "apellido",
+                "dni",
+                "categoria",
+                "fechaPago",
+                "monto",
+                "descripcion",
+                "tipo",
+                "usuario_registro",
+                "Comprobante",
+              ]}
+              mensajeVacio="Todavía no hay pagos registrados."
               key={tipoFiltro}
-              titulo={"Listado General de Pagos Registrados"}
+              titulo={"Pagos registrados"}
               data={pagosFiltrados} // 🔥 Ahora los datos incluyen el botón sin modificar TableGeneric
               filtros={
                 <div className="d-flex align-items-center gap-2">

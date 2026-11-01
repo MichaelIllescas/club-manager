@@ -12,7 +12,7 @@ describe("TableGeneric", () => {
 
   it("muestra un aviso cuando no hay datos", () => {
     render(<TableGeneric data={[]} />);
-    expect(screen.getByText("No se encontraron datos disponibles.")).toBeTruthy();
+    expect(screen.getByText("Todavía no hay registros.")).toBeTruthy();
   });
 
   it("pagina de a 10 filas", () => {
@@ -36,5 +36,23 @@ describe("TableGeneric", () => {
     render(<TableGeneric data={socios.slice(0, 1)} actions={[{ label: "Editar", onClick: editar }]} />);
     fireEvent.click(screen.getByText("Editar"));
     expect(editar).toHaveBeenCalledWith(socios[0]);
+  });
+});
+
+describe("TableGeneric con datos que llegan después", () => {
+  afterEach(cleanup);
+
+  it("pasa de vacía a tener datos sin romperse", () => {
+    const { rerender } = render(<TableGeneric data={[]} />);
+    expect(screen.getByText("Todavía no hay registros.")).toBeTruthy();
+
+    rerender(<TableGeneric data={socios} />);
+    expect(screen.getByText("Socio 01")).toBeTruthy();
+  });
+
+  it("oculta una columna al destildarla", () => {
+    render(<TableGeneric data={socios.slice(0, 1)} />);
+    fireEvent.click(screen.getByLabelText("DNI"));
+    expect(screen.queryByText("30000000")).toBeNull();
   });
 });

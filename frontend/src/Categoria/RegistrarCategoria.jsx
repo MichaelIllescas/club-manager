@@ -1,111 +1,179 @@
-import  { useState } from "react";
-import "./RegistrarCategoria.css";
-import NavBar from "/src/NavBar/NavBar";
-import Footer from "/src/Index/Footer";
-import apiClient from "../Config/axiosConfig"; 
+import { useEffect, useState } from "react";
+import Header from "../Navbar/Header";
+import Footer from "../Index/Footer";
+import apiClient from "../Config/axiosConfig";
+import "../Components/Alta.css";
+
+const MAX_DESCRIPCION = 255;
 
 const RegistrarCategoria = () => {
   const [categoria, setCategoria] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [mensaje, setMensaje] = useState(null); // Estado para mensajes de éxito o error
-  const [loading, setLoading] = useState(false); // Estado para manejar el botón de carga
+  const [mensaje, setMensaje] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [categorias, setCategorias] = useState([]);
+  const [ultimaId, setUltimaId] = useState(null);
+
+  const cargarCategorias = async () => {
+    try {
+      const response = await apiClient.get("/api/categorias");
+      setCategorias(response.data);
+    } catch (error) {
+      console.error("Error al cargar las categorías:", error);
+    }
+  };
+
+  useEffect(() => {
+    cargarCategorias();
+  }, []);
+
+  const nombreRepetido = categorias.some(
+    (c) => c.nombre?.trim().toLowerCase() === categoria.trim().toLowerCase()
+  );
+
+  const limpiar = () => {
+    setCategoria("");
+    setDescripcion("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMensaje(null); // Reinicia el mensaje
-  
+    setMensaje(null);
+
     try {
-      const nuevaCategoria = {
+      const response = await apiClient.post("/api/categorias", {
         nombre: categoria.trim(),
         descripcion: descripcion.trim(),
-      };
-  
-      console.log("Datos enviados:", nuevaCategoria); // Log para verificar
-  
-      const response = await apiClient.post("/api/categorias", nuevaCategoria);
-  
-      setMensaje({ texto: "Categoría registrada con éxito.", tipo: "success" });
-      console.log("Respuesta del servidor:", response.data);
-  
-      // Limpiar formulario
-      setCategoria("");
-      setDescripcion("");
+      });
+      setMensaje({ texto: `Se registró la categoría "${categoria.trim()}".`, tipo: "success" });
+      setUltimaId(response.data?.id ?? null);
+      limpiar();
+      cargarCategorias();
     } catch (error) {
-      console.error("Error al registrar la categoría:", error);
       setMensaje({
         texto:
           error.response?.data?.error ||
-          "Error al registrar la categoría. Verifique los datos ingresados.",
+          "No se pudo registrar la categoría. Revisá el nombre.",
         tipo: "error",
       });
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <>
-      <NavBar />
-      <div className="container mt-5 pt-3 d-flex justify-content-center">
-        <div className="bg-dark p-3 d-flex justify-content-center align-items-center rounded pt-5 mt-5 col-sm-10 col-lg-4">
-          <form
-            onSubmit={handleSubmit}
-            className="d-flex flex-column align-items-center"
-          >
-            <h1 className="text-center text-white mb-4">Registrar Categoría</h1>
+      <Header />
+      <main className="container alta">
+        <section className="panel alta__panel">
+          <h1 className="alta__titulo">Registrar categoría</h1>
+          <p className="alta__intro">
+            Las categorías agrupan a los jugadores, por ejemplo por edad o por división. Cada
+            jugador se asigna a una y los pagos se pueden consultar por categoría.
+          </p>
 
-            <div className="mb-3 w-100">
-              <label htmlFor="categoria" className="form-label text-white">
-                Categoría:
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="categoria" className="form-label">
+                Nombre
               </label>
               <input
                 type="text"
-                className="form-control"
                 id="categoria"
+                className={`form-control ${nombreRepetido ? "is-invalid" : ""}`}
+                placeholder="Ej: Sub 15"
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                placeholder="Ej: Sexta División"
+                maxLength={100}
                 required
               />
+              {nombreRepetido ? (
+                <div className="invalid-feedback">Ya existe una categoría con ese nombre.</div>
+              ) : (
+                <div className="alta__ayuda">Es el nombre que se ve en los listados y filtros.</div>
+              )}
             </div>
 
-            <div className="mb-3 w-100 mt-4">
-              <label htmlFor="descripcion" className="form-label text-white">
-                Descripción:
+            <div className="mb-3">
+              <label htmlFor="descripcion" className="form-label">
+                Descripción
+                <span className="alta__contador">
+                  {descripcion.length}/{MAX_DESCRIPCION}
+                </span>
               </label>
               <textarea
-                className="form-control"
                 id="descripcion"
+                className="form-control"
+                placeholder="Ej: Jugadores nacidos en 2011 y 2012"
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                rows="3"
-                placeholder="Ej: de 12 a 14 años"
+                maxLength={MAX_DESCRIPCION}
+                rows="4"
               />
+              <div className="alta__ayuda">Opcional. Sirve para aclarar quiénes entran en la categoría.</div>
             </div>
 
-            {/* Mostrar mensaje de éxito o error */}
+            <div className="alta__vista" aria-live="polite">
+              <div>
+                <span className="alta__vista-etiqueta">Así se va a ver en los listados</span>
+                <span className="alta__vista-nombre">{categoria.trim() || "Nombre de la categoría"}</span>
+                <span className="alta__item-detalle">{descripcion.trim() || "Sin descripción"}</span>
+              </div>
+            </div>
+
             {mensaje && (
-              <p
-                className={`fw-bold text-center ${
-                  mensaje.tipo === "success" ? "text-success" : "text-danger"
-                }`}
+              <div
+                className={`alert ${mensaje.tipo === "success" ? "alert-success" : "alert-danger"}`}
+                role="status"
               >
                 {mensaje.texto}
-              </p>
+              </div>
             )}
 
-            <button
-              type="submit"
-              className="btn btn-primary mt-3"
-              disabled={loading}
-            >
-              {loading ? "Registrando..." : "Registrar"}
-            </button>
+            <div className="alta__acciones">
+              <button type="button" className="btn btn-secondary" onClick={limpiar} disabled={loading}>
+                Limpiar
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading || nombreRepetido}
+              >
+                {loading ? "Registrando..." : "Registrar categoría"}
+              </button>
+            </div>
           </form>
-        </div>
-      </div>
+        </section>
 
+        <aside className="panel alta__panel">
+          <h2 className="alta__lista-titulo">Categorías actuales</h2>
+          <p className="alta__lista-sub">
+            {categorias.length === 1
+              ? "1 categoría registrada"
+              : `${categorias.length} categorías registradas`}
+          </p>
+          {categorias.length === 0 ? (
+            <p className="alta__vacio">
+              Todavía no hay categorías. La primera que registres aparece acá.
+            </p>
+          ) : (
+            <ul className="alta__lista">
+              {categorias.map((c) => (
+                <li
+                  key={c.id}
+                  className={`alta__item ${c.id === ultimaId ? "alta__item--nuevo" : ""}`}
+                >
+                  <span>
+                    <span className="alta__item-nombre">{c.nombre}</span>
+                    {c.descripcion && <span className="alta__item-detalle">{c.descripcion}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </aside>
+      </main>
       <Footer />
     </>
   );

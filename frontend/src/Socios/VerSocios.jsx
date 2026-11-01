@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../Navbar/Header";
 import TableGeneric from "/src/Components/TableGeneric";
 import apiClient from "../Config/axiosConfig";
@@ -53,7 +53,6 @@ function VerSocios() {
       label: "Editar",
       className: "btn-warning m-auto",
       onClick: handleEditClick,
-      
     },
   ];
 
@@ -68,25 +67,35 @@ function VerSocios() {
           }}
         >
           {/* Contenedor de la tabla */}
-          <div className="w-100" >
+          <div className="w-100">
             {loading ? (
               <p>Cargando datos...</p>
             ) : error ? (
               <p className="text-danger">{error}</p>
             ) : (
-              
-                <TableGeneric
-                  titulo={"Ver Socios Registrados"} // Título dinámico corregido
-                  data={socios}
-                  actions={actions}
-                  
-                />
-              
+              <TableGeneric
+                columnas={[
+                  "id",
+                  "nombre",
+                  "apellido",
+                  "dni",
+                  "telefono",
+                  "email",
+                  "numeroSocio",
+                  "fechaRegistro",
+                  "direccion",
+                  "estado",
+                ]}
+                mensajeVacio="Todavía no hay socios registrados."
+                titulo={"Socios"} // Título dinámico corregido
+                data={socios}
+                actions={actions}
+              />
             )}
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
 
       {/* Modal ActualizarSocio */}
       {showModal && socioId && (

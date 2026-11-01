@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 
 const CustomDropdown = ({ items, onSelect, labelKey, valueKey }) => {
@@ -51,6 +52,13 @@ const CustomDropdown = ({ items, onSelect, labelKey, valueKey }) => {
       )}
     </div>
   );
+};
+
+CustomDropdown.propTypes = {
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onSelect: PropTypes.func.isRequired,
+  labelKey: PropTypes.string.isRequired,
+  valueKey: PropTypes.string.isRequired,
 };
 
 export default CustomDropdown;

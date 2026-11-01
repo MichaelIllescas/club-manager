@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "../Navbar/Header";
 import Footer from "../Index/Footer";
 import TableGeneric from "/src/Components/TableGeneric";
@@ -66,7 +66,7 @@ const CambioEstadoUsuario = () => {
         onClick={() =>
           handleActionClick(
             usuario,
-            usuario.estado === "ACTIVO" ? "anular" : "habilitar"
+            usuario.estado === "ACTIVO" ? "anular" : "habilitar",
           )
         }
       >
@@ -79,7 +79,7 @@ const CambioEstadoUsuario = () => {
     <>
       <Header />
       <div className="pb-5 mb-5 px-1">
-        <div className=" pb-5 mb-5  pt-2 mt-2 vh-50">
+        <div className="pb-5 mb-5 pt-2 mt-2 vh-50">
           <div className="d-flex justify-content-center align-content-center">
             <div className="mt-5 col-lg-12 text-center">
               {loading ? (
@@ -88,7 +88,17 @@ const CambioEstadoUsuario = () => {
                 <p className="text-center text-danger">{error}</p>
               ) : (
                 <TableGeneric
-                  titulo={"Estado de los Usuarios"}
+                  columnas={[
+                    "id",
+                    "nombre",
+                    "apellido",
+                    "dni",
+                    "email",
+                    "estado",
+                    "acciones",
+                  ]}
+                  mensajeVacio="Todavía no hay usuarios registrados."
+                  titulo={"Estado de los usuarios"}
                   data={usuariosConAcciones}
                 />
               )}
@@ -96,7 +106,6 @@ const CambioEstadoUsuario = () => {
           </div>
         </div>
       </div>
-     
 
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>

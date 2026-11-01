@@ -1,7 +1,8 @@
 import Footer from "../Index/Footer";
 import { formatearMoneda } from "../Utils/formatearMoneda";
 import Header from "../Navbar/Header";
-import React, { useState, useEffect } from "react";
+import { COLOR_ANIO, COLOR_ANTERIOR, opcionesGrafico } from "../Utils/estiloGraficos";
+import { useState, useEffect } from "react";
 import apiClient from "../Config/axiosConfig";
 import { Bar } from "react-chartjs-2";
 import {
@@ -69,34 +70,23 @@ const VerRecaudacionesTrimestrales = () => {
     labels: trimestresLabels,
     datasets: [
       {
-        label: `Recaudaciones ${anioSeleccionado}`,
+        label: `${anioSeleccionado}`,
         data: datosTrimestrales,
-        backgroundColor: ["rgba(75, 192, 192, 0.6)", "rgba(54, 162, 235, 0.6)", "rgba(255, 206, 86, 0.6)", "rgba(153, 102, 255, 0.6)"],
-        borderColor: ["rgba(75, 192, 192, 1)", "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(153, 102, 255, 1)"],
+        backgroundColor: COLOR_ANIO,
+        borderRadius: 4,
         borderWidth: 1,
       },
       {
-        label: `Recaudaciones ${anioSeleccionado - 1}`,
+        label: `${anioSeleccionado - 1} (año anterior)`,
         data: datosAnioAnterior,
-        backgroundColor: "rgba(192, 75, 75, 0.6)",
-        borderColor: "rgba(192, 75, 75, 1)",
+        backgroundColor: COLOR_ANTERIOR,
+        borderRadius: 4,
         borderWidth: 1,
       },
     ],
   };
 
-  const options = {
-    locale: "es-AR",
-    responsive: true,
-    plugins: {
-      legend: { display: true, position: "top", labels: { color: "white" } },
-      tooltip: { enabled: true },
-    },
-    scales: {
-      x: { ticks: { color: "white" }, grid: { color: "rgba(255, 255, 255, 0.2)" } },
-      y: { ticks: { color: "white" }, grid: { color: "rgba(255, 255, 255, 0.2)" } },
-    },
-  };
+  const options = opcionesGrafico();
 
   const totalRecaudaciones = datosTrimestrales.reduce((total, valor) => total + (valor || 0), 0);
   const totalRecaudacionesAnterior = datosAnioAnterior.reduce((total, valor) => total + (valor || 0), 0);
@@ -109,15 +99,15 @@ const VerRecaudacionesTrimestrales = () => {
     <>
       <Header />
       <div className="my-5 pt-1 pb-5">
-        <div className="container my-5 bg-dark py-3  rounded my-5">
+        <div className="container my-5 panel py-3 rounded my-5">
           <div className="text-center mb-4">
-            <h1>Recaudación Trimestral</h1>
-            <label htmlFor="anio"className="text-white">Seleccione el año: </label>
+            <h1>Recaudación trimestral</h1>
+            <label htmlFor="anio"className="">Seleccione el año: </label>
             <select
               id="anio"
               value={anioSeleccionado}
               onChange={(e) => setAnioSeleccionado(parseInt(e.target.value))}
-              className="form-select w-auto d-inline-block ms-4"
+              className="form-select w-auto d-inline-block ms-3"
             >
               {[...Array(10)].map((_, i) => (
                 <option key={i} value={2025 + i}>{2025 + i}</option>
@@ -136,8 +126,8 @@ const VerRecaudacionesTrimestrales = () => {
                   <Bar data={data} options={options} />
                 </div>
                 <div className="col-lg-4">
-                  <div className="bg-dark text-light p-4 rounded">
-                    <h3 className="mb-3">Resumen Trimestral</h3>
+                  <div className="panel p-4 rounded">
+                    <h3 className="mb-3">Resumen trimestral</h3>
                     <p><strong>Año seleccionado:</strong> {anioSeleccionado}</p>
                     <p><strong>Total recaudado en {anioSeleccionado}:</strong> {formatearMoneda(totalRecaudaciones)}</p>
                     <p><strong>Total recaudado en {anioSeleccionado - 1}:</strong> {formatearMoneda(totalRecaudacionesAnterior)}</p>
@@ -148,7 +138,7 @@ const VerRecaudacionesTrimestrales = () => {
               </div>
 
               <div className="mt-4">
-                <table className="table table-striped table-dark">
+                <table className="table table-striped">
                   <thead>
                     <tr>
                       <th>Trimestre</th>

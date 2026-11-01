@@ -1,24 +1,28 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "../Navbar/Header";
 import Footer from "../index/Footer";
 import TableGeneric from "/src/Components/TableGeneric";
+import ResumenLista from "../Components/ResumenLista";
 import apiClient from "../Config/axiosConfig";
-import { FaEdit, FaTrash, FaInfoCircle } from "react-icons/fa";
+import { useSession } from "../Auth/useSession";
 
 const VerCategoria = () => {
-  const [categorias, setCategorias] = useState([]); // Estado para almacenar las categorías
-  const [loading, setLoading] = useState(true); // Estado para manejar el spinner o carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-
-  const actions = [];
+  const { rol } = useSession();
+  const [categorias, setCategorias] = useState([]);
+  const [jugadores, setJugadores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCategorias = async () => {
+    const fetchDatos = async () => {
       try {
-        const response = await apiClient.get(
-          "/api/categorias"
-        );
-        setCategorias(response.data); // Asignar las categorías al estado
+        const [respuestaCategorias, respuestaJugadores] = await Promise.all([
+          apiClient.get("/api/categorias"),
+          apiClient.get("/api/jugadores").catch(() => ({ data: [] })),
+        ]);
+        setCategorias(respuestaCategorias.data);
+        setJugadores(Array.isArray(respuestaJugadores.data) ? respuestaJugadores.data : []);
       } catch (err) {
         console.error("Error al obtener las categorías:", err);
         setError("No se pudieron cargar las categorías. Intente nuevamente.");
@@ -27,27 +31,58 @@ const VerCategoria = () => {
       }
     };
 
-    fetchCategorias(); // Llama a la función al montar el componente
+    fetchDatos();
   }, []);
+
+  // Jugadores activos de cada categoría
+  const activos = jugadores.filter((jugador) => jugador.estado === "ACTIVO");
+  const filas = categorias.map((categoria) => ({
+    id: categoria.id,
+    nombre: categoria.nombre,
+    descripcion: categoria.descripcion || "Sin descripción",
+    jugadores: activos.filter((jugador) => jugador.categoria === categoria.nombre).length,
+  }));
+
+  const masJugadores = filas.reduce((max, fila) => (fila.jugadores > (max?.jugadores ?? 0) ? fila : max), null);
 
   return (
     <>
       <Header />
-      <div className="d-flex justify-content-center align-content-center pt-4 pb-5 mb-5">
-      <div className="mt-5 col-lg-6 pb-5 mb-5">
-          {loading ? (
-            <p className="text-center">Cargando categorías...</p>
-          ) : error ? (
-            <p className="text-center text-danger">{error}</p>
-          ) : (
-            <TableGeneric
-              titulo={"Ver Categorías"}
-              data={categorias}
-              actions={actions}
+      <main className="container pb-5">
+        {loading ? (
+          <p className="mt-4">Cargando categorías...</p>
+        ) : error ? (
+          <div className="alert alert-danger mt-4">{error}</div>
+        ) : (
+          <>
+            <ResumenLista
+              datos={[
+                { nombre: "Categorías", valor: categorias.length },
+                { nombre: "Jugadores activos", valor: activos.length },
+                {
+                  nombre: masJugadores
+                    ? `La más numerosa (${masJugadores.jugadores} jugadores)`
+                    : "La más numerosa",
+                  valor: masJugadores ? masJugadores.nombre : "—",
+                },
+              ]}
             />
-          )}
-        </div>
-      </div>
+            <TableGeneric
+              columnas={["id", "nombre", "descripcion", "jugadores"]}
+              mensajeVacio="Todavía no hay categorías registradas."
+              titulo="Categorías"
+              data={filas}
+              accionPrincipal={
+                rol === "ADMIN" && (
+                  <Link to="/RegistarCategoria" className="btn btn-primary">
+                    <i className="fas fa-plus me-2" aria-hidden="true"></i>Nueva categoría
+                  </Link>
+                )
+              }
+            />
+          </>
+        )}
+      </main>
       <Footer />
     </>
   );

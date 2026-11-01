@@ -1,65 +1,78 @@
-import { Line } from "react-chartjs-2";
+import PropTypes from "prop-types";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  LineElement,
-  PointElement,
+  BarElement,
   CategoryScale,
   LinearScale,
   Tooltip,
-  Legend,
 } from "chart.js";
+import { formatearMoneda } from "../Utils/formatearMoneda";
 
-// Registrar componentes de Chart.js
-ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip);
 
+const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+const CANCHA = "#1f5e3b";
+const ESCUDO = "#e0a731";
+const LINEA = "#e3e8e1";
+const TINTA_SUAVE = "#4e5d55";
+
+// Recaudación de cada mes del año; el mes actual se resalta en dorado
 const GraficoIndex = ({ data }) => {
-  const meses = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ];
+  const mesActual = new Date().getMonth();
 
-  // Configuración de datos del gráfico
   const chartData = {
-    labels: meses,
+    labels: MESES,
     datasets: [
       {
-        label: "Recaudaciones Mensuales",
-        data: data || [], // Utiliza los datos pasados como prop
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderWidth: 2,
-        tension: 0.4,
+        label: "Recaudación",
+        data: data || [],
+        backgroundColor: MESES.map((_, i) => (i === mesActual ? ESCUDO : CANCHA)),
+        borderRadius: 4,
+        maxBarThickness: 42,
       },
     ],
   };
 
-  // Opciones del gráfico
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: true,
-        position: "top",
-      },
+      legend: { display: false },
       tooltip: {
-        enabled: true,
+        callbacks: {
+          label: (contexto) => formatearMoneda(contexto.parsed.y),
+        },
       },
     },
     scales: {
       x: {
-        ticks: {
-          color: "black",
-        },
+        grid: { display: false },
+        ticks: { color: TINTA_SUAVE, font: { family: "Barlow", size: 13 } },
       },
       y: {
+        beginAtZero: true,
+        suggestedMax: 1000,
+        grid: { color: LINEA },
+        border: { display: false },
         ticks: {
-          color: "black",
+          color: TINTA_SUAVE,
+          font: { family: "Barlow", size: 12 },
+          callback: (valor) => formatearMoneda(valor).replace(",00", ""),
         },
       },
     },
   };
 
-  return <Line data={chartData} options={chartOptions} />;
+  return (
+    <div style={{ height: 300 }}>
+      <Bar data={chartData} options={chartOptions} />
+    </div>
+  );
+};
+
+GraficoIndex.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string])).isRequired,
 };
 
 export default GraficoIndex;

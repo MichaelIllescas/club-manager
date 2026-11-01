@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Club Manager">
-  <path d="M60 6 104 22v34c0 29-19 49-44 58C35 105 16 85 16 56V22Z" fill="#1f3b57" stroke="#e8b04a" stroke-width="5"/>
-  <text x="60" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#ffffff">CM</text>
+  <path d="M60 6 104 22v34c0 29-19 49-44 58C35 105 16 85 16 56V22Z" fill="#1f5e3b" stroke="#e0a731" stroke-width="5"/>
+  <path d="M16 46h88" stroke="#ffffff" stroke-opacity=".35" stroke-width="3"/>
+  <text x="60" y="80" text-anchor="middle" font-family="'Barlow Condensed', Arial Narrow, sans-serif" font-size="40" font-weight="700" fill="#ffffff">CM</text>
 </svg>

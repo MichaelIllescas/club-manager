@@ -11,7 +11,7 @@ const FiltrarHistorial = () => {
   const [personasFiltradas, setPersonasFiltradas] = useState([]);
   const [historial, setHistorial] = useState([]);
   const [personaSeleccionada, setPersonaSeleccionada] = useState(null);
-  const [historialConBoton, setHistorialConBoton] = useState([]); 
+  const [historialConBoton, setHistorialConBoton] = useState([]);
 
   // Obtener jugadores y socios
   useEffect(() => {
@@ -48,7 +48,7 @@ const FiltrarHistorial = () => {
     const filtrados = personas.filter((persona) =>
       `${persona.nombre} ${persona.apellido}`
         .toLowerCase()
-        .includes(filtro.toLowerCase())
+        .includes(filtro.toLowerCase()),
     );
     setPersonasFiltradas(filtrados);
   }, [filtro, personas]);
@@ -83,9 +83,7 @@ const FiltrarHistorial = () => {
   const handleSeleccionarPersona = (persona) => {
     setPersonaSeleccionada(persona);
     fetchHistorial(persona.id, persona.tipo);
-    setFiltro(
-      `${persona.nombre} ${persona.apellido} DNI N° ${persona.dni}`
-    );
+    setFiltro(`${persona.nombre} ${persona.apellido} DNI N° ${persona.dni}`);
     setPersonasFiltradas([]);
   };
 
@@ -94,8 +92,8 @@ const FiltrarHistorial = () => {
       <Header />
       <div className="pt-3 pb-5">
         <div className="container my-5 py-5">
-          <div className="bg-black text-light p-3 rounded">
-            <h2>Filtrar Historial de Pagos de Jugadores o Socios</h2>
+          <div className="panel p-3 rounded">
+            <h2>Filtrar historial de pagos de jugadores o socios</h2>
             <div className="mb-3">
               <label className="form-label">Buscar jugador o socio:</label>
               <input
@@ -130,19 +128,29 @@ const FiltrarHistorial = () => {
                 <h4>
                   Historial de {personaSeleccionada.nombre}{" "}
                   {personaSeleccionada.apellido} (
-                  {personaSeleccionada.tipo === "jugador"
-                    ? "Jugador"
-                    : "Socio"}
+                  {personaSeleccionada.tipo === "jugador" ? "Jugador" : "Socio"}
                   )
                 </h4>
-                {historialConBoton.length > 0 ? (
+                {
                   <TableGeneric
+                    columnas={[
+                      "id",
+                      "nombre",
+                      "apellido",
+                      "dni",
+                      "categoria",
+                      "fechaPago",
+                      "monto",
+                      "descripcion",
+                      "tipo",
+                      "usuario_registro",
+                      "Comprobante",
+                    ]}
+                    mensajeVacio="Esta persona todavía no tiene pagos registrados."
                     titulo="Historial"
                     data={historialConBoton} // Ahora incluye la columna con el botón
                   />
-                ) : (
-                  <p>No hay historial disponible para esta persona.</p>
-                )}
+                }
               </div>
             )}
           </div>
